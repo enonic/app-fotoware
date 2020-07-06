@@ -36,25 +36,25 @@ dependencies {
 	//include "com.enonic.xp:lib-context:${xpVersion}"
 	//include "com.enonic.xp:lib-event:${xpVersion}"
 	//include "com.enonic.xp:lib-i18n:${xpVersion}"
-	//include "com.enonic.xp:lib-io:${xpVersion}"
+	include "com.enonic.xp:lib-io:${xpVersion}"
 	//include "com.enonic.xp:lib-mail:${xpVersion}"
 	//include "com.enonic.xp:lib-mustache:${xpVersion}"
 	//include "com.enonic.xp:lib-node:${xpVersion}"
 	//include "com.enonic.xp:lib-portal:${xpVersion}"
 	//include "com.enonic.xp:lib-repo:${xpVersion}"
-	//include "com.enonic.xp:lib-task:${xpVersion}"
+	include "com.enonic.xp:lib-task:${xpVersion}"
 	//include "com.enonic.xp:lib-thymeleaf:${xpVersion}"
 	//include "com.enonic.xp:lib-websocket:${xpVersion}"
 	//include "com.enonic.xp:lib-xslt:${xpVersion}"
 
 	//include 'com.enonic.lib:lib-cache:2.1.1'
 	//include 'com.enonic.lib:lib-guillotine:1.0.1'
-	//include 'com.enonic.lib:lib-http-client:2.0.0'
+	include 'com.enonic.lib:lib-http-client:2.1.2'
 	//include 'com.enonic.lib:lib-license:2.0.0'
 	//include 'com.enonic.lib:lib-router:2.1.0'
 	//include 'com.enonic.lib:menu:1.3.3'
-	//include 'com.enonic.lib:text-encoding:1.2.0'
-	//include 'com.enonic.lib:util:2.2.1'
+	include 'com.enonic.lib:lib-text-encoding:2.0.0'
+	include 'com.enonic.lib:lib-util:2.2.1'
 }
 
 
