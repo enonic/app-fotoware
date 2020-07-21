@@ -32,13 +32,13 @@ export const getCollectionList = ({
 
 	const {
 		//add,
-		data: archives//,
+		data: collections//,
 		//paging//,
 		//reorder,
 		//searchURL
 	} = collectionListResponseBodyObj;
 	//log.info(`paging:${toStr(paging)}`);
 	return {
-		archives
+		collections
 	};
 }; // export const getCollectionList

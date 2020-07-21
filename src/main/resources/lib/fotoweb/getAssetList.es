@@ -18,7 +18,7 @@ export const getAssetList = ({
 			access_token: accessToken
 		};
 	}
-	log.info(`assetListRequestParams:${toStr(assetListRequestParams)}`);
+	//log.info(`assetListRequestParams:${toStr(assetListRequestParams)}`);
 	const assetListResponse = request(assetListRequestParams);
 	//log.info(`assetListResponse:${toStr(assetListResponse)}`);
 
@@ -28,7 +28,7 @@ export const getAssetList = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! assetListListResponse:${toStr(assetListResponse)}`);
 	}
-	log.info(`assetListResponseBodyObj:${toStr(assetListResponseBodyObj)}`);
+	//log.info(`assetListResponseBodyObj:${toStr(assetListResponseBodyObj)}`);
 
 	const {
 		data: assets,

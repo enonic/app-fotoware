@@ -1,15 +1,24 @@
 import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
-import {getSiteConfig as getSiteConfigByKey} from '/lib/xp/content';
-import {run} from '/lib/xp/context';
+import {sanitize} from '/lib/xp/common';
+import {
+	get as getContentByKey,
+	getSiteConfig as getSiteConfigByKey
+} from '/lib/xp/content';
+import {
+	get as getContext,
+	run
+} from '/lib/xp/context';
 import {submit} from '/lib/xp/task';
 
-import {getPublicAPIDescriptor} from '../../lib/fotoweb/getPublicAPIDescriptor';
+//import {getPublicAPIDescriptor} from '../../lib/fotoweb/getPublicAPIDescriptor';
 import {getAccessToken} from '../../lib/fotoweb/getAccessToken';
 import {getprivateFullAPIDescriptor} from '../../lib/fotoweb/getprivateFullAPIDescriptor';
 import {getCollectionList} from '../../lib/fotoweb/getCollectionList';
+import {createOrModifyArchive} from '../../lib/fotoweb/createOrModifyArchive';
 //import {getCollection} from '../../lib/fotoweb/getCollection';
 import {getAssetList} from '../../lib/fotoweb/getAssetList';
+import {requestRendition} from '../../lib/fotoweb/requestRendition';
 
 export const get = ({
 	params: {
@@ -104,39 +113,80 @@ export const get = ({
 						});
 						//log.info(`accessToken:${toStr(accessToken)}`);
 						const {
-							archivesPath//,
-							//renditionRequest
+							archivesPath,
+							renditionRequest
 						} = getprivateFullAPIDescriptor({
 							accessToken,
 							hostname
 						});
 						//log.info(`archivesPath:${toStr(archivesPath)}`);
 						//log.info(`renditionRequest:${toStr(renditionRequest)}`);
-						const {archives} = getCollectionList({
+						const {collections} = getCollectionList({
 							accessToken,
 							url: `${hostname}${archivesPath}`
 						});
-						//log.info(`archives:${toStr(archives)}`);
-						//log.info(`archives[0]:${toStr(archives[0])}`);
+						//log.info(`collections:${toStr(collections)}`);
+						//log.info(`collections[0]:${toStr(collections[0])}`);
 
-						/* TODO Only needed when a collection has children
-						const {
-							/*name,
-							href,
-							assets
-						} = getCollection({
-							accessToken,
-							url: `${hostname}${archives[0].href}`
-						});
-						log.info(`assets[0]:${toStr(assets[0])}`);*/
+						const draftContext = getContext();
+						draftContext.branch = 'draft'; // create/modify in draft then publish
+						//log.info(`draftContext:${toStr(draftContext)}`);
 
-						const {
-							assets
-						} = getAssetList({
-							accessToken,
-							url: `${hostname}${archives[0].href}`
-						});
-						log.info(`assets[0]:${toStr(assets[0])}`);
+						run(draftContext, () => {
+							const folderContent = getContentByKey({key: privateFolder});
+							//log.info(`folderContent:${toStr(folderContent)}`);
+							const parentPath = folderContent._path;
+							const {
+								name: collectionName,
+								href: collectionHref
+							} = collections[0];
+							//log.info(`collectionName:${toStr(collectionName)}`);
+							//log.info(`href:${toStr(href)}`);
+							const {createdOrModifiedArchiveContent} = createOrModifyArchive({
+								parentPath,
+								//name: sanitize(href.replace(archivesPath, '').replace(/\/$/, '')), // NOPE private archives has public href :(
+								name: sanitize(collectionHref.replace('/fotoweb/archives/', '').replace(/\/$/, '')),
+								displayName: collectionName
+							});
+							log.info(`createdOrModifiedArchiveContent:${toStr(createdOrModifiedArchiveContent)}`);
+
+							/* TODO Only needed when a collection has children
+							const {
+								/*name,
+								href,
+								assets
+							} = getCollection({
+								accessToken,
+								url: `${hostname}${archives[0].href}`
+							});
+							log.info(`assets[0]:${toStr(assets[0])}`);*/
+
+							const {
+								assets
+							} = getAssetList({
+								accessToken,
+								url: `${hostname}${collections[0].href}`
+							});
+							//log.info(`assets[0]:${toStr(assets[0])}`);
+							const {renditions} = assets[0];
+							const {
+								href: renditionHref/*,
+								display_name: displayName,
+								description,
+								width,
+								height,
+								default: isDefault,
+								original,
+								sizeFixed,
+								profile*/
+							} = renditions.filter(({original}) => original === true)[0];
+							requestRendition({
+								accessToken,
+								renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
+								//renditionUrl: `${hostname}${renditionHref}`
+								renditionUrl: renditionHref
+							});
+						}); // draftContext.run
 					} // if private
 				} // task
 			}); // submit
