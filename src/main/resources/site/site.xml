@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
 	<form>
-		<input name="baseUrl" type="TextLine">
-  			<label>FotoWeb Url</label>
-			<help-text>https://company.fotoware.cloud/fotoweb</help-text>
+		<input name="hostname" type="TextLine">
+  			<label>Hostname</label>
+			<help-text>https://company.fotoware.cloud</help-text>
 			<occurrences minimum="1" maximum="1"/>
 			<config>
 				<regexp>https:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&amp;//=]*)</regexp>

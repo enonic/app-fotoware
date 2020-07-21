@@ -3,6 +3,7 @@ import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
 import {
 	create as createContent,
+	//createMedia,
 	exists,
 	get as getContent,
 	modify,
@@ -27,7 +28,7 @@ export const syncPublic = ({
 		//log.info(`folderContent:${toStr(folderContent)}`);
 		const parentPath = folderContent._path;
 
-		const archiveRequestParams = {
+		const collectionListRequestParams = {
 			contentType: 'application/json',
 			method: 'GET',
 			headers: {
@@ -35,17 +36,17 @@ export const syncPublic = ({
 			},
 			url: `${baseUrl}/archives/`
 		};
-		//log.info(`archiveRequestParams:${toStr(archiveRequestParams)}`);
-		const archiveResponse = request(archiveRequestParams);
-		//log.info(`archiveResponse:${toStr(archiveResponse)}`);
+		//log.info(`collectionListRequestParams:${toStr(collectionListRequestParams)}`);
+		const collectionListResponse = request(collectionListRequestParams);
+		//log.info(`collectionListResponse:${toStr(collectionListResponse)}`);
 
-		let archiveResponseBodyObj;
+		let collectionListResponseBodyObj;
 		try {
-			archiveResponseBodyObj = JSON.parse(archiveResponse.body);
+			collectionListResponseBodyObj = JSON.parse(collectionListResponse.body);
 		} catch (e) {
-			throw new Error(`Something went wrong when trying to JSON parse the response body! archiveResponse:${toStr(archiveResponse)}`);
+			throw new Error(`Something went wrong when trying to JSON parse the response body! collectionListResponse:${toStr(collectionListResponse)}`);
 		}
-		//log.info(`archiveResponseBodyObj:${toStr(archiveResponseBodyObj)}`);
+		//log.info(`collectionListResponseBodyObj:${toStr(collectionListResponseBodyObj)}`);
 
 		const {
 			//add,
@@ -53,7 +54,7 @@ export const syncPublic = ({
 			//paging,
 			//reorder,
 			//searchURL
-		} = archiveResponseBodyObj;
+		} = collectionListResponseBodyObj;
 
 		archives.forEach(({
 			/*alertHref,
@@ -154,7 +155,150 @@ export const syncPublic = ({
 					includeDependencies: false // default is true
 				});
 				log.info(`publishResult:${toStr(publishResult)}`);
-			}
+
+				/*const collectionRequestParams = {
+					contentType: 'application/json',
+					method: 'GET',
+					headers: {
+						//Accept: 'application/vnd.fotoware.collectioninfo+json' // without assets and children
+						Accept: 'application/vnd.fotoware.collection+json' // has assets and children
+					},
+					url: `${baseUrl}/archives/${href.replace('/fotoweb/archives/', '')}`
+				};
+				log.info(`collectionRequestParams:${toStr(collectionRequestParams)}`);
+				const collectionResponse = request(collectionRequestParams);
+				//log.info(`collectionResponse:${toStr(collectionResponse)}`);
+
+				let collectionResponseBodyObj;
+				try {
+					collectionResponseBodyObj = JSON.parse(collectionResponse.body);
+				} catch (e) {
+					throw new Error(`Something went wrong when trying to JSON parse the response body! collectionListResponse:${toStr(collectionListResponse)}`);
+				}
+				log.info(`collectionResponseBodyObj:${toStr(collectionResponseBodyObj)}`);
+
+				const {
+					name: name2,
+					description,
+					href: href2,
+					data,
+					dataTemplate,
+					orderRootHref,
+					matchingHref,
+					uploadHref,
+					propertyValidations,
+					urlComponents,
+					type: type2,
+					created,
+					modified,
+					deleted,
+					archived,
+					metadataEditor,
+					searchURL,
+					originalURL,
+					clearSearch,
+					searchString,
+					searchQuery,
+					alertHref,
+					alt_orders: altOrders,
+					taxonomies,
+					canHaveChildren,
+					isSearchable,
+					isSelectable,
+					isLinkCollection,
+					hasChildren,
+					canCopyTo,
+					canMoveTo,
+					canUploadTo,
+					canCreateFolders,
+					canIngestToChildren,
+					canBeDeleted,
+					canBeArchived,
+					isFolderNavigationEnabled,
+					isSmartFolderNavigationEnabled,
+					canSelect,
+					create,
+					permissions,
+					smartFolderHeader,
+					posterImages,
+					posterAsset,
+					pin,
+					assetCount,
+					assets,
+					childCount,
+					children,
+					ancestors,
+					props,
+					...rest2
+				} = collectionResponseBodyObj;
+				log.info(`name2:${toStr(name2)}`);
+				log.info(`href2:${toStr(href2)}`);
+				log.info(`type2:${toStr(type2)}`);
+				log.info(`rest2:${toStr(rest2)}`);
+				assets.forEach(({}, i) => {});*/
+
+				const assetListRequestParams = {
+					contentType: 'application/json',
+					method: 'GET',
+					headers: {
+						Accept: 'application/vnd.fotoware.assetlist+json' // Does this work on archive?
+					},
+					url: `${baseUrl}/archives/${href.replace('/fotoweb/archives/', '')}`
+				};
+				log.info(`assetListRequestParams:${toStr(assetListRequestParams)}`);
+				const assetListResponse = request(assetListRequestParams);
+				//log.info(`assetListResponse:${toStr(assetListResponse)}`);
+
+				let assetListResponseBodyObj;
+				try {
+					assetListResponseBodyObj = JSON.parse(assetListResponse.body);
+				} catch (e) {
+					throw new Error(`Something went wrong when trying to JSON parse the response body! assetListListResponse:${toStr(assetListResponse)}`);
+				}
+				log.info(`assetListResponseBodyObj:${toStr(assetListResponseBodyObj)}`);
+
+				const {
+					data: assets,
+					paging
+				} = assetListResponseBodyObj;
+				log.info(`assets:${toStr(assets)}`);
+				log.info(`paging:${toStr(paging)}`);
+				assets.forEach(({
+					href: assetHref,
+					archiveHREF,
+					linkstance,
+					created,
+					createdBy,
+					modified,
+					modifiedBy,
+					filename,
+					filesize,
+					uniqueid,
+					permissions,
+					pincount,
+					previewcount,
+					downloadcount,
+					workflowcount,
+					metadataeditcount,
+					revisioncount,
+					doctype,
+					capabilities,
+					previews,
+					quickRenditions,
+					metadataEditor,
+					renditions,
+					previewToken,
+					attributes,
+					metadata,
+					thumbnailFields,
+					builtinFields,
+					props,
+					...assetRest
+				}/*, i*/) => {
+					log.info(`assetRest:${toStr(assetRest)}`);
+					log.info(`assetHref:${toStr(assetHref)}`);
+				}); // assets.forEach
+			} // if archive
 		}); // archives.forEach
 
 		/*log.info(`data[0]:${toStr(data[0])}`);
