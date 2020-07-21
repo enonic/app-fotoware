@@ -18,9 +18,9 @@ export const getCollectionList = ({
 			access_token: accessToken
 		};
 	}
-	log.info(`collectionListRequestParams:${toStr(collectionListRequestParams)}`);
+	//log.info(`collectionListRequestParams:${toStr(collectionListRequestParams)}`);
 	const collectionListResponse = request(collectionListRequestParams);
-	log.info(`collectionListResponse:${toStr(collectionListResponse)}`);
+	//log.info(`collectionListResponse:${toStr(collectionListResponse)}`);
 
 	let collectionListResponseBodyObj;
 	try {
@@ -28,15 +28,16 @@ export const getCollectionList = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! collectionListResponse:${toStr(collectionListResponse)}`);
 	}
-	log.info(`collectionListResponseBodyObj:${toStr(collectionListResponseBodyObj)}`);
+	//log.info(`collectionListResponseBodyObj:${toStr(collectionListResponseBodyObj)}`);
 
 	const {
 		//add,
 		data: archives//,
-		//paging,
+		//paging//,
 		//reorder,
 		//searchURL
 	} = collectionListResponseBodyObj;
+	//log.info(`paging:${toStr(paging)}`);
 	return {
 		archives
 	};

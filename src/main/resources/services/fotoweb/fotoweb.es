@@ -8,6 +8,8 @@ import {getPublicAPIDescriptor} from '../../lib/fotoweb/getPublicAPIDescriptor';
 import {getAccessToken} from '../../lib/fotoweb/getAccessToken';
 import {getprivateFullAPIDescriptor} from '../../lib/fotoweb/getprivateFullAPIDescriptor';
 import {getCollectionList} from '../../lib/fotoweb/getCollectionList';
+//import {getCollection} from '../../lib/fotoweb/getCollection';
+import {getAssetList} from '../../lib/fotoweb/getAssetList';
 
 export const get = ({
 	params: {
@@ -51,9 +53,9 @@ export const get = ({
 		const {
 			archiveOptionSet: {
 				_selected: selected = [],
-				public: {
+				/*public: {
 					folder: publicFolder // contentId
-				} = {},
+				} = {},*/
 				private: {
 					clientId,
 					clientSecret,
@@ -102,8 +104,8 @@ export const get = ({
 						});
 						//log.info(`accessToken:${toStr(accessToken)}`);
 						const {
-							archivesPath,
-							renditionRequest
+							archivesPath//,
+							//renditionRequest
 						} = getprivateFullAPIDescriptor({
 							accessToken,
 							hostname
@@ -114,7 +116,27 @@ export const get = ({
 							accessToken,
 							url: `${hostname}${archivesPath}`
 						});
-						log.info(`archives:${toStr(archives)}`);
+						//log.info(`archives:${toStr(archives)}`);
+						//log.info(`archives[0]:${toStr(archives[0])}`);
+
+						/* TODO Only needed when a collection has children
+						const {
+							/*name,
+							href,
+							assets
+						} = getCollection({
+							accessToken,
+							url: `${hostname}${archives[0].href}`
+						});
+						log.info(`assets[0]:${toStr(assets[0])}`);*/
+
+						const {
+							assets
+						} = getAssetList({
+							accessToken,
+							url: `${hostname}${archives[0].href}`
+						});
+						log.info(`assets[0]:${toStr(assets[0])}`);
 					} // if private
 				} // task
 			}); // submit
