@@ -1,3 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
+	<form>
+		<input name="baseUrl" type="TextLine">
+  			<label>FotoWeb Url</label>
+			<help-text>https://company.fotoware.cloud/fotoweb</help-text>
+			<occurrences minimum="1" maximum="1"/>
+			<config>
+				<regexp>https:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&amp;//=]*)</regexp>
+			</config>
+		</input>
+		<option-set name="archiveOptionSet">
+  			<label i18n="archiveOptionSet.label">Archives</label>
+  			<expanded>false</expanded>
+  			<occurrences minimum="1" maximum="1"/>
+  			<help-text></help-text>
+  			<options minimum="1" maximum="2">
+    			<option name="public">
+					<default>true</default>
+      				<label i18n="public.label">Public</label>
+  					<help-text i18n="public.help-text"></help-text>
+					<items>
+						<input name="folder" type="ContentSelector">
+							<label>Folder</label>
+							<occurrences minimum="1" maximum="1"/>
+							<config>
+								<allowContentType>base:folder</allowContentType>
+								<allowPath>${site}/*</allowPath>
+								<treeMode>true</treeMode>
+								<showStatus>true</showStatus>
+								<hideToggleIcon>true</hideToggleIcon>
+							</config>
+						</input>
+					</items>
+    			</option>
+    			<option name="private">
+      				<label i18n="private.label">Private</label>
+					<help-text i18n="private.help-text"></help-text>
+      				<default>false</default>
+      				<items>
+						<input name="clientId" type="TextLine">
+				  			<label>Client ID</label>
+							<help-text></help-text>
+							<occurrences minimum="1" maximum="1"/>
+						</input>
+						<input name="clientSecret" type="TextLine">
+				  			<label>Client Secret</label>
+							<help-text></help-text>
+							<occurrences minimum="1" maximum="1"/>
+						</input>
+						<input name="folder" type="ContentSelector">
+							<label>Folder</label>
+							<occurrences minimum="1" maximum="1"/>
+							<config>
+								<allowContentType>base:folder</allowContentType>
+								<allowPath>${site}/*</allowPath>
+								<treeMode>true</treeMode>
+								<showStatus>true</showStatus>
+								<hideToggleIcon>true</hideToggleIcon>
+							</config>
+						</input>
+      				</items>
+    			</option>
+			</options>
+		</option-set>
+	</form>
 </site>

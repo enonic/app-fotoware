@@ -1,8 +1,112 @@
+import {toStr} from '/lib/util';
+import {forceArray} from '/lib/util/data';
+import {get as getContent} from '/lib/xp/content';
+import {run} from '/lib/xp/context';
+import {listener} from '/lib/xp/event';
+import {submit} from '/lib/xp/task';
+
+import {syncPublic} from '/lib/fotoweb/syncPublic';
+
+listener({
+	type: 'node.*',
+	localOnly: true,
+	callback: (event) => {
+		const {
+			data: {
+				nodes
+			},
+			//distributed,
+			//localOrigin,
+			//timestamp,
+			type
+		} = event;
+		if ([
+			//'node.created',
+			'node.pushed'//, // Only when a site is published
+			//'node.updated',
+			//'node.deleted'
+		].includes(type)) {
+			nodes.forEach((node/*, i*/) => {
+				const {
+					id,
+					//path,
+					branch,
+					repo
+				} = node;
+				if (
+					branch === 'master' // Have to publish site before sync updates
+					&& repo.startsWith('com.enonic.cms.')
+				) {
+					//log.info(`event:${toStr(event)}`);
+					//log.info(`node:${toStr(node)}`);
+					const context = {
+						repository: repo,
+						branch: 'master', // Always syncing to master
+						user: {
+							login: 'su',
+							idProvider: 'system'
+						},
+						principals: ['role:system.admin']
+					};
+					//log.info(`context:${toStr(context)}`);
+					run(context, () => {
+						const content = getContent({key: id});
+						//log.info(`content:${toStr(content)}`);
+						const {
+							data: {
+								siteConfig = []
+							} = {}
+						} = content;
+						const siteConfigs = forceArray(siteConfig);
+						//log.info(`siteConfigs:${toStr(siteConfigs)}`);
+						siteConfigs.forEach(({
+							applicationKey,
+							config
+						}/*, i*/) => {
+							if (applicationKey === 'com.enonic.app.fotoware') {
+								const {
+									archiveOptionSet: {
+										_selected: selected = [],
+										public: {
+											folder: publicFolder // contentId
+										} = {},
+										private: {
+											clientId,
+											clientSecret,
+											folder: privateFolder // contentId
+										} = {}
+									} = {},
+									baseUrl
+								} = config;
+								//log.info(`selected:${toStr(selected)}`);
+								log.info(`publicFolder:${toStr(publicFolder)}`); // contentId
+								log.info(`clientId:${toStr(clientId)}`);
+								log.info(`clientSecret:${toStr(clientSecret)}`);
+								log.info(`privateFolder:${toStr(privateFolder)}`); // contentId
+								//log.info(`baseUrl:${toStr(baseUrl)}`);
+								const selectedArr = forceArray(selected);
+								if (selectedArr.includes('public') && baseUrl && publicFolder) {
+									submit({
+										description: '',
+										task: () => syncPublic({
+											baseUrl,
+											folder: publicFolder // contentId
+										})
+									});
+								}
+							} // if fotoware app
+						}); // siteConfigs.forEach
+					}); // context.run
+				} // if branch
+			}); // nodes.forEach
+		} // if type
+	} // callback
+});
+
+/*
 //import {JWT} from 'jose';
 //import {verify} from 'jsonwebtoken';
 
-import {toStr} from '/lib/util';
-import {submit} from '/lib/xp/task';
 import {request} from '/lib/http-client';
 import {
 	//base64Encode,
@@ -10,7 +114,6 @@ import {
 } from '/lib/text-encoding';
 import {readText} from '/lib/xp/io';
 import {createMedia} from '/lib/xp/content';
-import {run} from '/lib/xp/context';
 
 //log.info(`app.config:${toStr(app.config)}`);
 const {
@@ -46,7 +149,7 @@ function decodeAccessToken(accessToken) {
 submit({
 	description: '',
 	task: () => {
-		/*const tokenRequestParams = {
+		const tokenRequestParams = {
 			body: `grant_type=client_credentials&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`,
 			contentType: 'application/x-www-form-urlencoded',
 			method: 'POST',
@@ -55,11 +158,11 @@ submit({
 			},
 			url: TOKEN_URL
 		};
-		//log.info(`tokenRequestParams:${toStr(tokenRequestParams)}`);
+		log.info(`tokenRequestParams:${toStr(tokenRequestParams)}`);
 		const tokenResponse = request(tokenRequestParams);
-		//log.info(`tokenResponse:${toStr(tokenResponse)}`);
+		log.info(`tokenResponse:${toStr(tokenResponse)}`);
 		const {
-			//cookies,
+			cookies,
 			//contentType, // application/json
 			//headers
 			//message,
@@ -75,29 +178,34 @@ submit({
 		} catch (e) {
 			throw new Error(`Something went wrong when trying to JSON parse the response body! response:${toStr(tokenResponse)}`);
 		}
-		/*const {
+		const {
 			access_token: accessToken//,
 			//expires_in, // Number of seconds after which the token is expected to expire.
 			//refresh_token//,
 			//token_type: tokenType // bearer
-		} = tokenResponseObj;*/
+		} = tokenResponseObj;
 
-		/*const jwt = decodeAccessToken(accessToken);
+		const jwt = decodeAccessToken(accessToken);
 		log.info(`jwt:${toStr(jwt)}`);
 		const {
 			payload: {
-				//iss//, //Contains the api url
+				iss//, //Contains the api url
 				//jti
 			}
 		} = jwt;
-		//log.info(`jti:${toStr(jti)}`);*/
+		log.info(`iss:${toStr(iss)}`);
+		//log.info(`jti:${toStr(jti)}`);
 
 		const archiveRequestParams = {
 			contentType: 'application/json',
 			method: 'GET',
 			headers: {
-				Accept: 'application/vnd.fotoware.assetlist+json'//,
-				//Authentication: `Bearer ${accessToken}` // 401
+				//Accept: 'application/vnd.fotoware.assetlist+json', // Part of collection
+				//Accept: 'application/vnd.fotoware.collection+json', // Part of collection list
+				//Accept: 'application/vnd.fotoware.collectioninfo+json', // Part of collection list
+				Accept: 'application/vnd.fotoware.collectionlist+json', // fotoweb/archives and fotoweb/me/archives
+				Authentication: `Bearer ${accessToken}`, //
+				Cookie: cookies.map(({name, value}) => `${name}=${value}`).join('; ')
 				//Authentication: `${tokenType} ${accessToken}` // 401
 				//Authentication: `Bearer ${jti}` // 401?
 				//Authentication: `${tokenType} ${jti}` // 401?
@@ -110,100 +218,9 @@ submit({
 			url: ARCHIVE_URL
 			//url: `${iss}archives/5000/`
 		};
-		//log.info(`archiveRequestParams:${toStr(archiveRequestParams)}`);
+		log.info(`archiveRequestParams:${toStr(archiveRequestParams)}`);
 		const archiveResponse = request(archiveRequestParams);
-		//log.info(`archiveResponse:${toStr(archiveResponse)}`);
-		let archiveResponseBodyObj;
-		try {
-			archiveResponseBodyObj = JSON.parse(archiveResponse.body);
-		} catch (e) {
-			throw new Error(`Something went wrong when trying to JSON parse the response body! archiveResponse:${toStr(archiveResponse)}`);
-		}
-		//log.info(`archiveResponseBodyObj:${toStr(archiveResponseBodyObj)}`);
-		const {data/*, paging*/} = archiveResponseBodyObj;
-		log.info(`data[0]:${toStr(data[0])}`);
-		const {
-			/*attributes: {
-        		imageattributes: {
-	            	pixelwidth,//: 1191,
-	            	pixelheight,//: 1684,
-	            	resolution,//: 72,
-	            	flipmirror,//: 0,
-	            	rotation,//: 0,
-	            	colorspace,//: 'rgb'
-	        	},
-	        	photoAttributes: {
-	            	flash: {
-	                	fired//: false
-	            	}
-	        	}
-    		},
-    		/*metadata: {
-        		[integer]: {
-            		value // string of list of string
-        		},
-    		},
-			builtinFields,
-			created,
-			createdBy,
-			modified,
-			modifiedBy,
-			filename,
-			filesize,*/
-			previews//,
-			//props
-			//renditions
-		} = data[0];
-		/*const {
-			//default: boolDefault,
-			//description,
-			//display_name: displayName,
-			//height,
-			href//,
-			//original,
-			//profile,
-			//sizeFixed,
-			//width
-		} = renditions[0];*/
-
-		const smallestPreview = previews.sort((a, b) => a.size - b.size)[0];
-		log.info(`smallestPreview:${toStr(smallestPreview)}`);
-		const {
-			//height,
-			href//,
-			//size,
-			//square,
-			//width
-		} = smallestPreview;
-
-		const imageRequestParams = {
-			method: 'GET',
-			url: `${BASE_URL}${href}`
-		};
-		log.info(`imageRequestParams:${toStr(imageRequestParams)}`);
-		const imageResponse = request(imageRequestParams);
-		log.info(`imageResponse:${toStr(imageResponse)}`);
-		if (imageResponse.status !== 200) {
-			throw new Error(`Status !== 200 imageResponse:${toStr(imageResponse)}`);
-		}
-		const CONTEXT = {
-			repository: 'com.enonic.cms.default',
-			branch: 'draft',
-			user: {
-				login: 'su',
-				idProvider: 'system'
-			},
-			principals: ['role:system.admin']
-		};
-		log.info(`CONTEXT:${toStr(CONTEXT)}`);
-		run(CONTEXT, () => {
-			const createMediaResult = createMedia({
-				name: 'myImage',
-				parentPath: '/mysite',
-				mimeType: imageResponse.contentType,
-				data: imageResponse.bodyStream
-			});
-			log.info(`createMediaResult:${toStr(createMediaResult)}`);
-		});
+		log.info(`archiveResponse:${toStr(archiveResponse)}`);
 	} // task
 }); // submit
+*/

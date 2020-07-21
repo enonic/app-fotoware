@@ -1,0 +1,14 @@
+<content-type>
+  <display-name>Archive</display-name>
+  <description></description>
+  <super-type>base:structured</super-type>
+  <is-abstract>false</is-abstract>
+  <is-final>true</is-final>
+  <is-built-in>false</is-built-in>
+  <allow-child-content>true</allow-child-content>
+  <form>
+    <input name="href" type="TextLine">
+      <label>href</label>
+    </input>
+  </form>
+</content-type>
