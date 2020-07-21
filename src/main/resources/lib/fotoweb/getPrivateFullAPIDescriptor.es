@@ -32,7 +32,7 @@ export const getprivateFullAPIDescriptor = ({
 	//log.info(`privateFullAPIDescriptorResponseBodyObj:${toStr(privateFullAPIDescriptorResponseBodyObj)}`);
 
 	const {
-		archives,
+		archives: archivesPath,
 		services: {
 			//login,
 			//search,
@@ -92,7 +92,7 @@ export const getprivateFullAPIDescriptor = ({
 	//log.info(`archives:${toStr(archives)}`);
 	//log.info(`renditionRequest:${toStr(renditionRequest)}`);
 	return {
-		archives,
+		archivesPath,
 		renditionRequest
 	};
 }; // export const getprivateFullAPIDescriptor

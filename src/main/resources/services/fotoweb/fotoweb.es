@@ -7,6 +7,7 @@ import {submit} from '/lib/xp/task';
 import {getPublicAPIDescriptor} from '../../lib/fotoweb/getPublicAPIDescriptor';
 import {getAccessToken} from '../../lib/fotoweb/getAccessToken';
 import {getprivateFullAPIDescriptor} from '../../lib/fotoweb/getprivateFullAPIDescriptor';
+import {getCollectionList} from '../../lib/fotoweb/getCollectionList';
 
 export const get = ({
 	params: {
@@ -46,7 +47,7 @@ export const get = ({
 			applicationKey: app.name,
 			key: siteId
 		});
-		log.info(`siteConfig:${toStr(siteConfig)}`);
+		//log.info(`siteConfig:${toStr(siteConfig)}`);
 		const {
 			archiveOptionSet: {
 				_selected: selected = [],
@@ -72,21 +73,21 @@ export const get = ({
 			submit({
 				description: '',
 				task: () => {
-					if (
+					/*if (
 						selectedArr.includes('public')
 						&& publicFolder
 					) {
 						const {
-							archives,
+							archivesPath,
 							renditionRequest
 						} = getPublicAPIDescriptor({hostname});
-						//log.info(`archives:${toStr(archives)}`);
+						//log.info(`archivesPath:${toStr(archivesPath)}`);
 						//log.info(`renditionRequest:${toStr(renditionRequest)}`);
 						/*syncPublic({
 							hostname,
 							folder: publicFolder // contentId
-						});*/
-					} // if public
+						});
+					} // if public*/
 
 					if (
 						selectedArr.includes('private')
@@ -101,14 +102,19 @@ export const get = ({
 						});
 						//log.info(`accessToken:${toStr(accessToken)}`);
 						const {
-							archives,
+							archivesPath,
 							renditionRequest
 						} = getprivateFullAPIDescriptor({
 							accessToken,
 							hostname
 						});
+						//log.info(`archivesPath:${toStr(archivesPath)}`);
+						//log.info(`renditionRequest:${toStr(renditionRequest)}`);
+						const {archives} = getCollectionList({
+							accessToken,
+							url: `${hostname}${archivesPath}`
+						});
 						log.info(`archives:${toStr(archives)}`);
-						log.info(`renditionRequest:${toStr(renditionRequest)}`);
 					} // if private
 				} // task
 			}); // submit

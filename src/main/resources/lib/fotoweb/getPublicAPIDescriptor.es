@@ -27,27 +27,27 @@ export const getPublicAPIDescriptor = ({
 	//log.info(`publicAPIDescriptorResponseBodyObj:${toStr(publicAPIDescriptorResponseBodyObj)}`);
 
 	const {
-		server, //"FotoWeb Core"
-		href, //"/fotoweb/"
-		background_tasks: backgroundTasks, //"/fotoweb/me/background-tasks/",
-		searchURL, //"/fotoweb/archives/{?q}",
-		archives, //"/fotoweb/archives/",
-		albums, //"/fotoweb/albums/",
-		taxonomies, //"/fotoweb/taxonomies/",
-		screens, //"/fotoweb/screens/",
+		archives: archivesPath, //"/fotoweb/archives/",
 		services: {
 			//login, //"/fotoweb/login",
 			//search, //"/fotoweb/search/",
 			rendition_request: renditionRequest //"/fotoweb/services/renditions"
-		},
+		}/*,
+		server, //"FotoWeb Core"
+		href, //"/fotoweb/"
+		background_tasks: backgroundTasks, //"/fotoweb/me/background-tasks/",
+		searchURL, //"/fotoweb/archives/{?q}",
+		albums, //"/fotoweb/albums/",
+		taxonomies, //"/fotoweb/taxonomies/",
+		screens, //"/fotoweb/screens/",
 		utc_offset: utcOffset, //0
-		...rest
+		...rest*/
 	} = publicAPIDescriptorResponseBodyObj;
 	//log.info(`rest:${toStr(rest)}`);
-	//log.info(`archives:${toStr(archives)}`);
+	//log.info(`archivesPath:${toStr(archivesPath)}`);
 	//log.info(`renditionRequest:${toStr(renditionRequest)}`);
 	return {
-		archives,
+		archivesPath,
 		renditionRequest
 	};
 }; // export const getPublicAPIDescriptor
