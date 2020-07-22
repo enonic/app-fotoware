@@ -37,6 +37,7 @@ export const getCollectionList = ({
 		//reorder,
 		//searchURL
 	} = collectionListResponseBodyObj;
+	//log.info(`collections:${toStr(collections)}`);
 	//log.info(`paging:${toStr(paging)}`);
 	return {
 		collections
