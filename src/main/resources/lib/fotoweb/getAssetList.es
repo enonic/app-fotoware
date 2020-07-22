@@ -22,6 +22,10 @@ export const getAssetList = ({
 	const assetListResponse = request(assetListRequestParams);
 	//log.info(`assetListResponse:${toStr(assetListResponse)}`);
 
+	if (assetListResponse.status !== 200) {
+		throw new Error(`Something went wrong when trying to get assetList assetListRequestParams:${toStr(assetListRequestParams)} assetListListResponse:${toStr(assetListResponse)}`);
+	}
+
 	const {cookies} = assetListResponse;
 	//log.info(`cookies:${toStr(cookies)}`);
 
@@ -38,9 +42,9 @@ export const getAssetList = ({
 		paging
 	} = assetListResponseBodyObj;
 	//log.info(`assets:${toStr(assets)}`);
-	log.info(`paging:${toStr(paging)}`);
 	return {
 		assets,
-		cookies
+		cookies,
+		paging
 	};
 }; // export const getAssetList

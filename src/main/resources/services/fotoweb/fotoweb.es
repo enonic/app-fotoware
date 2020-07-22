@@ -23,7 +23,7 @@ import {getprivateFullAPIDescriptor} from '../../lib/fotoweb/getprivateFullAPIDe
 import {getCollectionList} from '../../lib/fotoweb/getCollectionList';
 import {createOrModifyArchive} from '../../lib/fotoweb/createOrModifyArchive';
 //import {getCollection} from '../../lib/fotoweb/getCollection';
-import {getAssetList} from '../../lib/fotoweb/getAssetList';
+import {getAndPaginateAssetList} from '../../lib/fotoweb/getAndPaginateAssetList';
 import {requestRendition} from '../../lib/fotoweb/requestRendition';
 
 export const get = ({
@@ -145,98 +145,96 @@ export const get = ({
 								//log.info(`createdOrModifiedArchiveContent:${toStr(createdOrModifiedArchiveContent)}`);
 								const archiveContentPath = `${parentPath}/${archiveContentName}`;
 
-								const {
-									assets//,
-									//cookies
-								} = getAssetList({
-									url: `${hostname}${aPublicCollection.href}`
-								});
+								getAndPaginateAssetList({
+									hostname,
+									shortAbsolutePath: aPublicCollection.href,
+									fnHandleAssets: (assets) => {
+										total += assets.length;
+										assets.forEach((asset) => {
+											//log.info(`asset:${toStr(asset)}`);
+											const {
+												/*attributes: {
+													imageattributes: {
+														pixelwidth, // 1191
+														pixelheight, // 1684
+														resolution , // 72
+														flipmirror, // 0
+														rotation, // 0
+														colorspace // 'rgb'
+													},
+													photoAttributes: {
+														flash: {
+															fired, // false
+														}
+													}
+												},*/
+												//doctype // graphic image
+												filename,
+												//metadata,
+												//props,
+												renditions
+											} = asset;
+											progress({
+												current,
+												info: `Syncing asset ${filename} in collection ${collectionName}`,
+												total
+											});
+											const existsKey = `${archiveContentPath}/${filename}`;
+											//log.info(`existsKey:${toStr(existsKey)}`);
+											if (!exists({key: existsKey})) {
+												//log.info(`imageattributes:${toStr(imageattributes)}`);
+												//log.info(`photoAttributes:${toStr(photoAttributes)}`);
+												//log.info(`metadata:${toStr(metadata)}`);
+												//log.info(`props:${toStr(props)}`);
+												//log.info(`renditions:${toStr(renditions)}`);
+												const {
+													href: renditionHref/*,
+													display_name: displayName,
+													description,
+													width,
+													height,
+													default: isDefault,
+													original,
+													sizeFixed,
+													profile*/
+												} = renditions
+													.filter(({original}) => original === true)[0];
+													//.filter(({display_name: displayName}) => displayName === 'Original File')[0];
+													//.filter(({default: isDefault}) => isDefault === true)[0];
+													//.sort((a, b) => a.size - b.size)[0]; // Smallest images
+													//.sort((a, b) => b.size - a.size)[0]; // Largest images
+													//.filter(({display_name: displayName}) => displayName === 'JPG CMYK')[0];
+													//.filter(({display_name: displayName}) => displayName === 'JPG sRGB')[0];
+													//.filter(({display_name: displayName}) => displayName === 'TIFF JPG CMYK')[0]; // size = 0 ???
 
-								total += assets.length;
-
-								assets.forEach((asset) => {
-									//log.info(`asset:${toStr(asset)}`);
-									const {
-										/*attributes: {
-											imageattributes: {
-												pixelwidth, // 1191
-												pixelheight, // 1684
-												resolution , // 72
-												flipmirror, // 0
-												rotation, // 0
-												colorspace // 'rgb'
-											},
-											photoAttributes: {
-												flash: {
-													fired, // false
-												}
-											}
-										},*/
-										//doctype // graphic image
-										filename,
-										//metadata,
-										//props,
-										renditions
-									} = asset;
-									progress({
-										current,
-										info: `Syncing asset ${filename} in collection ${collectionName}`,
-										total
-									});
-									const existsKey = `${archiveContentPath}/${filename}`;
-									//log.info(`existsKey:${toStr(existsKey)}`);
-									if (!exists({key: existsKey})) {
-										//log.info(`imageattributes:${toStr(imageattributes)}`);
-										//log.info(`photoAttributes:${toStr(photoAttributes)}`);
-										//log.info(`metadata:${toStr(metadata)}`);
-										//log.info(`props:${toStr(props)}`);
-										//log.info(`renditions:${toStr(renditions)}`);
-										const {
-											href: renditionHref/*,
-											display_name: displayName,
-											description,
-											width,
-											height,
-											default: isDefault,
-											original,
-											sizeFixed,
-											profile*/
-										} = renditions
-											.filter(({original}) => original === true)[0];
-											//.filter(({display_name: displayName}) => displayName === 'Original File')[0];
-											//.filter(({default: isDefault}) => isDefault === true)[0];
-											//.sort((a, b) => a.size - b.size)[0]; // Smallest images
-											//.sort((a, b) => b.size - a.size)[0]; // Largest images
-											//.filter(({display_name: displayName}) => displayName === 'JPG CMYK')[0];
-											//.filter(({display_name: displayName}) => displayName === 'JPG sRGB')[0];
-											//.filter(({display_name: displayName}) => displayName === 'TIFF JPG CMYK')[0]; // size = 0 ???
-
-										const downloadRenditionResponse = requestRendition({
-											//cookies,
-											hostname,
-											renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
-											renditionUrl: renditionHref
-										});
-										//log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
-										//log.info(`parentPath:${toStr(parentPath)}`);
-										const createMediaResult = createMedia({
-											name: filename,
-											parentPath: archiveContentPath,
-											//mimeType: downloadRenditionResponse.contentType,
-											data: downloadRenditionResponse.bodyStream
-										});
-										//log.info(`createMediaResult:${toStr(createMediaResult)}`);
-										//const publishResult =
-										publish({
-											keys: [createMediaResult._id],
-											sourceBranch: 'draft',
-											targetBranch: 'master',
-											includeDependencies: false // default is true
-										});
-										//log.info(`publishResult:${toStr(publishResult)}`);
-									} // if !media exists
-									current += 1; // per asset synced
-								}); // assets.forEach
+												const downloadRenditionResponse = requestRendition({
+													//cookies,
+													hostname,
+													renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
+													renditionUrl: renditionHref
+												});
+												//log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
+												//log.info(`parentPath:${toStr(parentPath)}`);
+												const createMediaResult = createMedia({
+													name: filename,
+													parentPath: archiveContentPath,
+													//mimeType: downloadRenditionResponse.contentType,
+													data: downloadRenditionResponse.bodyStream
+												});
+												//log.info(`createMediaResult:${toStr(createMediaResult)}`);
+												//const publishResult =
+												publish({
+													keys: [createMediaResult._id],
+													sourceBranch: 'draft',
+													targetBranch: 'master',
+													includeDependencies: false // default is true
+												});
+												//log.info(`publishResult:${toStr(publishResult)}`);
+											} // if !media exists
+											current += 1; // per asset synced
+										}); // assets.forEach
+									} // fnHandleAssets
+								}); // getAndPaginateAssetList
 								current += 1; // per publicCollection synced
 							}); // publicCollections.forEach
 						}); // draftContext.run
@@ -300,7 +298,8 @@ export const get = ({
 								});
 								//name: sanitize(href.replace(archivesPath, '').replace(/\/$/, '')), // NOPE private archives has public href :(
 								const archiveContentName = sanitize(collectionHref.replace('/fotoweb/archives/', '').replace(/\/$/, ''));
-								const {createdOrModifiedArchiveContent} = createOrModifyArchive({
+								//const {createdOrModifiedArchiveContent} =
+								createOrModifyArchive({
 									parentPath,
 									name: archiveContentName,
 									displayName: collectionName
@@ -319,78 +318,77 @@ export const get = ({
 								});
 								log.info(`assets[0]:${toStr(assets[0])}`);*/
 
-								const {
-									assets//,
-									//cookies
-								} = getAssetList({
+								getAndPaginateAssetList({
 									accessToken,
-									url: `${hostname}${aPrivateCollection.href}`
-								});
-								total += assets.length;
+									hostname,
+									shortAbsolutePath: aPrivateCollection.href,
+									fnHandleAssets: (assets) => {
+										total += assets.length;
+										assets.forEach((asset) => {
+											//log.info(`asset:${toStr(asset)}`);
+											const {
+												filename,
+												renditions
+											} = asset;
+											//log.info(`renditions:${toStr(renditions)}`);
 
-								assets.forEach((asset) => {
-									//log.info(`asset:${toStr(asset)}`);
-									const {
-										filename,
-										renditions
-									} = asset;
-									//log.info(`renditions:${toStr(renditions)}`);
+											progress({
+												current,
+												info: `Syncing asset ${filename} in private collection ${collectionName}`,
+												total
+											});
+											const existsKey = `${archiveContentPath}/${filename}`;
+											//log.info(`existsKey:${toStr(existsKey)}`);
+											if (!exists({key: existsKey})) {
+												const {
+													href: renditionHref/*,
+													display_name: displayName,
+													description,
+													width,
+													height,
+													default: isDefault,
+													original,
+													sizeFixed,
+													profile*/
+												} = renditions
+													.filter(({original}) => original === true)[0];
+													//.filter(({display_name: displayName}) => displayName === 'Original File')[0];
+													//.filter(({default: isDefault}) => isDefault === true)[0];
+													//.sort((a, b) => a.size - b.size)[0]; // Smallest images
+													//.sort((a, b) => b.size - a.size)[0]; // Largest images
 
-									progress({
-										current,
-										info: `Syncing asset ${filename} in collection ${collectionName}`,
-										total
-									});
-									const existsKey = `${archiveContentPath}/${filename}`;
-									log.info(`existsKey:${toStr(existsKey)}`);
-									if (!exists({key: existsKey})) {
-										const {
-											href: renditionHref/*,
-											display_name: displayName,
-											description,
-											width,
-											height,
-											default: isDefault,
-											original,
-											sizeFixed,
-											profile*/
-										} = renditions
-											.filter(({original}) => original === true)[0];
-											//.filter(({display_name: displayName}) => displayName === 'Original File')[0];
-											//.filter(({default: isDefault}) => isDefault === true)[0];
-											//.sort((a, b) => a.size - b.size)[0]; // Smallest images
-											//.sort((a, b) => b.size - a.size)[0]; // Largest images
+												// WARNING These renditions might not exist!
+												//.filter(({display_name: displayName}) => displayName === 'JPG CMYK')[0];
+												//.filter(({display_name: displayName}) => displayName === 'JPG sRGB')[0];
+												//.filter(({display_name: displayName}) => displayName === 'TIFF JPG CMYK')[0]; // size = 0 ???
 
-											// WARNING These renditions might not exist!
-											//.filter(({display_name: displayName}) => displayName === 'JPG CMYK')[0];
-											//.filter(({display_name: displayName}) => displayName === 'JPG sRGB')[0];
-											//.filter(({display_name: displayName}) => displayName === 'TIFF JPG CMYK')[0]; // size = 0 ???
-
-										/*const downloadRenditionResponse = requestRendition({
-											accessToken,
-											//cookies,
-											renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
-											renditionUrl: renditionHref
-										});
-										log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
-										//log.info(`parentPath:${toStr(parentPath)}`);
-										const createMediaResult = createMedia({
-											name: filename,
-											parentPath: archiveContentPath,
-											//mimeType: downloadRenditionResponse.contentType,
-											data: downloadRenditionResponse.bodyStream
-										});
-										log.info(`createMediaResult:${toStr(createMediaResult)}`);
-										const publishResult = publish({
-											keys: [createMediaResult._id],
-											sourceBranch: 'draft',
-											targetBranch: 'master',
-											includeDependencies: false // default is true
-										});
-										log.info(`publishResult:${toStr(publishResult)}`);*/
-									} // if !exist media content
-									current += 1; // per private asset synced
-								}); // assets.forEach
+												/*const downloadRenditionResponse = requestRendition({
+													accessToken,
+													//cookies,
+													renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
+													renditionUrl: renditionHref
+												});
+												log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
+												//log.info(`parentPath:${toStr(parentPath)}`);
+												const createMediaResult = createMedia({
+													name: filename,
+													parentPath: archiveContentPath,
+													//mimeType: downloadRenditionResponse.contentType,
+													data: downloadRenditionResponse.bodyStream
+												});
+												log.info(`createMediaResult:${toStr(createMediaResult)}`);
+												const publishResult = publish({
+													keys: [createMediaResult._id],
+													sourceBranch: 'draft',
+													targetBranch: 'master',
+													includeDependencies: false // default is true
+												});
+												log.info(`publishResult:${toStr(publishResult)}`);*/
+											} // if !exist media content
+											current += 1; // per private asset synced
+										}); // assets.forEach
+									} // fnHandleAssets
+								}); // getAndPaginateAssetList
 								current += 1; // per private collection synced
 							}); // collections.forEach
 						}); // draftContext.run
