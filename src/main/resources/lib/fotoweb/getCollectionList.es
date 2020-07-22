@@ -22,6 +22,10 @@ export const getCollectionList = ({
 	const collectionListResponse = request(collectionListRequestParams);
 	//log.info(`collectionListResponse:${toStr(collectionListResponse)}`);
 
+	if (collectionListResponse.status !== 200) {
+		throw new Error(`Something went wrong when trying to get assetList collectionListRequestParams:${toStr(collectionListRequestParams)} collectionListResponse:${toStr(collectionListResponse)}`);
+	}
+
 	let collectionListResponseBodyObj;
 	try {
 		collectionListResponseBodyObj = JSON.parse(collectionListResponse.body);
@@ -32,14 +36,15 @@ export const getCollectionList = ({
 
 	const {
 		//add,
-		data: collections//,
-		//paging//,
+		data: collections,
+		paging//,
 		//reorder,
 		//searchURL
 	} = collectionListResponseBodyObj;
 	//log.info(`collections:${toStr(collections)}`);
 	//log.info(`paging:${toStr(paging)}`);
 	return {
-		collections
+		collections,
+		paging
 	};
 }; // export const getCollectionList
