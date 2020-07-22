@@ -3,6 +3,7 @@ import {forceArray} from '/lib/util/data';
 import {sanitize} from '/lib/xp/common';
 import {
 	createMedia,
+	exists,
 	get as getContentByKey,
 	getSiteConfig as getSiteConfigByKey,
 	publish
@@ -112,11 +113,6 @@ export const get = ({
 						//log.info(`publicCollections:${toStr(publicCollections)}`);
 						total += publicCollections.length;
 						current += 1; // Finished initializing
-						/*progress({
-							current,
-							info: 'Syncing public assets',
-							total
-						});*/
 
 						const draftContext = getContext();
 						draftContext.branch = 'draft'; // create/modify in draft then publish
@@ -140,12 +136,13 @@ export const get = ({
 									total
 								});
 								const archiveContentName = sanitize(collectionHref.replace('/fotoweb/archives/', '').replace(/\/$/, ''));
-								const {createdOrModifiedArchiveContent} = createOrModifyArchive({
+								//const {createdOrModifiedArchiveContent} =
+								createOrModifyArchive({
 									parentPath,
 									name: archiveContentName,
 									displayName: collectionName
 								});
-								log.info(`createdOrModifiedArchiveContent:${toStr(createdOrModifiedArchiveContent)}`);
+								//log.info(`createdOrModifiedArchiveContent:${toStr(createdOrModifiedArchiveContent)}`);
 								const archiveContentPath = `${parentPath}/${archiveContentName}`;
 
 								const {
@@ -186,54 +183,59 @@ export const get = ({
 										info: `Syncing asset ${filename} in collection ${collectionName}`,
 										total
 									});
-									//log.info(`imageattributes:${toStr(imageattributes)}`);
-									//log.info(`photoAttributes:${toStr(photoAttributes)}`);
-									//log.info(`metadata:${toStr(metadata)}`);
-									//log.info(`props:${toStr(props)}`);
-									//log.info(`renditions:${toStr(renditions)}`);
-									const {
-										href: renditionHref/*,
-										display_name: displayName,
-										description,
-										width,
-										height,
-										default: isDefault,
-										original,
-										sizeFixed,
-										profile*/
-									} = renditions
-										.filter(({original}) => original === true)[0];
-										//.filter(({display_name: displayName}) => displayName === 'Original File')[0];
-										//.filter(({default: isDefault}) => isDefault === true)[0];
-										//.sort((a, b) => a.size - b.size)[0]; // Smallest images
-										//.sort((a, b) => b.size - a.size)[0]; // Largest images
-										//.filter(({display_name: displayName}) => displayName === 'JPG CMYK')[0];
-										//.filter(({display_name: displayName}) => displayName === 'JPG sRGB')[0];
-										//.filter(({display_name: displayName}) => displayName === 'TIFF JPG CMYK')[0]; // size = 0 ???
+									const existsKey = `${archiveContentPath}/${filename}`;
+									//log.info(`existsKey:${toStr(existsKey)}`);
+									if (!exists({key: existsKey})) {
+										//log.info(`imageattributes:${toStr(imageattributes)}`);
+										//log.info(`photoAttributes:${toStr(photoAttributes)}`);
+										//log.info(`metadata:${toStr(metadata)}`);
+										//log.info(`props:${toStr(props)}`);
+										//log.info(`renditions:${toStr(renditions)}`);
+										const {
+											href: renditionHref/*,
+											display_name: displayName,
+											description,
+											width,
+											height,
+											default: isDefault,
+											original,
+											sizeFixed,
+											profile*/
+										} = renditions
+											.filter(({original}) => original === true)[0];
+											//.filter(({display_name: displayName}) => displayName === 'Original File')[0];
+											//.filter(({default: isDefault}) => isDefault === true)[0];
+											//.sort((a, b) => a.size - b.size)[0]; // Smallest images
+											//.sort((a, b) => b.size - a.size)[0]; // Largest images
+											//.filter(({display_name: displayName}) => displayName === 'JPG CMYK')[0];
+											//.filter(({display_name: displayName}) => displayName === 'JPG sRGB')[0];
+											//.filter(({display_name: displayName}) => displayName === 'TIFF JPG CMYK')[0]; // size = 0 ???
 
-									const downloadRenditionResponse = requestRendition({
-										//cookies,
-										hostname,
-										renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
-										//renditionUrl: `${hostname}${renditionHref}`
-										renditionUrl: renditionHref
-									});
-									//log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
-									log.info(`parentPath:${toStr(parentPath)}`);
-									const createMediaResult = createMedia({
-										name: filename,
-										parentPath: archiveContentPath,
-										//mimeType: downloadRenditionResponse.contentType,
-										data: downloadRenditionResponse.bodyStream
-									});
-									log.info(`createMediaResult:${toStr(createMediaResult)}`);
-									const publishResult = publish({
-										keys: [createMediaResult._id],
-										sourceBranch: 'draft',
-										targetBranch: 'master',
-										includeDependencies: false // default is true
-									});
-									log.info(`publishResult:${toStr(publishResult)}`);
+										const downloadRenditionResponse = requestRendition({
+											//cookies,
+											hostname,
+											renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
+											//renditionUrl: `${hostname}${renditionHref}`
+											renditionUrl: renditionHref
+										});
+										//log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
+										//log.info(`parentPath:${toStr(parentPath)}`);
+										const createMediaResult = createMedia({
+											name: filename,
+											parentPath: archiveContentPath,
+											//mimeType: downloadRenditionResponse.contentType,
+											data: downloadRenditionResponse.bodyStream
+										});
+										//log.info(`createMediaResult:${toStr(createMediaResult)}`);
+										//const publishResult =
+										publish({
+											keys: [createMediaResult._id],
+											sourceBranch: 'draft',
+											targetBranch: 'master',
+											includeDependencies: false // default is true
+										});
+										//log.info(`publishResult:${toStr(publishResult)}`);
+									} // if !media exists
 									current += 1; // per asset synced
 								}); // assets.forEach
 								current += 1; // per publicCollection synced
@@ -244,7 +246,7 @@ export const get = ({
 							info: 'Finished syncing public collections :)',
 							total
 						};
-						log.info(`progressParams:${toStr(progressParams)}`);
+						//log.info(`progressParams:${toStr(progressParams)}`);
 						progress(progressParams);
 					} // if public
 
