@@ -22,6 +22,9 @@ export const getAssetList = ({
 	const assetListResponse = request(assetListRequestParams);
 	//log.info(`assetListResponse:${toStr(assetListResponse)}`);
 
+	const {cookies} = assetListResponse;
+	//log.info(`cookies:${toStr(cookies)}`);
+
 	let assetListResponseBodyObj;
 	try {
 		assetListResponseBodyObj = JSON.parse(assetListResponse.body);
@@ -37,6 +40,7 @@ export const getAssetList = ({
 	//log.info(`assets:${toStr(assets)}`);
 	log.info(`paging:${toStr(paging)}`);
 	return {
-		assets
+		assets,
+		cookies
 	};
 }; // export const getAssetList

@@ -162,13 +162,15 @@ export const get = ({
 							log.info(`assets[0]:${toStr(assets[0])}`);*/
 
 							const {
-								assets
+								assets//,
+								//cookies
 							} = getAssetList({
 								accessToken,
 								url: `${hostname}${collections[0].href}`
 							});
 							//log.info(`assets[0]:${toStr(assets[0])}`);
 							const {renditions} = assets[0];
+							log.info(`renditions:${toStr(renditions)}`);
 							const {
 								href: renditionHref/*,
 								display_name: displayName,
@@ -179,9 +181,19 @@ export const get = ({
 								original,
 								sizeFixed,
 								profile*/
-							} = renditions.filter(({original}) => original === true)[0];
+							} = renditions
+								//.filter(({original}) => original === true)[0];
+								//.filter(({display_name: displayName}) => displayName === 'Original File')[0];
+								//.filter(({default: isDefault}) => isDefault === true)[0];
+								//.sort((a, b) => a.size - b.size)[0]; // Smallest images
+								//.sort((a, b) => b.size - a.size)[0]; // Largest images
+								//.filter(({display_name: displayName}) => displayName === 'JPG CMYK')[0];
+								.filter(({display_name: displayName}) => displayName === 'JPG sRGB')[0];
+								//.filter(({display_name: displayName}) => displayName === 'TIFF JPG CMYK')[0]; // size = 0 ???
+
 							requestRendition({
 								accessToken,
+								//cookies,
 								renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
 								//renditionUrl: `${hostname}${renditionHref}`
 								renditionUrl: renditionHref
