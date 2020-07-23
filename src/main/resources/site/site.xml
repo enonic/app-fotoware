@@ -24,11 +24,12 @@
 							<label>Folder</label>
 							<occurrences minimum="1" maximum="1"/>
 							<config>
-								<allowContentType>base:folder</allowContentType>
+								<allowContentType>archive</allowContentType>
+								<!--allowContentType>base:folder</allowContentType-->
 								<allowPath>${site}/*</allowPath>
-								<treeMode>true</treeMode>
-								<showStatus>true</showStatus>
-								<hideToggleIcon>true</hideToggleIcon>
+								<treeMode>false</treeMode>
+								<showStatus>false</showStatus>
+								<hideToggleIcon>false</hideToggleIcon>
 							</config>
 						</input>
 					</items>
@@ -52,11 +53,12 @@
 							<label>Folder</label>
 							<occurrences minimum="1" maximum="1"/>
 							<config>
-								<allowContentType>base:folder</allowContentType>
+								<allowContentType>archive</allowContentType>
+								<!--allowContentType>base:folder</allowContentType-->
 								<allowPath>${site}/*</allowPath>
-								<treeMode>true</treeMode>
-								<showStatus>true</showStatus>
-								<hideToggleIcon>true</hideToggleIcon>
+								<treeMode>false</treeMode>
+								<showStatus>false</showStatus>
+								<hideToggleIcon>false</hideToggleIcon>
 							</config>
 						</input>
       				</items>
