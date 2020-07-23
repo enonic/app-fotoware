@@ -1,4 +1,4 @@
-import {getAssetList} from './getAssetList';
+import {getAssetList} from './get';
 //import {toStr} from '/lib/util';
 
 export const getAndPaginateAssetList = ({

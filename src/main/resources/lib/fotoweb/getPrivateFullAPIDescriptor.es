@@ -1,7 +1,7 @@
 import {request} from '/lib/http-client';
 import {toStr} from '/lib/util';
 
-export const getprivateFullAPIDescriptor = ({
+export const getPrivateFullAPIDescriptor = ({
 	hostname,
 	accessToken
 }) => {
@@ -95,4 +95,4 @@ export const getprivateFullAPIDescriptor = ({
 		archivesPath,
 		renditionRequest
 	};
-}; // export const getprivateFullAPIDescriptor
+}; // export const getPrivateFullAPIDescriptor

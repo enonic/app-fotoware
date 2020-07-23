@@ -5,26 +5,26 @@ import {
 	exists,
 	publish
 } from '/lib/xp/content';
-import {
-	get as getContext,
-	run
-} from '/lib/xp/context';
+import {run} from '/lib/xp/context';
 import {
 	progress,
 	submit
 } from '/lib/xp/task';
 
-import {getConfigFromSite} from '../../lib/fotoweb/xp/getConfigFromSite';
-
-import {getPublicAPIDescriptor} from '../../lib/fotoweb/getPublicAPIDescriptor';
 import {getAccessToken} from '../../lib/fotoweb/getAccessToken';
-import {getprivateFullAPIDescriptor} from '../../lib/fotoweb/getprivateFullAPIDescriptor';
-import {getAndPaginateCollectionList} from '../../lib/fotoweb/getAndPaginateCollectionList';
-import {paginateCollectionList} from '../../lib/fotoweb/paginateCollectionList';
-import {createOrModifyArchive} from '../../lib/fotoweb/createOrModifyArchive';
-import {getCollection} from '../../lib/fotoweb/getCollection';
-import {getAndPaginateAssetList} from '../../lib/fotoweb/getAndPaginateAssetList';
+import {getPrivateFullAPIDescriptor} from '../../lib/fotoweb/getPrivateFullAPIDescriptor';
+import {getPublicAPIDescriptor} from '../../lib/fotoweb/getPublicAPIDescriptor';
 import {requestRendition} from '../../lib/fotoweb/requestRendition';
+
+import {getAndPaginateAssetList} from '../../lib/fotoweb/assetList/getAndPaginate';
+
+import {getCollection} from '../../lib/fotoweb/collection/get';
+
+import {getAndPaginateCollectionList} from '../../lib/fotoweb/collectionList/getAndPaginate';
+import {paginateCollectionList} from '../../lib/fotoweb/collectionList/paginate';
+
+import {getConfigFromSite} from '../../lib/fotoweb/xp/getConfigFromSite';
+import {createOrModifyArchive} from '../../lib/fotoweb/xp/createOrModifyArchive';
 
 /*
  CollectionList┐
@@ -73,18 +73,14 @@ export const get = ({
 		siteId
 	});
 	//log.info(`selected:${toStr(selected)}`);
-	log.info(`publicFolderPath:${toStr(publicFolderPath)}`); // contentId
+	//log.info(`publicFolderPath:${toStr(publicFolderPath)}`); // contentId
 	//log.info(`clientId:${toStr(clientId)}`);
 	//log.info(`clientSecret:${toStr(clientSecret)}`);
-	log.info(`privateFolderPath:${toStr(privateFolderPath)}`); // contentId
+	//log.info(`privateFolderPath:${toStr(privateFolderPath)}`); // contentId
 	//log.info(`hostname:${toStr(hostname)}`);
-	if (!(
-		hostname
-		&& (
-			(selected.includes('public') && publicFolderPath)
-			|| (selected.includes('private') && clientId && clientSecret && privateFolderPath)
-		)
-	)) {
+	const boolSyncPublic = !!(selected.includes('public') && publicFolderPath);
+	const boolSyncPrivate = !!(selected.includes('private') && clientId && clientSecret && privateFolderPath);
+	if (!(hostname && (boolSyncPublic || boolSyncPrivate))) {
 		return {
 			status: 500,
 			body: {
@@ -105,30 +101,31 @@ export const get = ({
 				info: 'Initializing FotoWeb Intergration Task',
 				total
 			});
-			if (
-				selected.includes('public')
-				&& publicFolderPath
-			) {
-				const {
-					archivesPath,
-					renditionRequest
-				} = getPublicAPIDescriptor({hostname});
-				//log.info(`archivesPath:${toStr(archivesPath)}`);
-				//log.info(`renditionRequest:${toStr(renditionRequest)}`);
+			run({
+				repository,
+				branch: 'draft', // Always sync to draft and publish to master
+				user: {
+					login: 'su',
+					idProvider: 'system'
+				},
+				principals: ['role:system.admin']
+			}, () => {
+				if (boolSyncPublic) {
+					const {
+						archivesPath,
+						renditionRequest
+					} = getPublicAPIDescriptor({hostname});
+					//log.info(`archivesPath:${toStr(archivesPath)}`);
+					//log.info(`renditionRequest:${toStr(renditionRequest)}`);
 
-				getAndPaginateCollectionList({
-					hostname,
-					shortAbsolutePath: archivesPath,
-					fnHandleCollections: (publicCollections) => {
-						//log.info(`publicCollections:${toStr(publicCollections)}`);
-						total += publicCollections.length;
-						current += 1; // Finished initializing
+					getAndPaginateCollectionList({
+						hostname,
+						shortAbsolutePath: archivesPath,
+						fnHandleCollections: (publicCollections) => {
+							//log.info(`publicCollections:${toStr(publicCollections)}`);
+							total += publicCollections.length;
+							current += 1; // Finished initializing
 
-						const draftContext = getContext();
-						draftContext.branch = 'draft'; // create/modify in draft then publish
-						//log.info(`draftContext:${toStr(draftContext)}`);
-
-						run(draftContext, () => {
 							const parentPath = publicFolderPath;
 							publicCollections.forEach((aPublicCollection/*, i*/) => {
 								//log.info(`aPublicCollection:${toStr(aPublicCollection)}`);
@@ -246,49 +243,38 @@ export const get = ({
 								}); // getAndPaginateAssetList
 								current += 1; // per publicCollection synced
 							}); // publicCollections.forEach
-						}); // draftContext.run
-					} // fnHandleCollections
-				}); // getAndPaginateCollectionList
-				const progressParams = {
-					current,
-					info: 'Finished syncing public collections :)',
-					total
-				};
-				//log.info(`progressParams:${toStr(progressParams)}`);
-				progress(progressParams);
-			} // if public
+						} // fnHandleCollections
+					}); // getAndPaginateCollectionList
+					const progressParams = {
+						current,
+						info: 'Finished syncing public collections :)',
+						total
+					};
+					//log.info(`progressParams:${toStr(progressParams)}`);
+					progress(progressParams);
+				} // if public
 
-			if (
-				selectedArr.includes('private')
-				&& clientId
-				&& clientSecret
-				&& privateFolderPath
-			) {
-				const {accessToken} = getAccessToken({
-					hostname,
-					clientId,
-					clientSecret
-				});
-				//log.info(`accessToken:${toStr(accessToken)}`);
-				const {
-					archivesPath,
-					renditionRequest
-				} = getprivateFullAPIDescriptor({
-					accessToken,
-					hostname
-				});
-				//log.info(`archivesPath:${toStr(archivesPath)}`);
-				//log.info(`renditionRequest:${toStr(renditionRequest)}`);
+				if (boolSyncPrivate) {
+					const {accessToken} = getAccessToken({
+						hostname,
+						clientId,
+						clientSecret
+					});
+					//log.info(`accessToken:${toStr(accessToken)}`);
+					const {
+						archivesPath,
+						renditionRequest
+					} = getPrivateFullAPIDescriptor({
+						accessToken,
+						hostname
+					});
+					//log.info(`archivesPath:${toStr(archivesPath)}`);
+					//log.info(`renditionRequest:${toStr(renditionRequest)}`);
 
-				const fnHandlePrivateCollections = (collections) => {
-					//log.info(`collections:${toStr(collections)}`);
-					total += collections.length;
+					const fnHandlePrivateCollections = (collections) => {
+						//log.info(`collections:${toStr(collections)}`);
+						total += collections.length;
 
-					const draftContext = getContext();
-					draftContext.branch = 'draft'; // create/modify in draft then publish
-					//log.info(`draftContext:${toStr(draftContext)}`);
-
-					run(draftContext, () => {
 						const parentPath = privateFolderPath;
 						collections.forEach((aPrivateCollection) => {
 							//log.info(`aPrivateCollection:${toStr(aPrivateCollection)}`);
@@ -410,24 +396,24 @@ export const get = ({
 							}); // getAndPaginateAssetList
 							current += 1; // per private collection synced
 						}); // collections.forEach
-					}); // draftContext.run
-				}; // fnHandlePrivateCollections
+					}; // fnHandlePrivateCollections
 
-				getAndPaginateCollectionList({
-					accessToken,
-					hostname,
-					shortAbsolutePath: archivesPath,
-					fnHandleCollections: fnHandlePrivateCollections
-				}); // getAndPaginateCollectionList
+					getAndPaginateCollectionList({
+						accessToken,
+						hostname,
+						shortAbsolutePath: archivesPath,
+						fnHandleCollections: fnHandlePrivateCollections
+					}); // getAndPaginateCollectionList
 
-				const progressParams = {
-					current,
-					info: 'Finished syncing private collections :)',
-					total
-				};
-				log.info(`progressParams:${toStr(progressParams)}`);
-				progress(progressParams);
-			} // if private
+					const progressParams = {
+						current,
+						info: 'Finished syncing private collections :)',
+						total
+					};
+					//log.info(`progressParams:${toStr(progressParams)}`);
+					progress(progressParams);
+				} // if private
+			}); // run
 		} // task
 	}); // submit
 
