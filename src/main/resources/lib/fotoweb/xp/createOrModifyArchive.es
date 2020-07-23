@@ -23,7 +23,7 @@ export const createOrModifyArchive = ({
 			key: contentPath,
 			editor: (content) => {
 				/* eslint-disable no-param-reassign */
-				content.displayName = name;
+				content.displayName = displayName;
 				content.data.href = href;
 				//content.x = rest; // Needs schema
 				/* eslint-enable no-param-reassign */
