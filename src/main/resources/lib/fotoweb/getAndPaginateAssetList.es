@@ -29,3 +29,41 @@ export const getAndPaginateAssetList = ({
 		} // while next
 	} // if paging
 }; // export const getAndPaginateAssetList
+
+/*
+assets.forEach(({
+	href: assetHref,
+	archiveHREF,
+	linkstance,
+	created,
+	createdBy,
+	modified,
+	modifiedBy,
+	filename,
+	filesize,
+	uniqueid,
+	permissions,
+	pincount,
+	previewcount,
+	downloadcount,
+	workflowcount,
+	metadataeditcount,
+	revisioncount,
+	doctype,
+	capabilities,
+	previews,
+	quickRenditions,
+	metadataEditor,
+	renditions,
+	previewToken,
+	attributes,
+	metadata,
+	thumbnailFields,
+	builtinFields,
+	props,
+	...assetRest
+}) => {
+	log.info(`assetRest:${toStr(assetRest)}`);
+	log.info(`assetHref:${toStr(assetHref)}`);
+}); // assets.forEach
+*/

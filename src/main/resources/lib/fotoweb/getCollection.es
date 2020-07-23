@@ -3,7 +3,8 @@ import {toStr} from '/lib/util';
 
 export const getCollection = ({
 	accessToken,
-	url
+	hostname,
+	shortAbsolutePath
 }) => {
 	const collectionRequestParams = {
 		contentType: 'application/json',
@@ -12,7 +13,7 @@ export const getCollection = ({
 			//Accept: 'application/vnd.fotoware.collectioninfo+json' // without assets and children
 			Accept: 'application/vnd.fotoware.collection+json' // has assets and children
 		},
-		url
+		url: `${hostname}${shortAbsolutePath}`
 	};
 	if (accessToken) {
 		collectionRequestParams.params = {
@@ -32,13 +33,13 @@ export const getCollection = ({
 	//log.info(`collectionResponseBodyObj:${toStr(collectionResponseBodyObj)}`);
 
 	const {
+		childCount,
+		children/*,
 		name,
 		href,
 		hasChildren,
-		childCount,
-		children,
 		assets
-		/*assets : {
+		assets : {
 			data: assetsData,
 			paging: {
 				//prev,
@@ -46,9 +47,8 @@ export const getCollection = ({
 				//first,
 				//last
 			} = {}
-		},*/
-
-		/*description,
+		},
+		description,
 		data,
 		dataTemplate,
 		orderRootHref,
@@ -96,13 +96,12 @@ export const getCollection = ({
 		...rest*/
 	} = collectionResponseBodyObj;
 	//log.info(`rest:${toStr(rest)}`);
-	log.info(`hasChildren:${toStr(hasChildren)}`);
-	log.info(`childCount:${toStr(childCount)}`);
-	log.info(`children:${toStr(children)}`);
+	//log.info(`hasChildren:${toStr(hasChildren)}`);
+	//log.info(`childCount:${toStr(childCount)}`);
+	//log.info(`children:${toStr(children)}`);
 	return {
-		name,
-		href,
-		assets/*,
-		children*/
+		//assets, // Using getAndPaginateAssetList instead
+		childCount,
+		children // collection list (object)
 	};
 }; // export const getCollection
