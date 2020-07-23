@@ -95,13 +95,13 @@ export const get = ({
 	submit({
 		description: '',
 		task: () => {
-			let current = 0; // No items has been processed yet
-			let total = 1; // So it looks like there is something to do.
-			progress({
-				current,
+			const progressObj = {
+				current: 0, // No items has been processed yet
 				info: 'Initializing FotoWeb Intergration Task',
-				total
-			});
+				total: 1 // So it looks like there is something to do.
+			};
+			progress(progressObj);
+			progressObj.current += 1; // Finished initializing
 			run({
 				repository,
 				branch: 'draft', // Always sync to draft and publish to master
@@ -121,8 +121,7 @@ export const get = ({
 
 					const fnHandlePublicCollections = (publicCollections) => {
 						//log.info(`publicCollections:${toStr(publicCollections)}`);
-						total += publicCollections.length;
-						current += 1; // Finished initializing
+						progressObj.total += publicCollections.length; // Found public collections to process
 
 						publicCollections.forEach((aPublicCollection/*, i*/) => {
 							//log.info(`aPublicCollection:${toStr(aPublicCollection)}`);
@@ -132,11 +131,8 @@ export const get = ({
 							} = aPublicCollection;
 							//log.info(`collectionName:${toStr(collectionName)}`);
 							//log.info(`collectionHref:${toStr(collectionHref)}`);
-							progress({
-								current,
-								info: `Syncing public collection ${collectionName}`,
-								total
-							});
+							progressObj.info = `Syncing public collection ${collectionName}`;
+							progress(progressObj);
 
 							const collectionContentPath = decodeURIComponent(collectionHref).replace('/fotoweb/archives', publicFolderPath).replace(/\/$/, '');
 							//log.info(`collectionContentPath:${toStr(collectionContentPath)}`);
@@ -162,7 +158,6 @@ export const get = ({
 							if (childCount) {
 								//log.info(`childCount:${toStr(childCount)}`);
 								//log.info(`children:${toStr(children)}`);
-								total += childCount;
 								paginateCollectionList({
 									hostname,
 									collectionList: {
@@ -179,7 +174,7 @@ export const get = ({
 								shortAbsolutePath: aPublicCollection.href,
 								doPaginate: false, // DEBUG
 								fnHandleAssets: (assets) => {
-									total += assets.length;
+									progressObj.total += assets.length; // Found public assets to process
 									assets.forEach((asset) => {
 										//log.info(`asset:${toStr(asset)}`);
 										const {
@@ -204,11 +199,8 @@ export const get = ({
 											//props,
 											renditions
 										} = asset;
-										progress({
-											current,
-											info: `Syncing asset ${filename} in collection ${collectionName}`,
-											total
-										});
+										progressObj.info = `Syncing asset ${filename} in collection ${collectionName}`;
+										progress(progressObj);
 										const existsKey = `${collectionContentPath}/${filename}`;
 										//log.info(`existsKey:${toStr(existsKey)}`);
 										if (!exists({key: existsKey})) {
@@ -261,11 +253,11 @@ export const get = ({
 											});
 											//log.info(`publishResult:${toStr(publishResult)}`);
 										} // if !media exists
-										current += 1; // per asset synced
+										progressObj.current += 1; // Finished syncing a public asset
 									}); // assets.forEach
 								} // fnHandleAssets
 							}); // getAndPaginateAssetList
-							current += 1; // per publicCollection synced
+							progressObj.current += 1; // Finished syncing a public collection
 						}); // publicCollections.forEach
 					}; // fnHandlePublicCollections
 
@@ -274,13 +266,9 @@ export const get = ({
 						shortAbsolutePath: archivesPath,
 						fnHandleCollections: fnHandlePublicCollections
 					}); // getAndPaginateCollectionList
-					const progressParams = {
-						current,
-						info: 'Finished syncing public collections :)',
-						total
-					};
-					//log.info(`progressParams:${toStr(progressParams)}`);
-					progress(progressParams);
+					progressObj.info = 'Finished syncing public collections :)';
+					log.info(`progressObj:${toStr(progressObj)}`);
+					progress(progressObj);
 				} // if boolSyncPublic
 
 				if (boolSyncPrivate) {
@@ -302,7 +290,7 @@ export const get = ({
 
 					const fnHandlePrivateCollections = (collections) => {
 						//log.info(`collections:${toStr(collections)}`);
-						total += collections.length;
+						progressObj.total += collections.length; // Found private collections to process
 
 						collections.forEach((aPrivateCollection) => {
 							//log.info(`aPrivateCollection:${toStr(aPrivateCollection)}`);
@@ -312,11 +300,8 @@ export const get = ({
 							} = aPrivateCollection;
 							//log.info(`collectionName:${toStr(collectionName)}`);
 							//log.info(`collectionHref:${toStr(collectionHref)}`);
-							progress({
-								current,
-								info: `Syncing private collection ${collectionName}`,
-								total
-							});
+							progressObj.info = `Syncing private collection ${collectionName}`;
+							progress(progressObj);
 
 							//name: sanitize(href.replace(archivesPath, '').replace(/\/$/, '')), // NOPE private archives has "public" href :(
 							const collectionContentPath = decodeURIComponent(collectionHref).replace('/fotoweb/archives', privateFolderPath).replace(/\/$/, '');
@@ -345,7 +330,6 @@ export const get = ({
 							if (childCount) {
 								//log.info(`childCount:${toStr(childCount)}`);
 								//log.info(`children:${toStr(children)}`);
-								total += childCount;
 								paginateCollectionList({
 									accessToken,
 									hostname,
@@ -364,7 +348,7 @@ export const get = ({
 								shortAbsolutePath: aPrivateCollection.href,
 								doPaginate: false, // DEBUG
 								fnHandleAssets: (assets) => {
-									total += assets.length;
+									progressObj.total += assets.length; // Found private assets to process
 									assets.forEach((asset) => {
 										//log.info(`asset:${toStr(asset)}`);
 										const {
@@ -373,11 +357,8 @@ export const get = ({
 										} = asset;
 										//log.info(`renditions:${toStr(renditions)}`);
 
-										progress({
-											current,
-											info: `Syncing asset ${filename} in private collection ${collectionName}`,
-											total
-										});
+										progressObj.info = `Syncing asset ${filename} in private collection ${collectionName}`;
+										progress(progressObj);
 										const existsKey = `${collectionContentPath}/${filename}`;
 										//log.info(`existsKey:${toStr(existsKey)}`);
 										if (!exists({key: existsKey})) {
@@ -426,11 +407,11 @@ export const get = ({
 											});
 											log.info(`publishResult:${toStr(publishResult)}`);*/
 										} // if !exist media content
-										current += 1; // per private asset synced
+										progressObj.current += 1; // Finished syncing a private asset
 									}); // assets.forEach
 								} // fnHandleAssets
 							}); // getAndPaginateAssetList
-							current += 1; // per private collection synced
+							progressObj.current += 1; // Finished syncing a private collection
 						}); // collections.forEach
 					}; // fnHandlePrivateCollections
 
@@ -441,13 +422,9 @@ export const get = ({
 						fnHandleCollections: fnHandlePrivateCollections
 					}); // getAndPaginateCollectionList
 
-					const progressParams = {
-						current,
-						info: 'Finished syncing private collections :)',
-						total
-					};
-					log.info(`progressParams:${toStr(progressParams)}`);
-					progress(progressParams);
+					progressObj.info = 'Finished syncing private collections :)';
+					log.info(`progressObj:${toStr(progressObj)}`);
+					progress(progressObj);
 				} // if boolSyncPrivate
 			}); // run
 		} // task
