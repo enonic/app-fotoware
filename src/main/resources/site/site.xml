@@ -9,6 +9,107 @@
 				<regexp>https:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&amp;//=]*)</regexp>
 			</config>
 		</input>
+
+		<option-set name="docTypesOptionSet">
+			<label>Doc-types and extentions to include</label>
+			<expanded>false</expanded>
+			<help-text></help-text>
+  			<occurrences minimum="1" maximum="1"/>
+			<options minimum="1" maximum="5">
+				<option name="document">
+					<label>Document</label>
+					<default>false</default>
+  					<help-text></help-text>
+					<items>
+						<input name="pdf" type="CheckBox">
+						  <label>PDF</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+					</items>
+				</option>
+				<option name="generic">
+					<label>Generic</label>
+					<default>false</default>
+  					<help-text></help-text>
+					<items>
+						<input name="cof" type="CheckBox">
+						  <label>Cof</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+						<input name="cop" type="CheckBox">
+						  <label>Cop</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+						<input name="cos" type="CheckBox">
+						  <label>Cos</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+						<input name="cot" type="CheckBox">
+						  <label>Cot</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+						<input name="zip" type="CheckBox">
+						  <label>Zip</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+					</items>
+				</option>
+				<option name="graphic">
+					<label>Graphic</label>
+					<default>true</default>
+  					<help-text></help-text>
+					<items>
+						<input name="ai" type="CheckBox">
+						  <label>Ai</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+						<input name="svg" type="CheckBox">
+						  <label>SVG</label>
+						  <default>checked</default><!-- default is unchecked -->
+						</input>
+					</items>
+				</option>
+				<option name="image">
+					<label>Image</label>
+					<default>true</default>
+  					<help-text></help-text>
+					<items>
+						<input name="cr2" type="CheckBox">
+							<label>CR2</label>
+							<default>unchecked</default><!-- default is unchecked -->
+						</input>
+						<input name="jpg" type="CheckBox">
+						  <label>JPG</label>
+						  <default>checked</default><!-- default is unchecked -->
+						</input>
+						<input name="png" type="CheckBox">
+						  <label>PNG</label>
+						  <default>checked</default><!-- default is unchecked -->
+						</input>
+						<input name="psd" type="CheckBox">
+							<label>PSD</label>
+							<default>unchecked</default><!-- default is unchecked -->
+						</input>
+						<input name="tif" type="CheckBox">
+						  <label>TIFF</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+					</items>
+				</option>
+				<option name="movie">
+					<label>Movie</label>
+					<default>false</default>
+  					<help-text></help-text>
+					<items>
+						<input name="mp4" type="CheckBox">
+						  <label>Ai</label>
+						  <default>unchecked</default><!-- default is unchecked -->
+						</input>
+					</items>
+				</option>
+			</options>
+		</option-set>
+
 		<option-set name="archiveOptionSet">
   			<label i18n="archiveOptionSet.label">Archives</label>
   			<expanded>false</expanded>
