@@ -27,6 +27,7 @@ import {paginateCollectionList} from '../../lib/fotoweb/collectionList/paginate'
 
 import {getConfigFromSite} from '../../lib/fotoweb/xp/getConfigFromSite';
 import {createOrModifyCollection} from '../../lib/fotoweb/xp/createOrModifyCollection';
+import {sanitizePath} from '../../lib/fotoweb/xp/sanitizePath';
 
 /*
 Archive┐ (Public/Private)
@@ -146,7 +147,7 @@ export const get = ({
 							progressObj.info = `Syncing public collection ${collectionName}`;
 							progress(progressObj);
 
-							const collectionContentPath = decodeURIComponent(collectionHref).replace('/fotoweb/archives', publicFolderPath).replace(/\/$/, '');
+							const collectionContentPath = sanitizePath(decodeURIComponent(collectionHref).replace('/fotoweb/archives', publicFolderPath).replace(/\/$/, ''));
 							//log.info(`collectionContentPath:${toStr(collectionContentPath)}`);
 							const collectionContentParentPath = collectionContentPath.replace(/\/[^/]+$/, '');
 							//log.info(`collectionContentParentPath:${toStr(collectionContentParentPath)}`);
@@ -352,7 +353,7 @@ export const get = ({
 							progress(progressObj);
 
 							//name: sanitize(href.replace(archivesPath, '').replace(/\/$/, '')), // NOPE private archives has "public" href :(
-							const collectionContentPath = decodeURIComponent(collectionHref).replace('/fotoweb/archives', privateFolderPath).replace(/\/$/, '');
+							const collectionContentPath = sanitizePath(decodeURIComponent(collectionHref).replace('/fotoweb/archives', privateFolderPath).replace(/\/$/, ''));
 							//log.info(`collectionContentPath:${toStr(collectionContentPath)}`);
 							const collectionContentParentPath = collectionContentPath.replace(/\/[^/]+$/, '');
 							//log.info(`collectionContentParentPath:${toStr(collectionContentParentPath)}`);
