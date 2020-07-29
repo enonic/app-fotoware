@@ -10,7 +10,7 @@ export const getPrivateFullAPIDescriptor = ({
 		method: 'GET',
 		headers: {
 			Accept: 'application/vnd.fotoware.full-api-descriptor+json'//,
-			//Authentication: `Bearer ${accessToken}` // 401 Unauthorized: You are not authorized to access this resource
+			//Authentication: `bearer ${accessToken}` // 401 Unauthorized: You are not authorized to access this resource
 			//FWAPIToken: accessToken // 500 Internal server error!
 		},
 		params: {
