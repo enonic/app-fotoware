@@ -104,6 +104,9 @@ export const get = ({
 			//const foundDocTypesAndExtentions = {};
 			//const foundExtentions = [];
 			const stateObj = {
+				allFilesCount: 0,
+				includedFilesCount: 0,
+				syncedThisTimeFilesCount: 0,
 				allFilesSize: 0,
 				includedFilesSize: 0,
 				syncedThisTimeFilesSize: 0
@@ -188,6 +191,7 @@ export const get = ({
 								doPaginate: false, // DEBUG
 								fnHandleAssets: (assets) => {
 									progressObj.total += assets.length; // Found public assets to process
+									stateObj.allFilesCount += assets.length;
 									assets.forEach((asset) => {
 										//log.info(`asset:${toStr(asset)}`);
 										const {
@@ -235,6 +239,7 @@ export const get = ({
 
 										const extention = filename.replace(/.+\./, '').toLowerCase();
 										if (selectedDocTypes.includes(doctype) && selectedExtensions.includes(extention)) {
+											stateObj.includedFilesCount += 1;
 											stateObj.includedFilesSize += filesize;
 											progressObj.info = `Syncing asset ${filename} in collection ${collectionName}`;
 											progress(progressObj);
@@ -243,6 +248,7 @@ export const get = ({
 											if (exists({key: existsKey})) {
 												log.info(`Skipping ${existsKey}, already exists.`);
 											} else {
+												stateObj.syncedThisTimeFilesCount += 1;
 												stateObj.syncedThisTimeFilesSize += filesize;
 												//log.info(`imageattributes:${toStr(imageattributes)}`);
 												//log.info(`photoAttributes:${toStr(photoAttributes)}`);
@@ -292,7 +298,16 @@ export const get = ({
 													includeDependencies: false // default is true
 												});
 												//log.info(`publishResult:${toStr(publishResult)}`);
-												log.info(`stateObj:${toStr(stateObj)}`);
+												log.info(`state:${toStr({
+													allFilesCount: stateObj.allFilesCount,
+													includedFilesCount: stateObj.includedFilesCount,
+													excludedFilesCount: stateObj.allFilesCount - stateObj.includedFilesCount,
+													syncedThisTimeFilesCount: stateObj.syncedThisTimeFilesCount,
+													exsistingFilesCount: stateObj.includedFilesCount - stateObj.syncedThisTimeFilesCount,
+													allFilesSize: `${humanFileSize(stateObj.allFilesSize)} (${stateObj.allFilesSize})`,
+													includedFilesSize: `${humanFileSize(stateObj.includedFilesSize)} (${stateObj.includedFilesSize})`,
+													syncedThisTimeFilesSize: `${humanFileSize(stateObj.syncedThisTimeFilesSize)} (${stateObj.syncedThisTimeFilesSize})`
+												})}`);
 											} // if !media exists
 										} else {
 											log.info(`Skipping filename:${filename}, not included.`);
@@ -311,6 +326,11 @@ export const get = ({
 						fnHandleCollections: fnHandlePublicCollections
 					}); // getAndPaginateCollectionList
 					log.info(`state:${toStr({
+						allFilesCount: stateObj.allFilesCount,
+						includedFilesCount: stateObj.includedFilesCount,
+						excludedFilesCount: stateObj.allFilesCount - stateObj.includedFilesCount,
+						syncedThisTimeFilesCount: stateObj.syncedThisTimeFilesCount,
+						exsistingFilesCount: stateObj.includedFilesCount - stateObj.syncedThisTimeFilesCount,
 						allFilesSize: `${humanFileSize(stateObj.allFilesSize)} (${stateObj.allFilesSize})`,
 						includedFilesSize: `${humanFileSize(stateObj.includedFilesSize)} (${stateObj.includedFilesSize})`,
 						syncedThisTimeFilesSize: `${humanFileSize(stateObj.syncedThisTimeFilesSize)} (${stateObj.syncedThisTimeFilesSize})`
@@ -398,6 +418,7 @@ export const get = ({
 								doPaginate: false, // DEBUG
 								fnHandleAssets: (assets) => {
 									progressObj.total += assets.length; // Found private assets to process
+									stateObj.allFilesCount += assets.length;
 									assets.forEach((asset) => {
 										//log.info(`asset:${toStr(asset)}`);
 										const {
@@ -427,6 +448,7 @@ export const get = ({
 
 										const extention = filename.replace(/.+\./, '').toLowerCase();
 										if (selectedDocTypes.includes(doctype) && selectedExtensions.includes(extention)) {
+											stateObj.includedFilesCount += 1;
 											stateObj.includedFilesSize += filesize;
 											progressObj.info = `Syncing asset ${filename} in private collection ${collectionName}`;
 											progress(progressObj);
@@ -435,6 +457,7 @@ export const get = ({
 											if (exists({key: existsKey})) {
 												log.info(`Skipping ${existsKey}, already exists.`);
 											} else {
+												stateObj.syncedThisTimeFilesCount += 1;
 												stateObj.syncedThisTimeFilesSize += filesize;
 												const {
 													href: renditionHref/*,
@@ -485,6 +508,11 @@ export const get = ({
 													//log.info(`publishResult:${toStr(publishResult)}`);
 												}
 												log.info(`state:${toStr({
+													allFilesCount: stateObj.allFilesCount,
+													includedFilesCount: stateObj.includedFilesCount,
+													excludedFilesCount: stateObj.allFilesCount - stateObj.includedFilesCount,
+													syncedThisTimeFilesCount: stateObj.syncedThisTimeFilesCount,
+													exsistingFilesCount: stateObj.includedFilesCount - stateObj.syncedThisTimeFilesCount,
 													allFilesSize: `${humanFileSize(stateObj.allFilesSize)} (${stateObj.allFilesSize})`,
 													includedFilesSize: `${humanFileSize(stateObj.includedFilesSize)} (${stateObj.includedFilesSize})`,
 													syncedThisTimeFilesSize: `${humanFileSize(stateObj.syncedThisTimeFilesSize)} (${stateObj.syncedThisTimeFilesSize})`
@@ -513,6 +541,11 @@ export const get = ({
 					progress(progressObj);
 				} // if boolSyncPrivate
 				log.info(`state:${toStr({
+					allFilesCount: stateObj.allFilesCount,
+					includedFilesCount: stateObj.includedFilesCount,
+					excludedFilesCount: stateObj.allFilesCount - stateObj.includedFilesCount,
+					syncedThisTimeFilesCount: stateObj.syncedThisTimeFilesCount,
+					exsistingFilesCount: stateObj.includedFilesCount - stateObj.syncedThisTimeFilesCount,
 					allFilesSize: `${humanFileSize(stateObj.allFilesSize)} (${stateObj.allFilesSize})`,
 					includedFilesSize: `${humanFileSize(stateObj.includedFilesSize)} (${stateObj.includedFilesSize})`,
 					syncedThisTimeFilesSize: `${humanFileSize(stateObj.syncedThisTimeFilesSize)} (${stateObj.syncedThisTimeFilesSize})`
