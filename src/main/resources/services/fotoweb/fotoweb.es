@@ -1,3 +1,5 @@
+import humanFileSize from 'filesize';
+
 import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
 import {
@@ -80,7 +82,7 @@ export const get = ({
 	//log.info(`clientId:${toStr(clientId)}`);
 	//log.info(`clientSecret:${toStr(clientSecret)}`);
 	//log.info(`privateFolderPath:${toStr(privateFolderPath)}`); // contentId
-	//log.info(`hostname:${toStr(hostname)}`);
+	log.info(`hostname:${toStr(hostname)}`);
 	const boolSyncPublic = !!(selected.includes('public') && publicFolderPath);
 	const boolSyncPrivate = !!(selected.includes('private') && clientId && clientSecret && privateFolderPath);
 	if (!(hostname && (boolSyncPublic || boolSyncPrivate))) {
@@ -100,6 +102,11 @@ export const get = ({
 			//const foundDocTypes = [];
 			//const foundDocTypesAndExtentions = {};
 			//const foundExtentions = [];
+			const stateObj = {
+				allFilesSize: 0,
+				includedFilesSize: 0,
+				syncedThisTimeFilesSize: 0
+			};
 			const progressObj = {
 				current: 0, // No items has been processed yet
 				info: 'Initializing FotoWeb Intergration Task',
@@ -200,10 +207,13 @@ export const get = ({
 											},*/
 											doctype, // graphic image
 											filename,
+											filesize,
 											//metadata,
 											//props,
 											renditions
 										} = asset;
+
+										stateObj.allFilesSize += filesize;
 
 										/*const extention = filename.replace(/[^.]+\./, '');
 										if (!foundDocTypes.includes(doctype)) {
@@ -224,11 +234,15 @@ export const get = ({
 
 										const extention = filename.replace(/.+\./, '').toLowerCase();
 										if (selectedDocTypes.includes(doctype) && selectedExtensions.includes(extention)) {
+											stateObj.includedFilesSize += filesize;
 											progressObj.info = `Syncing asset ${filename} in collection ${collectionName}`;
 											progress(progressObj);
 											const existsKey = `${collectionContentPath}/${filename}`;
 											//log.info(`existsKey:${toStr(existsKey)}`);
-											if (!exists({key: existsKey})) {
+											if (exists({key: existsKey})) {
+												log.info(`Skipping ${existsKey}, already exists.`);
+											} else {
+												stateObj.syncedThisTimeFilesSize += filesize;
 												//log.info(`imageattributes:${toStr(imageattributes)}`);
 												//log.info(`photoAttributes:${toStr(photoAttributes)}`);
 												//log.info(`metadata:${toStr(metadata)}`);
@@ -257,7 +271,7 @@ export const get = ({
 												const downloadRenditionResponse = requestRendition({
 													//cookies,
 													hostname,
-													renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
+													renditionServiceShortAbsolutePath: renditionRequest,
 													renditionUrl: renditionHref
 												});
 												//log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
@@ -277,9 +291,10 @@ export const get = ({
 													includeDependencies: false // default is true
 												});
 												//log.info(`publishResult:${toStr(publishResult)}`);
+												log.info(`stateObj:${toStr(stateObj)}`);
 											} // if !media exists
 										} else {
-											log.info(`Skipping filename:${filename}`);
+											log.info(`Skipping filename:${filename}, not included.`);
 										} // if doctype && extension
 										progressObj.current += 1; // Finished syncing a public asset
 									}); // assets.forEach
@@ -294,6 +309,11 @@ export const get = ({
 						shortAbsolutePath: archivesPath,
 						fnHandleCollections: fnHandlePublicCollections
 					}); // getAndPaginateCollectionList
+					log.info(`state:${toStr({
+						allFilesSize: `${humanFileSize(stateObj.allFilesSize)} (${stateObj.allFilesSize})`,
+						includedFilesSize: `${humanFileSize(stateObj.includedFilesSize)} (${stateObj.includedFilesSize})`,
+						syncedThisTimeFilesSize: `${humanFileSize(stateObj.syncedThisTimeFilesSize)} (${stateObj.syncedThisTimeFilesSize})`
+					})}`);
 					progressObj.info = 'Finished syncing public collections :)';
 					log.info(`progressObj:${toStr(progressObj)}`);
 					progress(progressObj);
@@ -382,9 +402,10 @@ export const get = ({
 										const {
 											doctype,
 											filename,
+											filesize,
 											renditions
 										} = asset;
-
+										stateObj.allFilesSize += filesize;
 										/*const extention = filename.replace(/[^.]+\./, '');
 										if (!foundDocTypes.includes(doctype)) {
 											foundDocTypes.push(doctype);
@@ -405,11 +426,15 @@ export const get = ({
 
 										const extention = filename.replace(/.+\./, '').toLowerCase();
 										if (selectedDocTypes.includes(doctype) && selectedExtensions.includes(extention)) {
+											stateObj.includedFilesSize += filesize;
 											progressObj.info = `Syncing asset ${filename} in private collection ${collectionName}`;
 											progress(progressObj);
 											const existsKey = `${collectionContentPath}/${filename}`;
 											//log.info(`existsKey:${toStr(existsKey)}`);
-											if (!exists({key: existsKey})) {
+											if (exists({key: existsKey})) {
+												log.info(`Skipping ${existsKey}, already exists.`);
+											} else {
+												stateObj.syncedThisTimeFilesSize += filesize;
 												const {
 													href: renditionHref/*,
 													display_name: displayName,
@@ -432,14 +457,15 @@ export const get = ({
 												//.filter(({display_name: displayName}) => displayName === 'JPG sRGB')[0];
 												//.filter(({display_name: displayName}) => displayName === 'TIFF JPG CMYK')[0]; // size = 0 ???
 
-												/*const downloadRenditionResponse = requestRendition({
+												const downloadRenditionResponse = requestRendition({
 													accessToken,
 													//cookies,
-													renditionRequestServiceUrl: `${hostname}${renditionRequest}`,
+													hostname,
+													renditionServiceShortAbsolutePath: renditionRequest,
 													renditionUrl: renditionHref
 												});
 												if (downloadRenditionResponse) {
-													log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
+													//log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
 													//log.info(`parentPath:${toStr(parentPath)}`);
 													const createMediaResult = createMedia({
 														name: filename,
@@ -447,18 +473,24 @@ export const get = ({
 														//mimeType: downloadRenditionResponse.contentType,
 														data: downloadRenditionResponse.bodyStream
 													});
-													log.info(`createMediaResult:${toStr(createMediaResult)}`);
-													const publishResult = publish({
+													//log.info(`createMediaResult:${toStr(createMediaResult)}`);
+													//const publishResult =
+													publish({
 														keys: [createMediaResult._id],
 														sourceBranch: 'draft',
 														targetBranch: 'master',
 														includeDependencies: false // default is true
 													});
-													log.info(`publishResult:${toStr(publishResult)}`);
-												}*/
+													//log.info(`publishResult:${toStr(publishResult)}`);
+												}
+												log.info(`state:${toStr({
+													allFilesSize: `${humanFileSize(stateObj.allFilesSize)} (${stateObj.allFilesSize})`,
+													includedFilesSize: `${humanFileSize(stateObj.includedFilesSize)} (${stateObj.includedFilesSize})`,
+													syncedThisTimeFilesSize: `${humanFileSize(stateObj.syncedThisTimeFilesSize)} (${stateObj.syncedThisTimeFilesSize})`
+												})}`);
 											} // if !exist media content
 										} else {
-											log.info(`Skipping filename:${filename}`);
+											log.info(`Skipping filename:${filename}, not included.`);
 										} // if doctype && extension
 										progressObj.current += 1; // Finished syncing a private asset
 									}); // assets.forEach
@@ -479,6 +511,11 @@ export const get = ({
 					log.info(`progressObj:${toStr(progressObj)}`);
 					progress(progressObj);
 				} // if boolSyncPrivate
+				log.info(`state:${toStr({
+					allFilesSize: `${humanFileSize(stateObj.allFilesSize)} (${stateObj.allFilesSize})`,
+					includedFilesSize: `${humanFileSize(stateObj.includedFilesSize)} (${stateObj.includedFilesSize})`,
+					syncedThisTimeFilesSize: `${humanFileSize(stateObj.syncedThisTimeFilesSize)} (${stateObj.syncedThisTimeFilesSize})`
+				})}`);
 			}); // run
 			//log.info(`foundDocTypes:${toStr(foundDocTypes)}`);
 			//log.info(`foundExtentions:${toStr(foundExtentions)}`);

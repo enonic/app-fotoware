@@ -5,7 +5,7 @@ export const requestRendition = ({
 	accessToken,
 	cookies,
 	hostname,
-	renditionRequestServiceUrl,
+	renditionServiceShortAbsolutePath,
 	renditionUrl
 }) => {
 	const renditionServiceRequestParams = {
@@ -49,15 +49,17 @@ export const requestRendition = ({
 			//href: renditionUrl
 		},*/
 		//queryParams: {},
-		url: renditionRequestServiceUrl
+		url: `${hostname}${renditionServiceShortAbsolutePath}`
 	};
 	if (accessToken) {
+		renditionServiceRequestParams.headers.Authorization = `bearer ${accessToken}`;
+
 		// Becomes 403 FORBIDDEN without this
-		renditionServiceRequestParams.params = {
+		/*renditionServiceRequestParams.params = {
 			access_token: accessToken//, // 415 UNSUPPORTED MEDIA TYPE
 			//FWAPIToken: accessToken // 415 UNSUPPORTED MEDIA TYPE
 			//href: renditionUrl // 415 UNSUPPORTED MEDIA TYPE
-		};
+		};*/
 		/*renditionServiceRequestParams.queryParams = {
 			//access_token: accessToken // 403 FORBIDDEN
 			FWAPIToken: accessToken//, // 403 FORBIDDEN
@@ -73,47 +75,57 @@ export const requestRendition = ({
 	//log.info(`rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
 
 	if (rendtitionServiceResponse.status !== 202) {
-		if (rendtitionServiceResponse.status !== 415) {
-			log.error(`Something went wrong when trying to get rendition url renditionServiceRequestParams:${toStr(renditionServiceRequestParams)} rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
-		}
-		//throw new Error(`Something went wrong when trying to get rendition url renditionUrl:${renditionUrl}`);
+		//if (rendtitionServiceResponse.status !== 415) {
+		log.error(`Something went wrong when trying to get rendition url renditionServiceRequestParams:${toStr(renditionServiceRequestParams)} rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
+		//}
+		throw new Error(`Something went wrong when trying to get rendition url renditionUrl:${renditionUrl}`);
 	}
 
-	if (rendtitionServiceResponse.status === 202) {
-		let rendtitionServiceResponseBodyObj;
-		try {
-			rendtitionServiceResponseBodyObj = JSON.parse(rendtitionServiceResponse.body);
-		} catch (e) {
-			throw new Error(`Something went wrong when trying to JSON parse the response body! rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
-		}
-		//log.info(`rendtitionServiceResponseBodyObj:${toStr(rendtitionServiceResponseBodyObj)}`);
-
-		const {
-			href
-		} = rendtitionServiceResponseBodyObj;
-		const rendtitionRequestUrl = `${hostname}${href}`;
-		log.info(`rendtitionRequestUrl:${toStr(rendtitionRequestUrl)}`);
-
-		const pollAndDownloadRenditionRequestParams = {
-			method: 'GET',
-			url: rendtitionRequestUrl
-		};
-		log.info(`pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)}`);
-
-		let pollAndDownloadRenditionResponse = {
-			status: 202
-		};
-		while (pollAndDownloadRenditionResponse.status === 202) {
-			pollAndDownloadRenditionResponse = request(pollAndDownloadRenditionRequestParams);
-		}
-		if (pollAndDownloadRenditionResponse.status === 410) {
-			log.error(`Rendition no longer available rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionResponse:${pollAndDownloadRenditionResponse}`);
-			throw new Error(`Rendition no longer available renditionUrl:${renditionUrl}`);
-		}
-		if (pollAndDownloadRenditionResponse.status !== 200) {
-			log.error(`Something went wrong while trying to poll and download rendition rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionResponse:${pollAndDownloadRenditionResponse}`);
-			throw new Error(`Something went wrong while trying to poll and download rendition renditionUrl:${renditionUrl}`);
-		}
-		return pollAndDownloadRenditionResponse;
+	//if (rendtitionServiceResponse.status === 202) {
+	let rendtitionServiceResponseBodyObj;
+	try {
+		rendtitionServiceResponseBodyObj = JSON.parse(rendtitionServiceResponse.body);
+	} catch (e) {
+		throw new Error(`Something went wrong when trying to JSON parse the response body! rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
 	}
+	//log.info(`rendtitionServiceResponseBodyObj:${toStr(rendtitionServiceResponseBodyObj)}`);
+
+	const {
+		href
+	} = rendtitionServiceResponseBodyObj;
+	const rendtitionRequestUrl = `${hostname}${href}`;
+	//log.info(`rendtitionRequestUrl:${toStr(rendtitionRequestUrl)}`);
+
+	const pollAndDownloadRenditionRequestParams = {
+		method: 'GET',
+		url: rendtitionRequestUrl
+	};
+	if (accessToken) {
+		pollAndDownloadRenditionRequestParams.headers = { Authorization: `bearer ${accessToken}` };
+	}
+	//log.info(`pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)}`);
+
+	let pollAndDownloadRenditionResponse = {
+		status: 202
+	};
+	while (pollAndDownloadRenditionResponse.status === 202) {
+		pollAndDownloadRenditionResponse = request(pollAndDownloadRenditionRequestParams);
+	}
+	if (pollAndDownloadRenditionResponse.status === 410) {
+		log.error(`Rendition no longer available rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionResponse:${pollAndDownloadRenditionResponse}`);
+		throw new Error(`Rendition no longer available renditionUrl:${renditionUrl}`);
+	}
+	if (pollAndDownloadRenditionResponse.status !== 200) {
+		log.error(`Something went wrong while trying to poll and download rendition rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)} pollAndDownloadRenditionResponse:${pollAndDownloadRenditionResponse}`);
+		throw new Error(`Something went wrong while trying to poll and download rendition renditionUrl:${renditionUrl}`);
+	}
+	/*log.info(`debug rendition service and download:${toStr({
+		renditionServiceRequestParams,
+		rendtitionServiceResponse,
+		rendtitionServiceResponseBodyObj,
+		pollAndDownloadRenditionRequestParams,
+		pollAndDownloadRenditionResponse
+	})}`);*/
+	return pollAndDownloadRenditionResponse;
+	//}
 }; // export const requestRendition
