@@ -1,7 +1,8 @@
 {
   "author": "Christian Andreas Westgaard <comlock@gmail.com>",
   "dependencies": {
-    "filesize": "^6.1.0"
+    "filesize": "^6.1.0",
+    "get-value": "^3.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",

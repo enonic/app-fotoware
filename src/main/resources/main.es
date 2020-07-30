@@ -1,10 +1,10 @@
+/*
 import {toStr} from '/lib/util';
 import {deepen} from '/lib/fotoweb/xp/deepen';
 
 log.info(`app.config:${toStr(app.config)}`);
 log.info(`deepen(app.config):${toStr(deepen(app.config))}`);
 
-/*
 import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
 import {get as getContent} from '/lib/xp/content';
