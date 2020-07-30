@@ -167,4 +167,9 @@
 			</options>
 		</option-set>
 	</form>
+	<mappings>
+		<mapping controller="/site/content-types/archive/page.js">
+			<match>type:'com.enonic.app.fotoware:archive'</match>
+		</mapping>
+	</mappings>
 </site>
