@@ -20,11 +20,13 @@ export function deepen(o) {
 			return a;
 		}).join('.').split('.')
 			.map((a) => a.replace(/#/g, '.'));*/
-		const parts = k.split(/'|"/)
-			.map((a) => a.startsWith('.') || a.endsWith('.') ? a : a.replace(/\./g, '#')) // eslint-disable-line no-confusing-arrow
-			.join('')
-			.split('.')
-			.map((a) => a.replace(/#/g, '.'));
+		const parts = k.search(/'|"/) !== -1
+			? k.split(/'|"/)
+				.map((a) => a.startsWith('.') || a.endsWith('.') ? a : a.replace(/\./g, '#')) // eslint-disable-line no-confusing-arrow
+				.join('')
+				.split('.')
+				.map((a) => a.replace(/#/g, '.'))
+			: k.split('.');
 		//log.info(`parts:${toStr(parts)}`);
 		const key = parts.pop();
 		//log.info(`key:${toStr(key)}`);
