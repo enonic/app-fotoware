@@ -1,3 +1,4 @@
+import deepEqual from 'fast-deep-equal';
 import humanFileSize from 'filesize';
 
 import {toStr} from '/lib/util';
@@ -113,6 +114,8 @@ export const get = ({
 				includedFilesSize: 0,
 				syncedThisTimeFilesSize: 0
 			};
+			const metaDataViews = {};
+			const fields = {};
 			const progressObj = {
 				current: 0, // No items has been processed yet
 				info: 'Initializing FotoWeb Intergration Task',
@@ -145,7 +148,7 @@ export const get = ({
 							//log.info(`aPublicCollection:${toStr(aPublicCollection)}`);
 							const {
 								name: collectionName,
-								href: collectionHref,
+								href: collectionHref//,
 								/*metadataEditor: {
 									href: metadataHref
 								}*/
@@ -393,17 +396,28 @@ export const get = ({
 							const {
 								//builtinFields,
 								//detailRegions,
+								fields: metaDataViewFields,
 								id: metaDataViewId//,
 								//name,
 								//thumbnailFields
 							} = getMetadataView({
 								accessToken,
+								fields,
 								hostname,
 								shortAbsolutePath: metadataHref
 							});
+							//log.info(`metaDataViewFields:${toStr(metaDataViewFields)}`);
 							//log.info(`metaDataViewId:${toStr(metaDataViewId)}`);
-							//log.info(`detailRegions:${toStr(detailRegions)}`);
-							throw('a');
+							if (metaDataViews[metaDataViewId]) {
+								if (!deepEqual(metaDataViews[metaDataViewId], {metaDataViewFields})) {
+									throw new Error(`metaDataViews:${toStr(metaDataViews)} metaDataViewFields:${toStr(metaDataViewFields)} metaDataViewId:${metaDataViewId} already exist!`);
+								}
+							} else {
+								metaDataViews[metaDataViewId] = {
+									metaDataViewFields
+								};
+								log.info(`Object.keys(metaDataViews):${toStr(Object.keys(metaDataViews))}`);
+							}
 
 							//name: sanitize(href.replace(archivesPath, '').replace(/\/$/, '')), // NOPE private archives has "public" href :(
 							const collectionContentPath = sanitizePath(decodeURIComponent(collectionHref).replace('/fotoweb/archives', privateFolderPath).replace(/\/$/, ''));

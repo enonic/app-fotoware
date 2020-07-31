@@ -6,11 +6,15 @@ import {forceArray} from '/lib/util/data';
 
 export const getMetadataView = ({
 	accessToken,
+	fields, // gets modified
 	hostname,
 	shortAbsolutePath
 }) => {
 	const metadataViewRequestParams = {
 		contentType: 'application/json',
+		/*headers: {
+			'Accept-Language': 'nb, no, en-US, en pt-BR' // Localization
+		},*/
 		method: 'GET',
 		url: `${hostname}${shortAbsolutePath}`
 	};
@@ -36,14 +40,14 @@ export const getMetadataView = ({
 		//href,
 		name,
 		builtinFields,
-		detailRegions,
+		detailRegions, // Contains descriptions of all metadata fields (WARNING NO this turns out not to be true)
 		thumbnailFields//,
 		//preserveModificationTime,
 		//...rest
 	} = metadataViewResponseBodyObj;
 	//log.info(`rest:${toStr(rest)}`);
 
-	const fields = {};
+	//const fields = {};
 
 	//log.info(`builtinFields:${toStr(builtinFields)}`);
 	Object.keys(builtinFields).forEach((k) => {
@@ -58,7 +62,7 @@ export const getMetadataView = ({
 				throw new Error(`1 fieldId:${fieldId} fieldRest:${toStr(fieldRest)} already in fields:${toStr(fields)}`);
 			}
 		} else {
-			fields[fieldId] = fieldRest;
+			fields[fieldId] = fieldRest; // eslint-disable-line no-param-reassign
 		}
 	});
 
@@ -90,7 +94,7 @@ export const getMetadataView = ({
 					throw new Error(`2 fieldId:${fieldId} fieldRest:${toStr(fieldRest)} already in fields:${toStr(fields)}`);
 				}
 			} else {
-				fields[fieldId] = fieldRest;
+				fields[fieldId] = fieldRest; // eslint-disable-line no-param-reassign
 			}
 			detailRegionsObj[detailRegionName][fieldId] = {
 				field: {
@@ -121,7 +125,7 @@ export const getMetadataView = ({
 						throw new Error(`3 fieldId:${fieldId} fieldRest:${toStr(fieldRest)} already in fields:${toStr(fields)}`);
 					}
 				} else {
-					fields[fieldId] = fieldRest;
+					fields[fieldId] = fieldRest; // eslint-disable-line no-param-reassign
 				}
 			}
 		}); // aThumbnailFieldsArray.forEach
