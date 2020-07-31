@@ -25,6 +25,8 @@ import {getCollection} from '../../lib/fotoweb/collection/get';
 import {getAndPaginateCollectionList} from '../../lib/fotoweb/collectionList/getAndPaginate';
 import {paginateCollectionList} from '../../lib/fotoweb/collectionList/paginate';
 
+import {getMetadataView} from '../../lib/fotoweb/metadata/get';
+
 import {getConfigFromSite} from '../../lib/fotoweb/xp/getConfigFromSite';
 import {createOrModifyCollection} from '../../lib/fotoweb/xp/createOrModifyCollection';
 import {sanitizePath} from '../../lib/fotoweb/xp/sanitizePath';
@@ -143,12 +145,25 @@ export const get = ({
 							//log.info(`aPublicCollection:${toStr(aPublicCollection)}`);
 							const {
 								name: collectionName,
-								href: collectionHref
+								href: collectionHref,
+								/*metadataEditor: {
+									href: metadataHref
+								}*/
 							} = aPublicCollection;
 							//log.info(`collectionName:${toStr(collectionName)}`);
 							//log.info(`collectionHref:${toStr(collectionHref)}`);
 							progressObj.info = `Syncing public collection ${collectionName}`;
 							progress(progressObj);
+
+							/*const {
+								id: metaDataViewId
+							} = getMetadataView({
+								hostname,
+								shortAbsolutePath: metadataHref
+							});
+							log.info(`metaDataViewId:${toStr(metaDataViewId)}`);
+							throw('a');
+							*/
 
 							const collectionContentPath = sanitizePath(decodeURIComponent(collectionHref).replace('/fotoweb/archives', publicFolderPath).replace(/\/$/, ''));
 							//log.info(`collectionContentPath:${toStr(collectionContentPath)}`);
@@ -365,12 +380,30 @@ export const get = ({
 							//log.info(`aPrivateCollection:${toStr(aPrivateCollection)}`);
 							const {
 								name: collectionName,
-								href: collectionHref
+								href: collectionHref,
+								metadataEditor: {
+									href: metadataHref
+								}
 							} = aPrivateCollection;
 							//log.info(`collectionName:${toStr(collectionName)}`);
 							//log.info(`collectionHref:${toStr(collectionHref)}`);
 							progressObj.info = `Syncing private collection ${collectionName}`;
 							progress(progressObj);
+
+							const {
+								//builtinFields,
+								//detailRegions,
+								id: metaDataViewId//,
+								//name,
+								//thumbnailFields
+							} = getMetadataView({
+								accessToken,
+								hostname,
+								shortAbsolutePath: metadataHref
+							});
+							//log.info(`metaDataViewId:${toStr(metaDataViewId)}`);
+							//log.info(`detailRegions:${toStr(detailRegions)}`);
+							throw('a');
 
 							//name: sanitize(href.replace(archivesPath, '').replace(/\/$/, '')), // NOPE private archives has "public" href :(
 							const collectionContentPath = sanitizePath(decodeURIComponent(collectionHref).replace('/fotoweb/archives', privateFolderPath).replace(/\/$/, ''));
