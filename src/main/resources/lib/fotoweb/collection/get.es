@@ -34,8 +34,9 @@ export const getCollection = ({
 
 	const {
 		childCount,
-		children/*,
-		name,
+		children,
+		metadataEditor,
+		name/*,
 		href,
 		hasChildren,
 		assets
@@ -61,7 +62,6 @@ export const getCollection = ({
 		modified,
 		deleted,
 		archived,
-		metadataEditor,
 		searchURL,
 		originalURL,
 		clearSearch,
@@ -102,6 +102,8 @@ export const getCollection = ({
 	return {
 		//assets, // Using getAndPaginateAssetList instead
 		childCount,
-		children // collection list (object)
+		children, // collection list (object)
+		metadataEditor,
+		name
 	};
 }; // export const getCollection

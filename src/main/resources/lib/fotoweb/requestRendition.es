@@ -112,11 +112,11 @@ export const requestRendition = ({
 		pollAndDownloadRenditionResponse = request(pollAndDownloadRenditionRequestParams);
 	}
 	if (pollAndDownloadRenditionResponse.status === 410) {
-		log.error(`Rendition no longer available rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionResponse:${pollAndDownloadRenditionResponse}`);
+		log.error(`Rendition no longer available rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionResponse:${toStr(pollAndDownloadRenditionResponse)}`);
 		throw new Error(`Rendition no longer available renditionUrl:${renditionUrl}`);
 	}
 	if (pollAndDownloadRenditionResponse.status !== 200) {
-		log.error(`Something went wrong while trying to poll and download rendition rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)} pollAndDownloadRenditionResponse:${pollAndDownloadRenditionResponse}`);
+		log.error(`Something went wrong while trying to poll and download rendition rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)} pollAndDownloadRenditionResponse:${toStr(pollAndDownloadRenditionResponse)}`);
 		throw new Error(`Something went wrong while trying to poll and download rendition renditionUrl:${renditionUrl}`);
 	}
 	/*log.info(`debug rendition service and download:${toStr({
