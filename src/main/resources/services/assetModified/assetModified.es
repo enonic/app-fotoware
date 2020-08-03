@@ -3,10 +3,7 @@ import getIn from 'get-value';
 import {URL} from '/lib/galimatias';
 import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
-import {
-	get as getContent,
-	query as queryContent
-} from '/lib/xp/content';
+import {query as queryContent} from '/lib/xp/content';
 import {
 	//get as getContext,
 	run as runInContext
@@ -28,6 +25,7 @@ import {getMetadataView} from '/lib/fotoweb/metadata/get';
 
 import {createOrModifyCollection} from '/lib/fotoweb/xp/createOrModifyCollection';
 import {deepen} from '/lib/fotoweb/xp/deepen';
+import {getConfigFromArchiveContent} from '/lib/fotoweb/xp/getConfigFromArchiveContent';
 import {sanitizePath} from '/lib/fotoweb/xp/sanitizePath';
 
 export const post = (request) => {
@@ -143,54 +141,13 @@ export const post = (request) => {
 				const privateFolderPath = queryContentRes.hits[0]._path;
 				//log.info(`privateFolderPath:${toStr(privateFolderPath)}`);
 
-				const archiveContent = getContent({key: queryContentRes.hits[0]._id });
 				const {
-					docTypesOptionSet: {
-						_selected: selectedDocTypes = ['graphic', 'image'],
-						document: {
-							pdf = false
-						} = {},
-						generic: {
-							cof = false,
-							cop = false,
-							cos = false,
-							cot = false,
-							zip = false
-						} = {},
-						graphic: {
-							ai = false,
-							svg = true
-						} = {},
-						image: {
-							cr2 = false,
-							jpg = true,
-							png = true,
-							psd = false,
-							tif = false
-						} = {},
-						movie: {
-							mp4 = false
-						} = {}
-					} = {}
-				} = archiveContent.data;
+					selectedDocTypes,
+					selectedExtensions
+				} = getConfigFromArchiveContent({
+					archiveContentId: queryContentRes.hits[0]._id
+				});
 
-				const selectedExtensions = [];
-				if (pdf) { selectedExtensions.push('pdf'); }
-				if (cof) { selectedExtensions.push('cof'); }
-				if (cop) { selectedExtensions.push('cop'); }
-				if (cos) { selectedExtensions.push('cos'); }
-				if (cot) { selectedExtensions.push('cot'); }
-				if (zip) { selectedExtensions.push('zip'); }
-				if (ai) { selectedExtensions.push('ai'); }
-				if (svg) { selectedExtensions.push('svg'); }
-				if (cr2) { selectedExtensions.push('cr2'); }
-				if (jpg) { selectedExtensions.push('jpg'); }
-				if (png) { selectedExtensions.push('png'); }
-				if (psd) { selectedExtensions.push('psd'); }
-				if (tif) { selectedExtensions.push('tif'); }
-				if (mp4) { selectedExtensions.push('mp4'); }
-				//log.info(`selectedDocTypes:${toStr(selectedDocTypes)}`);
-				//log.info(`selectedExtensions:${toStr(selectedExtensions)}`);
 				const {accessToken} = getAccessToken({
 					hostname: base,
 					clientId,
