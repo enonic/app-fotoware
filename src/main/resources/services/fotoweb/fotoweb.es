@@ -6,6 +6,7 @@ import {sanitize} from '/lib/xp/common';
 import {
 	createMedia,
 	exists,
+	modify as modifyContent,
 	publish
 } from '/lib/xp/content';
 import {run} from '/lib/xp/context';
@@ -31,6 +32,8 @@ import {getMetadataView} from '../../lib/fotoweb/metadata/get';
 import {getConfigFromSite} from '../../lib/fotoweb/xp/getConfigFromSite';
 import {createOrModifyCollection} from '../../lib/fotoweb/xp/createOrModifyCollection';
 import {sanitizePath} from '../../lib/fotoweb/xp/sanitizePath';
+
+const SANITIZED_APP_NAME = sanitize(app.name);
 
 /*
 Archive┐ (Public/Private)
@@ -86,7 +89,7 @@ export const get = ({
 	//log.info(`clientId:${toStr(clientId)}`);
 	//log.info(`clientSecret:${toStr(clientSecret)}`);
 	//log.info(`privateFolderPath:${toStr(privateFolderPath)}`); // contentId
-	log.info(`hostname:${toStr(hostname)}`);
+	//log.info(`hostname:${toStr(hostname)}`);
 	const boolSyncPublic = !!(selected.includes('public') && publicFolderPath);
 	const boolSyncPrivate = !!(selected.includes('private') && clientId && clientSecret && privateFolderPath);
 	if (!(hostname && (boolSyncPublic || boolSyncPrivate))) {
@@ -412,12 +415,12 @@ export const get = ({
 								if (!deepEqual(metaDataViews[metaDataViewId], {metaDataViewFields})) {
 									throw new Error(`metaDataViews:${toStr(metaDataViews)} metaDataViewFields:${toStr(metaDataViewFields)} metaDataViewId:${metaDataViewId} already exist!`);
 								}
-							} else {
+							} /*else {
 								metaDataViews[metaDataViewId] = {
 									metaDataViewFields
 								};
 								log.info(`Object.keys(metaDataViews):${toStr(Object.keys(metaDataViews))}`);
-							}
+							}*/
 
 							//name: sanitize(href.replace(archivesPath, '').replace(/\/$/, '')), // NOPE private archives has "public" href :(
 							const collectionContentPath = sanitizePath(decodeURIComponent(collectionHref).replace('/fotoweb/archives', privateFolderPath).replace(/\/$/, ''));
@@ -472,6 +475,7 @@ export const get = ({
 											doctype,
 											filename,
 											filesize,
+											metadata,
 											renditions
 										} = asset;
 										stateObj.allFilesSize += filesize;
@@ -538,6 +542,7 @@ export const get = ({
 												if (downloadRenditionResponse) {
 													//log.info(`downloadRenditionResponse:${toStr(downloadRenditionResponse)}`);
 													//log.info(`parentPath:${toStr(parentPath)}`);
+
 													const createMediaResult = createMedia({
 														name: filename,
 														parentPath: collectionContentPath,
@@ -546,6 +551,48 @@ export const get = ({
 													});
 													//log.info(`createMediaResult:${toStr(createMediaResult)}`);
 													//const publishResult =
+
+													//log.info(`metadata:${toStr(metadata)}`);
+													const metadataArray = Object.keys(metadata).map((k) => {
+														if (!fields[k]) {
+															log.error(`Unable to find field:${toStr(k)} metadata:${toStr(metadata)}`);
+															return null;
+														}
+														return {
+															id: k,
+															label: fields[k].label,
+															/*'multi-instance'
+															'max-size'
+															multiline
+															data-type
+															"validation": {
+																"regexp": null,
+																"max": null,
+																"min": null
+															},
+															taxonomyHref*/
+															values: metadata[k].value
+														};
+													}).filter((x) => x); // remove null entries
+													log.info(`metadataArray:${toStr(metadataArray)}`);
+
+													modifyContent({
+														key: createMediaResult._id,
+														editor: (node) => {
+															log.info(`node:${toStr(node)}`);
+															log.info(`node.type:${toStr(node.type)}`);
+															if (!node.x) {
+																node.x = {}; // eslint-disable-line no-param-reassign
+															}
+															node.x[SANITIZED_APP_NAME] = { // eslint-disable-line no-param-reassign
+																fotoWare: {
+																	metadata: metadataArray
+																}
+															};
+															return node;
+														}, // editor
+														requireValid: true
+													}); // modifyContent
 													publish({
 														keys: [createMediaResult._id],
 														sourceBranch: 'draft',

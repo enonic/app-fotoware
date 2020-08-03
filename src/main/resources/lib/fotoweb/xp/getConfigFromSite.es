@@ -104,10 +104,10 @@ export const getConfigFromSite = ({
 		principals: ['role:system.admin']
 	}, () => ({
 		selected: forceArray(selected),
-		publicFolderPath: publicFolderId ? getContentByKey({key: publicFolderId})._path : null,
+		publicFolderPath: publicFolderId ? getContentByKey({key: publicFolderId}) && getContentByKey({key: publicFolderId})._path : null,
 		clientId,
 		clientSecret,
-		privateFolderPath: privateFolderId ? getContentByKey({key: privateFolderId})._path : null,
+		privateFolderPath: privateFolderId ? getContentByKey({key: privateFolderId}) && getContentByKey({key: privateFolderId})._path : null,
 		hostname,
 		selectedDocTypes,
 		selectedExtensions

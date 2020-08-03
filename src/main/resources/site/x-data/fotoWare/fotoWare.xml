@@ -1,0 +1,23 @@
+<x-data>
+	<display-name>FotoWare</display-name>
+	<form>
+		<item-set name="metadata">
+			<label>Metadata</label>
+			<occurrences minimum="0" maximum="0"/>
+			<items>
+				<input name="id" type="TextLine">
+					<label>Id</label>
+					<occurrences minimum="1" maximum="1"/>
+				</input>
+				<input name="label" type="TextLine">
+					<label>Label</label>
+					<occurrences minimum="1" maximum="1"/>
+				</input>
+				<input name="values" type="TextLine">
+					<label>Values</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+			</items>
+		</item-set>
+	</form>
+</x-data>

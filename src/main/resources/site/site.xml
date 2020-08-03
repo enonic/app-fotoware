@@ -102,7 +102,7 @@
   					<help-text></help-text>
 					<items>
 						<input name="mp4" type="CheckBox">
-						  <label>Ai</label>
+						  <label>Mp4</label>
 						  <default>unchecked</default><!-- default is unchecked -->
 						</input>
 					</items>
@@ -172,4 +172,6 @@
 			<match>type:'com.enonic.app.fotoware:archive'</match>
 		</mapping>
 	</mappings>
+	<!--x-data name="fotoWare" allowContentTypes="^media:(archive|code|document|image|unknown|vector|video)$" optional="true"/-->
+	<x-data name="fotoWare" allowContentTypes="^media:.*$" optional="true"/>
 </site>
