@@ -1,9 +1,51 @@
-/*
 import {toStr} from '/lib/util';
 import {deepen} from '/lib/fotoweb/xp/deepen';
 
-log.info(`app.config:${toStr(app.config)}`);
-log.info(`deepen(app.config):${toStr(deepen(app.config))}`);
+//log.info(`app.config:${toStr(app.config)}`);
+
+const config = deepen(app.config);
+//log.info(`config:${toStr(config)}`);
+
+const {
+	fotoware: {
+		sites = {}
+	} = {}
+} = config;
+//log.info(`sites:${toStr(sites)}`);
+
+Object.keys(sites).forEach((site) => {
+	const {
+		doctypes: {
+			document: docTypeDocument = 'false',
+			graphic: docTypeGraphic = 'true',
+			generic: docTypeGeneric = 'false',
+			image: docTypeImage = 'true',
+			movie: docTypeMovie = 'false'
+		} = {},
+		url = `https://${site}.fotoware.cloud`,
+		remoteAddresses = {},
+		path = 'FotoWare',
+		clientSecret,
+		clientId,
+		project = 'default'
+	} = sites[site];
+	log.info(`${toStr({
+		site,
+		docTypeDocument,
+		docTypeGraphic,
+		docTypeGeneric,
+		docTypeImage,
+		docTypeMovie,
+		url,
+		remoteAddresses,
+		path,
+		clientSecret,
+		clientId,
+		project
+	})}`);
+});
+
+/*
 
 import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
