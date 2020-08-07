@@ -137,7 +137,7 @@ export function syncSiteFlat({siteConfig}) {
 							const {
 								doctype,
 								filename,
-								//filesize,
+								filesize,
 								href: assetHref,
 								metadata,
 								renditions
@@ -153,15 +153,44 @@ export function syncSiteFlat({siteConfig}) {
 										x: {
 											[X_APP_NAME]: {
 												fotoWare: {
+													filesize: exisitingMediaFilesize,
 													hrefs: exisitingMediaHrefs
 												} = {}
-											} = {}
+											} = {}/*,
+											media: {
+												imageInfo: {
+													byteSize: exisitingMediaByteSize
+												} = {}
+											} = {}*/
 										} = {}
 									} = exisitingMedia;
-									if ( exisitingMediaHrefs && forceArray(exisitingMediaHrefs).includes(assetHref)) {
-										log.info(`Skipping assetHref:${assetHref} already exists as mediaId:${mediaId}`);
+									const exisitingMediaHrefsArray = forceArray(exisitingMediaHrefs);
+									if ( exisitingMediaHrefs && exisitingMediaHrefsArray.includes(assetHref)) {
+										//log.info(`Skipping assetHref:${assetHref} already exists as mediaId:${mediaId}`);
 									} else {
-										log.warning(`filename:${filename} exists, but hrefs:${toStr(exisitingMediaHrefs)} doesn't include assetHref:${assetHref}!`);
+										//log.warning(`filename:${filename} exists, but hrefs:${toStr(exisitingMediaHrefs)} doesn't include assetHref:${assetHref}!`);
+										if(filesize === exisitingMediaFilesize) {
+											// Probably same image, add new href
+											modifyContent({
+												key: mediaId,
+												editor: (node) => {
+													try {
+														//log.info(`node:${toStr(node)}`);
+														exisitingMediaHrefsArray.push(assetHref);
+														node.x[X_APP_NAME].fotoWare.hrefs = exisitingMediaHrefsArray;
+													} catch (e) {
+														// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+														log.error(`Unable to add assetHref:${assetHref} in node:${toStr(node)}`);
+														throw e;
+													}
+													return node;
+												}, // editor
+												requireValid: false // Not under site so there is no x-data definitions
+											}); // modifyContent
+										} else {
+											// Not the same image!
+											log.error(`filename:${filename} exists, but hrefs:${toStr(exisitingMediaHrefs)} doesn't include assetHref:${assetHref}! and filesize:${filesize} !== exisitingMediaFilesize:${exisitingMediaFilesize}`);
+										}
 									}
 								} else {
 									const {
@@ -192,7 +221,7 @@ export function syncSiteFlat({siteConfig}) {
 										if (createMediaResult) {
 											const metadataArray = Object.keys(metadata).map((k) => {
 												if (!fields[k]) {
-													log.error(`Unable to find field:${toStr(k)} metadata:${toStr(metadata)}`);
+													log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])} assetHref:${assetHref}`);
 													return null;
 												}
 												return {
@@ -217,21 +246,24 @@ export function syncSiteFlat({siteConfig}) {
 											modifyContent({
 												key: createMediaResult._id,
 												editor: (node) => {
-													//log.info(`node:${toStr(node)}`);
-													//log.info(`node.type:${toStr(node.type)}`);
-													if (!node.x) {
-														node.x = {}; // eslint-disable-line no-param-reassign
-													}
-													const fotoWareXData = {
-														fotoWare: {
-															hrefs: assetHref, // TODO Might be multiple
-															metadata: metadataArray
-														}
-													}
+													let fotoWareXData;
 													try {
+														//log.info(`node:${toStr(node)}`);
+														//log.info(`node.type:${toStr(node.type)}`);
+														if (!node.x) {
+															node.x = {}; // eslint-disable-line no-param-reassign
+														}
+														fotoWareXData = {
+															fotoWare: {
+																filesize,
+																hrefs: assetHref, // NOTE Might be multiple
+																metadata: metadataArray
+															}
+														}
 														node.x[X_APP_NAME] = fotoWareXData; // eslint-disable-line no-param-reassign
 													} catch (e) {
 														// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+														log.error(`node:${toStr(node)}`);
 														log.error(`fotoWareXData:${toStr(fotoWareXData)}`);
 														throw e;
 													}
