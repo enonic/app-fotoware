@@ -1,12 +1,18 @@
-import {getCollectionList} from './get';
+//import {getCollectionList} from './get';
+import {getCollectionList} from '/lib/fotoware/api/collectionList/get';
 import {toStr} from '/lib/util';
 
-export const paginateCollectionList = ({
+export const getAndPaginateCollectionList = ({
 	accessToken,
 	hostname,
-	collectionList,
+	shortAbsolutePath,
 	fnHandleCollections
 }) => {
+	//log.info(`shortAbsolutePath:${toStr(shortAbsolutePath)}`);
+	let collectionList = getCollectionList({
+		accessToken,
+		url: `${hostname}${shortAbsolutePath}`
+	});
 	//log.info(`collectionList:${toStr(collectionList)}`);
 	fnHandleCollections(collectionList.collections);
 	if (collectionList.paging) {
@@ -15,14 +21,12 @@ export const paginateCollectionList = ({
 		//next, // URL of next page. If null, then there is no next page, and the current representation is the last page.
 		//first, // URL of first page. This attribute is never null and can be used for restarting navigation at the beginning of the list.
 		//last // URL of last page. If null, then the last page is not known, because it is not known how many pages there are. The last page (if the list has finite length) can be “discovered” by following paging.next repeatedly
-		let {next} = collectionList.paging;
-		while (next) {
-			const collectionListPage = getCollectionList({
+		while (collectionList.paging.next) {
+			collectionList = getCollectionList({
 				accessToken,
-				url: `${hostname}${next}`
+				url: `${hostname}${collectionList.paging.next}`
 			});
-			next = collectionListPage.paging.next;
-			fnHandleCollections(collectionListPage.collections);
+			fnHandleCollections(collectionList.collections);
 		} // while next
 	} // if paging
-}; // export const paginateCollectionList
+}; // export const getAndPaginateCollectionList

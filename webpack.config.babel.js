@@ -19,7 +19,8 @@ import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
 //──────────────────────────────────────────────────────────────────────────────
 // Common
 //──────────────────────────────────────────────────────────────────────────────
-const MODE = 'production';
+const MODE = 'development';
+//const MODE = 'production';
 const JS_EXTENSION_GLOB_BRACE = '*.{es,es6,mjs,jsx,flow,js}';
 const ASSETS_PATH_GLOB_BRACE = '{site/assets,assets}';
 
@@ -258,7 +259,6 @@ const STYLE_CONFIG = {
 //console.log(`STYLE_CONFIG:${JSON.stringify(STYLE_CONFIG, null, 4)}`);
 
 WEBPACK_CONFIG.push(STYLE_CONFIG);
-
 
 //──────────────────────────────────────────────────────────────────────────────
 const ESM_ASSETS_GLOB = `${SRC_DIR}/${ASSETS_PATH_GLOB_BRACE}/**/*.{jsx,mjs}`;

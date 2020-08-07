@@ -14,19 +14,19 @@ import {
 	submit
 } from '/lib/xp/task';
 
-import {getAccessToken} from '/lib/fotoweb/getAccessToken';
-import {getPrivateFullAPIDescriptor} from '/lib/fotoweb/getPrivateFullAPIDescriptor';
+import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
+import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 
-import {handleAsset} from '/lib/fotoweb/asset/handle';
+import {handleAsset} from '/lib/fotoware/api/asset/handle';
 
-import {getCollection} from '/lib/fotoweb/collection/get';
+import {getCollection} from '/lib/fotoware/api/collection/get';
 
-import {getMetadataView} from '/lib/fotoweb/metadata/get';
+import {getMetadataView} from '/lib/fotoware/api/metadata/get';
 
-import {createOrModifyCollection} from '/lib/fotoweb/xp/createOrModifyCollection';
-import {deepen} from '/lib/fotoweb/xp/deepen';
-import {getConfigFromArchiveContent} from '/lib/fotoweb/xp/getConfigFromArchiveContent';
-import {sanitizePath} from '/lib/fotoweb/xp/sanitizePath';
+import {createOrModifyCollection} from '/lib/fotoware/xp/createOrModifyCollection';
+import {deepen} from '/lib/fotoware/xp/deepen';
+import {getConfigFromArchiveContent} from '/lib/fotoware/xp/getConfigFromArchiveContent';
+import {sanitizePath} from '/lib/fotoware/xp/sanitizePath';
 
 export const post = (request) => {
 	//log.info(`request:${toStr(request)}`);

@@ -11,7 +11,8 @@ import {
 	publish
 } from '/lib/xp/content';
 
-import {requestRendition} from '../requestRendition';
+//import {requestRendition} from '../requestRendition';
+import {requestRendition} from '/lib/fotoware/api/requestRendition';
 
 const SANITIZED_APP_NAME = sanitize(app.name);
 

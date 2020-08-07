@@ -14,25 +14,25 @@ import {
 	submit
 } from '/lib/xp/task';
 
-import {getAccessToken} from '../../lib/fotoweb/getAccessToken';
-import {getPrivateFullAPIDescriptor} from '../../lib/fotoweb/getPrivateFullAPIDescriptor';
-import {getPublicAPIDescriptor} from '../../lib/fotoweb/getPublicAPIDescriptor';
-import {requestRendition} from '../../lib/fotoweb/requestRendition';
+import {getAccessToken} from '../../lib/fotoware/api/getAccessToken';
+import {getPrivateFullAPIDescriptor} from '../../lib/fotoware/api/getPrivateFullAPIDescriptor';
+import {getPublicAPIDescriptor} from '../../lib/fotoware/api/getPublicAPIDescriptor';
+import {requestRendition} from '../../lib/fotoware/api/requestRendition';
 
-import {handleAsset} from '../../lib/fotoweb/asset/handle';
+import {handleAsset} from '../../lib/fotoware/api/asset/handle';
 
-import {getAndPaginateAssetList} from '../../lib/fotoweb/assetList/getAndPaginate';
+import {getAndPaginateAssetList} from '../../lib/fotoware/api/assetList/getAndPaginate';
 
-import {getCollection} from '../../lib/fotoweb/collection/get';
+import {getCollection} from '../../lib/fotoware/api/collection/get';
 
-import {getAndPaginateCollectionList} from '../../lib/fotoweb/collectionList/getAndPaginate';
-import {paginateCollectionList} from '../../lib/fotoweb/collectionList/paginate';
+import {getAndPaginateCollectionList} from '../../lib/fotoware/api/collectionList/getAndPaginate';
+import {paginateCollectionList} from '../../lib/fotoware/api/collectionList/paginate';
 
-import {getMetadataView} from '../../lib/fotoweb/metadata/get';
+import {getMetadataView} from '../../lib/fotoware/api/metadata/get';
 
-import {getConfigFromSite} from '../../lib/fotoweb/xp/getConfigFromSite';
-import {createOrModifyCollection} from '../../lib/fotoweb/xp/createOrModifyCollection';
-import {sanitizePath} from '../../lib/fotoweb/xp/sanitizePath';
+import {getConfigFromSite} from '../../lib/fotoware/xp/getConfigFromSite';
+import {createOrModifyCollection} from '../../lib/fotoware/xp/createOrModifyCollection';
+import {sanitizePath} from '../../lib/fotoware/xp/sanitizePath';
 
 /*
 Archive┐ (Public/Private)

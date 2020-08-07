@@ -1,63 +1,24 @@
-import {toStr} from '/lib/util';
-import {deepen} from '/lib/fotoweb/xp/deepen';
+import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
+//import {toStr} from '/lib/util';
+import {submit} from '/lib/xp/task';
+import {syncSiteFlat} from '/lib/fotoware/xp/syncSiteFlat';
 
-//log.info(`app.config:${toStr(app.config)}`);
+const sitesConfigs = getConfigFromAppCfg();
+//log.info(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-const config = deepen(app.config);
-//log.info(`config:${toStr(config)}`);
+Object.keys(sitesConfigs).forEach((site) => {
+	submit({
+		description: '',
+		task: () => {
+			syncSiteFlat({siteConfig: sitesConfigs[site]})
+		}
+	}); // submit
+}); // forEach site
 
-const {
-	fotoware: {
-		sites = {}
-	} = {}
-} = config;
-//log.info(`sites:${toStr(sites)}`);
 
-Object.keys(sites).forEach((site) => {
-	const {
-		doctypes: {
-			document: docTypeDocument = 'false',
-			graphic: docTypeGraphic = 'true',
-			generic: docTypeGeneric = 'false',
-			image: docTypeImage = 'true',
-			movie: docTypeMovie = 'false'
-		} = {},
-		url = `https://${site}.fotoware.cloud`,
-		remoteAddresses = {},
-		path = 'FotoWare',
-		clientSecret,
-		clientId,
-		project = 'default'
-	} = sites[site];
-	log.info(`${toStr({
-		site,
-		docTypeDocument,
-		docTypeGraphic,
-		docTypeGeneric,
-		docTypeImage,
-		docTypeMovie,
-		url,
-		remoteAddresses,
-		path,
-		clientSecret,
-		clientId,
-		project
-	})}`);
-});
 
 /*
-
-import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
-import {get as getContent} from '/lib/xp/content';
-import {run} from '/lib/xp/context';
 import {listener} from '/lib/xp/event';
-import {submit} from '/lib/xp/task';
-
-//import {syncPublic} from '/lib/fotoweb/syncPublic';
-import {getPublicAPIDescriptor} from '/lib/fotoweb/getPublicAPIDescriptor';
-import {getAccessToken} from '/lib/fotoweb/getAccessToken';
-import {getprivateFullAPIDescriptor} from '/lib/fotoweb/getprivateFullAPIDescriptor';
 
 listener({
 	type: 'node.*',
@@ -78,7 +39,7 @@ listener({
 			//'node.updated',
 			//'node.deleted'
 		].includes(type)) {
-			nodes.forEach((node/*, i) => {
+			nodes.forEach((node) => {
 				const {
 					id,
 					//path,
@@ -91,100 +52,6 @@ listener({
 				) {
 					log.info(`event:${toStr(event)}`);
 					//log.info(`node:${toStr(node)}`);
-					const context = {
-						repository: repo,
-						branch: 'master', // Always syncing to master
-						user: {
-							login: 'su',
-							idProvider: 'system'
-						},
-						principals: ['role:system.admin']
-					};
-					//log.info(`context:${toStr(context)}`);
-					run(context, () => {
-						const content = getContent({key: id});
-						//log.info(`content:${toStr(content)}`);
-						const {
-							data: {
-								siteConfig = []
-							} = {}
-						} = content;
-						const siteConfigs = forceArray(siteConfig);
-						//log.info(`siteConfigs:${toStr(siteConfigs)}`);
-						siteConfigs.forEach(({
-							applicationKey,
-							config
-						}/*, i) => {
-							if (applicationKey === 'com.enonic.app.fotoware') {
-								const {
-									archiveOptionSet: {
-										_selected: selected = [],
-										public: {
-											folder: publicFolder // contentId
-										} = {},
-										private: {
-											clientId,
-											clientSecret,
-											folder: privateFolder // contentId
-										} = {}
-									} = {},
-									hostname
-								} = config;
-								//log.info(`selected:${toStr(selected)}`);
-								//log.info(`publicFolder:${toStr(publicFolder)}`); // contentId
-								//log.info(`clientId:${toStr(clientId)}`);
-								//log.info(`clientSecret:${toStr(clientSecret)}`);
-								//log.info(`privateFolder:${toStr(privateFolder)}`); // contentId
-								//log.info(`hostname:${toStr(hostname)}`);
-								const selectedArr = forceArray(selected);
-								if (hostname) {
-									submit({
-										description: '',
-										task: () => {
-											if (
-												selectedArr.includes('public')
-												&& publicFolder
-											) {
-												const {
-													archives,
-													renditionRequest
-												} = getPublicAPIDescriptor({hostname});
-												log.info(`archives:${toStr(archives)}`);
-												log.info(`renditionRequest:${toStr(renditionRequest)}`);
-												/*syncPublic({
-													hostname,
-													folder: publicFolder // contentId
-												});
-											} // if public
-
-											if (
-												selectedArr.includes('private')
-												&& clientId
-												&& clientSecret
-												&& privateFolder
-											) {
-												const {accessToken} = getAccessToken({
-													hostname,
-													clientId,
-													clientSecret
-												});
-												log.info(`accessToken:${toStr(accessToken)}`);
-												const {
-													archives,
-													renditionRequest
-												} = getprivateFullAPIDescriptor({
-													accessToken,
-													hostname
-												});
-												log.info(`archives:${toStr(archives)}`);
-												log.info(`renditionRequest:${toStr(renditionRequest)}`);
-											} // if private
-										} // task
-									}); // submit
-								} // if hostname
-							} // if fotoware app
-						}); // siteConfigs.forEach
-					}); // context.run
 				} // if branch
 			}); // nodes.forEach
 		} // if type
