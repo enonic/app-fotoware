@@ -1,4 +1,32 @@
 /*
+In order for task progress to show total number of items to process as soon as possible,
+at the cost of some memory, we could iterate all collectionLists and assetLists first.
+But then no assets would start appearing before several minutes has passed :(
+TODO ¿Can we do both at the same time?
+
+We could have two namedTasks:
+1. PopulateQueueTask (write to FolderContent once per assetList page) submitNamed?
+2. ProcessQueueTask
+
+Race condition.
+Task1 writes state 1
+Task2 reades state 1
+Task1 writes state 2
+Task2 writees modified state1, state2 LOST!
+modifyContent can work on two different "objects" in side the same content.
+
+content: {
+	fullQueue, (written to from PopulateQ, read by ProcessQ)
+	processedQueue (written to by ProcessQ)
+}
+When ProcessQ has nothing more to do, delete fullQueue and processedQueue?
+
+Another Option would be to:
+* Have no state shared between tasks.
+* Have a namedTask for downloading a rendition. Which creates or modifies with new assetHrefs.
+* While iterating collectionLists and assetLists, submit one downloadTask if none running.
+* After iterating wait for downloadTask and submit until queue empty.
+
 During a sync I should not encounter the same url twice or the FotoWeb API is broken.
 But on second sync I should encounter mostly the same urls as in the first sync, and could skip them.
 NOTE To skip an assetHref on second sync an array of assetHrefs is enough, BUT...
@@ -60,17 +88,23 @@ import deepEqual from 'fast-deep-equal';
 //import getIn from 'get-value';
 import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
+//import {forceArray} from '/lib/util/data';
 import {sanitize} from '/lib/xp/common';
 import {
 	create as createContent,
 	createMedia,
-	getAttachmentStream,
+	//getAttachmentStream,
 	get as getContentByKey,
 	modify as modifyContent
 } from '/lib/xp/content';
 import {run} from '/lib/xp/context';
 import {readText} from '/lib/xp/io';
+import {
+	get as getTask,
+	isRunning,
+	sleep,
+	submitNamed
+} from '/lib/xp/task';
 
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
@@ -133,7 +167,7 @@ function sinceMediaDoesNotExistCreateIt({
 		editor: (node) => {
 			let fotoWareXData;
 			try {
-				//log.info(`node:${toStr(node)}`);
+				log.info(`node:${toStr(node)}`);
 				//log.info(`node.type:${toStr(node.type)}`);
 				if (!node.x) {
 					node.x = {}; // eslint-disable-line no-param-reassign
@@ -157,6 +191,18 @@ function sinceMediaDoesNotExistCreateIt({
 		requireValid: false // Not under site so there is no x-data definitions
 	}); // modifyContent
 	//log.info(`modifiedMedia:${toStr(modifiedMedia)}`);
+
+	/*const mediaPath = `/${path}/${mediaName}`;
+	const md5sumOfAttachment = md5(readText(getAttachmentStream({
+		key: mediaPath,
+		name: mediaName
+	})));
+	if (md5sum !== md5sumOfAttachment) {
+		log.error(`MD5SUM of download:${md5sum} and attachment:${md5sumOfAttachment} doesn't match!`);
+		throw new Error(`MD5SUM of download:${md5sum} and attachment:${md5sumOfAttachment} doesn't match!`);
+	} else {
+		log.info(`YAY MD5SUM of download:${md5sum} and attachment:${md5sumOfAttachment} does match :)`);
+	}*/
 } // sinceMediaDoesNotExistCreateIt
 
 
@@ -233,7 +279,7 @@ export function syncSiteFlat({siteConfig}) {
 		log.info(`Loaded storedState:${toStr(storedState)}`);
 
 		function fnHandleCollections(collections) {
-			//collections = [collections[0]]; // DEBUG
+			collections = [collections[0]]; // DEBUG
 			collections.forEach((collection) => {
 				const {
 					href: collectionHref,
@@ -283,9 +329,9 @@ export function syncSiteFlat({siteConfig}) {
 					accessToken,
 					hostname: url,
 					shortAbsolutePath: collectionHref,
-					//doPaginate: false, // DEBUG
+					doPaginate: false, // DEBUG
 					fnHandleAssets: (assets) => {
-						//assets = [assets[0]]; // DEBUG
+						assets = [assets[0]]; // DEBUG
 						assets.forEach((asset) => {
 							const innerFolderContent = getContentByKey({key: `/${path}`});
 							const {
@@ -312,15 +358,35 @@ export function syncSiteFlat({siteConfig}) {
 							if (!docTypes[doctype]) {return;}
 
 							const mediaName = sanitize(`${filename}.${filesize}`).replace(/\./g, '-'); // This should be unique most of the time
-							if (storedState[mediaName] && forceArray(storedState[mediaName].assetHrefs).includes(assetHref)) {
+							/*if (storedState[mediaName] && forceArray(storedState[mediaName].assetHrefs).includes(assetHref)) {
 								log.info(`Skipping assetHref:${assetHref}, synced before`);
 								return;
+							}*/
+							const taskId = submitNamed({
+								name: 'downloadAndPersistRendition',
+								config: {
+									hostname: url,
+									path,
+									accessToken,
+									fields,
+									renditionServiceShortAbsolutePath: renditionRequest,
+									assetHref,
+									mediaName,
+									metadata,
+									renditionUrl: renditionHref
+								}
+							});
+							log.info(`taskId:${taskId}`);
+							while(isRunning(taskId)) { // WAITING | RUNNING | FINISHED | FAILED
+								sleep(100);
 							}
-
+							const notRunningTask = getTask(taskId);
+							log.info(`notRunningTasxk:${notRunningTask}`);
+							throw 'DEBUG'; // DEBUG
 							// TODO Get md5sum from exisiting media attachmentStream if has assetHref? Only required to resume if storedState is broken.
 							const mediaPath = `/${path}/${mediaName}`;
 							const exisitingMedia = getContentByKey({key: mediaPath});
-							if (exisitingMedia) {
+							/*if (exisitingMedia) {
 								// Check if assetHref matches
 								let {
 									x: {
@@ -375,7 +441,7 @@ export function syncSiteFlat({siteConfig}) {
 										return;
 									}
 								} // exisitingMediaHrefs includes assetHref
-							} // if exisitingMedia
+							} // if exisitingMedia*/
 
 							const {
 								href: renditionHref/*,
@@ -396,11 +462,11 @@ export function syncSiteFlat({siteConfig}) {
 								renditionServiceShortAbsolutePath: renditionRequest,
 								renditionUrl: renditionHref
 							});
-							const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
-							//log.info(`new mediaName:${mediaName} md5sum:${md5sum}`);
+							const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
+							//log.info(`new mediaName:${mediaName} md5sumOfDownload:${md5sumOfDownload}`);
 
-							if (storedState[mediaName] && md5sum !== storedState[mediaName].md5sum) {
-								log.error(`Hash collision for mediaName:${mediaName} storedState:${toStr(storedState[mediaName])} md5sum:${md5sum}!`);
+							if (storedState[mediaName] && md5sumOfDownload !== storedState[mediaName].md5sum) {
+								log.error(`Hash collision for mediaName:${mediaName} storedState:${toStr(storedState[mediaName])} md5sumOfDownload:${md5sumOfDownload}!`);
 								return;
 							}
 
@@ -441,7 +507,7 @@ export function syncSiteFlat({siteConfig}) {
 								}
 								if (!storedState[mediaName]) { // This should not happen when storedState is loaded from previous sync (and is consistent)
 									storedState[mediaName] = {
-										md5sum,
+										md5sum: md5sumOfDownload,
 										assetHrefs: [assetHref]
 									};
 								} else {
@@ -466,13 +532,13 @@ export function syncSiteFlat({siteConfig}) {
 								assetHref,
 								downloadRenditionResponse,
 								fields,
-								md5sum,
+								md5sum: md5sumOfDownload,
 								mediaName,
 								metadata,
 								path
 							});
 							storedState[mediaName] = {
-								md5sum,
+								md5sum: md5sumOfDownload,
 								assetHrefs: [assetHref]
 							};
 							//log.info(`added mediaName:${mediaName} to storedState:${toStr(storedState)}`);
