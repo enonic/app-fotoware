@@ -1,43 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <task>
 	<description>Download and persist rendition</description>
 	<form>
 		<!-- From config -->
 		<input name="hostname" type="TextLine">
-			<label>hostname</label>
+			<label>Hostname</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="path" type="TextLine">
-			<label>path</label>
+			<label>Path</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<!-- From API -->
 		<input name="accessToken" type="TextLine">
-			<label>accessToken</label>
+			<label>Access token</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="fields" type="TextLine">
-			<label>fields</label>
+			<label>Fields</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="renditionServiceShortAbsolutePath" type="TextLine">
-			<label>renditionServiceShortAbsolutePath</label>
+			<label>Rendition-service short absolute path</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<!-- From asset -->
 		<input name="assetHref" type="TextLine">
-			<label>assetHref</label>
+			<label>Asset href</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="mediaName" type="TextLine">
-			<label>mediaName</label>
+			<label>Media name</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="metadata" type="TextLine">
-			<label>metadata</label>
+			<label>Metadata</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="renditionUrl" type="TextLine">
-			<label>renditionUrl</label>
+			<label>Rendition url</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 	</form>
