@@ -2,10 +2,10 @@
 During a sync I should not encounter the same url twice or the FotoWeb API is broken.
 But on second sync I should encounter mostly the same urls as in the first sync, and could skip them.
 NOTE To skip an assetHref on second sync an array of assetHrefs is enough, BUT...
-WARNING: A fileNameSize should only have a single md5sum or we have a conflict!
-NOTE: So we have to check for conflicts.
+WARNING: A fileNameSize should only have a single md5sum or we have a collision!
+NOTE: So we have to check for collisions.
 
-This should be enough to check for conflicts:
+This should be enough to check for collisions:
 const md5sumForFileNameSize = {
 	fileNameSize1: md5sum1,
 	fileNameSize2: md5sum2
@@ -25,6 +25,17 @@ const storedState = {
 	}
 };
 
+Lets assume storedState is lost for some reason, but loads of media has been synced before.
+Given I have assetHref, filename and filesize
+IF mediaPathExist
+THEN
+	DO generate md5 from attachmentStream and store
+	OR get md5 from xdata
+	WARNING Assuming md5sum of downloaded bodyStream is identical to md5sum of attachmentStream.
+	Get assetHrefs from xdata
+	Add assetHref if missing
+	Update storedState with all data from exisitingMedia
+
 Given I have assetHref, filename and filesize
 IF assetHref in storedState
 THEN
@@ -32,7 +43,7 @@ THEN
 ELSE
 	Download Rendition
 	Genereate MD5sum
-	IF fileNameSize md5sum conflict
+	IF fileNameSize md5sum collision
 	THEN
 		log ERROR and skip
 	ELSE
@@ -54,11 +65,12 @@ import {sanitize} from '/lib/xp/common';
 import {
 	create as createContent,
 	createMedia,
+	getAttachmentStream,
 	get as getContentByKey,
 	modify as modifyContent
 } from '/lib/xp/content';
 import {run} from '/lib/xp/context';
-
+import {readText} from '/lib/xp/io';
 
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
@@ -75,6 +87,7 @@ function sinceMediaDoesNotExistCreateIt({
 	assetHref,
 	downloadRenditionResponse,
 	fields,
+	md5sum,
 	metadata,
 	mediaName,
 	path
@@ -128,7 +141,8 @@ function sinceMediaDoesNotExistCreateIt({
 				fotoWareXData = {
 					fotoWare: {
 						hrefs: assetHref, // NOTE Might be multiple
-						metadata: metadataArray
+						metadata: metadataArray,
+						md5sum
 					}
 				}
 				node.x[X_APP_NAME] = fotoWareXData; // eslint-disable-line no-param-reassign
@@ -218,13 +232,6 @@ export function syncSiteFlat({siteConfig}) {
 		} = folderContent;
 		log.info(`Loaded storedState:${toStr(storedState)}`);
 
-		getAndPaginateCollectionList({
-			accessToken,
-			hostname: url,
-			shortAbsolutePath: archivesPath,
-			fnHandleCollections
-		});
-
 		function fnHandleCollections(collections) {
 			//collections = [collections[0]]; // DEBUG
 			collections.forEach((collection) => {
@@ -280,7 +287,7 @@ export function syncSiteFlat({siteConfig}) {
 					fnHandleAssets: (assets) => {
 						//assets = [assets[0]]; // DEBUG
 						assets.forEach((asset) => {
-							const folderContent = getContentByKey({key: `/${path}`});
+							const innerFolderContent = getContentByKey({key: `/${path}`});
 							const {
 								x: {
 									[X_APP_NAME]: {
@@ -289,7 +296,7 @@ export function syncSiteFlat({siteConfig}) {
 										} = {}
 									} = {}
 								} = {}
-							} = folderContent;
+							} = innerFolderContent;
 							if (shouldStop) {
 								throw new Error(`shouldStop:true`);
 							}
@@ -310,6 +317,66 @@ export function syncSiteFlat({siteConfig}) {
 								return;
 							}
 
+							// TODO Get md5sum from exisiting media attachmentStream if has assetHref? Only required to resume if storedState is broken.
+							const mediaPath = `/${path}/${mediaName}`;
+							const exisitingMedia = getContentByKey({key: mediaPath});
+							if (exisitingMedia) {
+								// Check if assetHref matches
+								let {
+									x: {
+										[X_APP_NAME]: {
+											fotoWare: {
+												hrefs: exisitingMediaHrefs,
+												md5sum: exisitingMediaMd5sum
+											} = {}
+										} = {}
+									} = {}
+								} = exisitingMedia;
+								if (!exisitingMediaHrefs) {
+									log.warning(`A media was created without reference to it's assetUrl mediaPath:${mediaPath}`);
+									exisitingMediaHrefs = [];
+								} else if (!Array.isArray(exisitingMediaHrefs)) {
+									exisitingMediaHrefs = [exisitingMediaHrefs];
+								}
+								if(exisitingMediaHrefs.includes(assetHref)) {
+									if (!exisitingMediaMd5sum) {
+										const attachmentStream = getAttachmentStream({
+											key: mediaPath,
+											name: mediaName
+										});
+										exisitingMediaMd5sum = md5(readText(attachmentStream));
+										modifyContent({
+											key: mediaPath,
+											editor: (node) => {
+												node.x[X_APP_NAME].fotoWare.md5sum = exisitingMediaMd5sum;
+												return node;
+											},
+											requireValid: false // Not under site so there is no x-data definitions
+										}); // modifyContent
+									}
+									// At this point assetHref is not it storedState
+									// The mediaName might still be in storedState
+									// If so you can check for collision
+									if (storedState[mediaName]) {
+										if (storedState[mediaName].md5sum !== exisitingMediaMd5sum) {
+											log.error(`Hash collision for mediaName:${mediaName} storedState:${toStr(storedState[mediaName])} md5sum:${exisitingMediaMd5sum}!`);
+											return;
+										}
+										if (!storedState[mediaName].assetHrefs) {storedState[mediaName].assetHrefs = [];}
+										if (!Array.isArray(storedState[mediaName].assetHrefs)) {storedState[mediaName].assetHrefs = [storedState[mediaName].assetHrefs];}
+										storedState[mediaName].assetHrefs.push(assetHref);
+										return;
+									} else {
+										// If mediaName is not in storedState add it
+										storedState[mediaName] = {
+											assetHrefs: [assetHref],
+											md5sum: exisitingMediaMd5sum
+										}
+										return;
+									}
+								} // exisitingMediaHrefs includes assetHref
+							} // if exisitingMedia
+
 							const {
 								href: renditionHref/*,
 								display_name: displayName,
@@ -329,7 +396,7 @@ export function syncSiteFlat({siteConfig}) {
 								renditionServiceShortAbsolutePath: renditionRequest,
 								renditionUrl: renditionHref
 							});
-							const md5sum = md5(downloadRenditionResponse.bodyStream.readText);
+							const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
 							//log.info(`new mediaName:${mediaName} md5sum:${md5sum}`);
 
 							if (storedState[mediaName] && md5sum !== storedState[mediaName].md5sum) {
@@ -337,8 +404,6 @@ export function syncSiteFlat({siteConfig}) {
 								return;
 							}
 
-							const mediaPath = `/${path}/${mediaName}`;
-							const exisitingMedia = getContentByKey({key: mediaPath});
 							if (exisitingMedia) {
 								// Check if assetHref matches
 								let {
@@ -401,6 +466,7 @@ export function syncSiteFlat({siteConfig}) {
 								assetHref,
 								downloadRenditionResponse,
 								fields,
+								md5sum,
 								mediaName,
 								metadata,
 								path
@@ -417,14 +483,26 @@ export function syncSiteFlat({siteConfig}) {
 			}); // forEach collection
 		} // function fnHandleCollections
 
-		log.info(`Storing storedState:${toStr(storedState)}`);
-		modifyContent({
-			key: folderContent._id,
-			editor: (node) => {
-				node.x[X_APP_NAME].fotoWare.storedState = storedState; // NOTE Property name cannot contain .
-				return node;
-			},
-			requireValid: false // Not under site so there is no x-data definitions
-		});
+		try {
+			getAndPaginateCollectionList({
+				accessToken,
+				hostname: url,
+				shortAbsolutePath: archivesPath,
+				fnHandleCollections
+			});
+		} catch (e) {
+			log.error(`Something went wrong during sync e:${toStr(e)}`);
+			throw e; // Finally should run before this re-throw ends the task.
+		} finally {
+			log.info(`Storing storedState:${toStr(storedState)}`);
+			modifyContent({
+				key: folderContent._id,
+				editor: (node) => {
+					node.x[X_APP_NAME].fotoWare.storedState = storedState; // NOTE Property name cannot contain .
+					return node;
+				},
+				requireValid: false // Not under site so there is no x-data definitions
+			});
+		}
 	}); // run in project
 } // export function syncSiteFlat
