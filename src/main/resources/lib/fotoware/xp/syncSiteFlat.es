@@ -1,15 +1,18 @@
 import deepEqual from 'fast-deep-equal';
 //import getIn from 'get-value';
+import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
+//import {forceArray} from '/lib/util/data';
 import {sanitize} from '/lib/xp/common';
 import {
 	create as createContent,
 	createMedia,
+	getAttachmentStream,
 	get as getContentByKey,
 	modify as modifyContent
 } from '/lib/xp/content';
 import {run} from '/lib/xp/context';
+
 
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
@@ -26,13 +29,14 @@ function sinceMediaDoesNotExistCreateIt({
 	accessToken,
 	assetHref,
 	fields,
-	filename,
-	filesize,
+	//filename,
+	//filesize,
 	metadata,
+	mediaName,
 	path,
 	renditionRequest,
 	renditions,
-	seenFilenames,
+	//seenFilenames,
 	url
 }) {
 	const {
@@ -54,9 +58,11 @@ function sinceMediaDoesNotExistCreateIt({
 		renditionServiceShortAbsolutePath: renditionRequest,
 		renditionUrl: renditionHref
 	});
+	const md5sum = md5(downloadRenditionResponse.bodyStream.readText);
+	log.info(`new mediaName:${mediaName} md5sum:${md5sum}`);
 	if (downloadRenditionResponse) {
 		const createMediaResult = createMedia({
-			name: filename,
+			name: mediaName,
 			parentPath: `/${path}`,
 			data: downloadRenditionResponse.bodyStream
 		});
@@ -97,7 +103,7 @@ function sinceMediaDoesNotExistCreateIt({
 						}
 						fotoWareXData = {
 							fotoWare: {
-								filesize,
+								//filesize,
 								hrefs: assetHref, // NOTE Might be multiple
 								metadata: metadataArray
 							}
@@ -116,18 +122,18 @@ function sinceMediaDoesNotExistCreateIt({
 			//log.info(`modifiedMedia:${toStr(modifiedMedia)}`);
 
 			// Update seenFilenames
-			if (!seenFilenames[filename][filesize]) {seenFilenames[filename][filesize] = {};}
-			if (!seenFilenames[filename][filesize].hrefs) {seenFilenames[filename][filesize].hrefs = [];}
-			seenFilenames[filename][filesize].hrefs.push(assetHref);
-			const mediaPath = `/${path}/${filename}`;
-			seenFilenames[filename][filesize].mediaPath = mediaPath;
-			log.info(`seenFilenames:${toStr(seenFilenames)}`);
+			//if (!seenFilenames[filename][filesize]) {seenFilenames[filename][filesize] = {};}
+			//if (!seenFilenames[filename][filesize].hrefs) {seenFilenames[filename][filesize].hrefs = [];}
+			//seenFilenames[filename][filesize].hrefs.push(assetHref);
+			//const mediaPath = `/${path}/${filename}`;
+			//seenFilenames[filename][filesize].mediaPath = mediaPath;
+			//log.info(`seenFilenames:${toStr(seenFilenames)}`);
 			throw 'STOPPED ON PURPOSE AFTER CREATING SINGLE MEDIA'; // DEBUG
 		} // if createMediaResult
 	} // if downloadRenditionResponse
 } // sinceMediaDoesNotExistCreateIt
 
-function sinceMediaExistWithFileSizeAndHrefJustRememberIt({
+/*function sinceMediaExistWithFileSizeAndHrefJustRememberIt({
 	assetHref,
 	filename,
 	filesize,
@@ -140,23 +146,23 @@ function sinceMediaExistWithFileSizeAndHrefJustRememberIt({
 	seenFilenames[filename][filesize].mediaPath = mediaPath;
 	log.info(`seenFilenames:${toStr(seenFilenames)}`);
 	throw 'STOPPED ON PURPOSE AFTER MEDIA EXIST WITH SAME FILESIZE AND ASSETHREF'; // DEBUG
-} // sinceMediaExistWithFileSizeAndHrefJustRememberIt
+} // sinceMediaExistWithFileSizeAndHrefJustRememberIt*/
 
 function sinceMediaExistWithFilesizeButMissingHrefAddHref({
 	assetHref,
-	exisitingMediaHrefsArray,
-	filename,
-	filesize,
-	mediaPath,
-	seenFilenames
+	exisitingMediaHrefs,
+	//filename,
+	//filesize,
+	mediaPath//,
+	//seenFilenames
 }) {
 	modifyContent({
 		key: mediaPath,
 		editor: (node) => {
 			try {
 				//log.info(`node:${toStr(node)}`);
-				exisitingMediaHrefsArray.push(assetHref);
-				node.x[X_APP_NAME].fotoWare.hrefs = exisitingMediaHrefsArray;
+				exisitingMediaHrefs.push(assetHref);
+				node.x[X_APP_NAME].fotoWare.hrefs = exisitingMediaHrefs;
 			} catch (e) {
 				// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
 				log.error(`Unable to add assetHref:${assetHref} in node:${toStr(node)}`);
@@ -166,11 +172,11 @@ function sinceMediaExistWithFilesizeButMissingHrefAddHref({
 		}, // editor
 		requireValid: false // Not under site so there is no x-data definitions
 	}); // modifyContent
-	if (!seenFilenames[filename][filesize]) {seenFilenames[filename][filesize] = {};}
-	if (!seenFilenames[filename][filesize].hrefs) {seenFilenames[filename][filesize].hrefs = [];}
-	seenFilenames[filename][filesize].hrefs.push(assetHref);
-	seenFilenames[filename][filesize].mediaPath = mediaPath;
-	log.info(`seenFilenames:${toStr(seenFilenames)}`);
+	//if (!seenFilenames[filename][filesize]) {seenFilenames[filename][filesize] = {};}
+	//if (!seenFilenames[filename][filesize].hrefs) {seenFilenames[filename][filesize].hrefs = [];}
+	//seenFilenames[filename][filesize].hrefs.push(assetHref);
+	//seenFilenames[filename][filesize].mediaPath = mediaPath;
+	//log.info(`seenFilenames:${toStr(seenFilenames)}`);
 	throw 'STOPPED ON PURPOSE AFTER MEDIA EXIST WITH SAME FILESIZE ADDED ASSETHREF'; // DEBUG
 } // sinceMediaExistWithFilesizeButMissingHrefAddHref
 
@@ -242,24 +248,14 @@ export function syncSiteFlat({siteConfig}) {
 
 		// On third asset which is same filename, but different filesize create new media content with assetHref and filesize
 
-		const seenFilenames = {/*
-			'filename.jpg': {
-				filesize1: {
-					mediaPath: 'uuid', // Needed to add hrefs
-					hrefs: [
-						'href1',
-						'href2'
-					]
-				},
-				filesize2: {
-					mediaPath: 'uuid', // Needed to add hrefs
-					hrefs: [
-						'href3',
-						'href4'
-					]
-				}
-			} // 'filename.jpg'
-		*/}; // seenFilenames
+		/*const seenFilenames = {/*
+			'filename.jpg.filesize': {
+				hrefs: [
+					'href1',
+					'href2'
+				]
+			},
+		/}; // seenFilenames*/
 
 		getAndPaginateCollectionList({
 			accessToken,
@@ -343,90 +339,152 @@ export function syncSiteFlat({siteConfig}) {
 								metadata,
 								renditions
 							} = asset;
-							if (docTypes[doctype]) {
-								if (seenFilenames[filename]) {
-									// filename seen before this sync, check if filesize matches
-									if (seenFilenames[filename][filesize]) {
-										// Yup that filename with same filesize has been seen before this sync
-										// Thus we should already have an unique mediaPath
-										// TODO Open that unique mediaPath and add assetHref
-										throw `STOPPED ON PURPOSE AFTER SEEN FILENAME ${filename} AND FILESIZE ${filesize} THIS SYNC`; // DEBUG
-									} else {
-										// We have seen the filename, but not that filesize this sync
-										// TODO Check if media content exists from previous sync?
-										// TODO Create new media content
-										// TODO Update seenFilenames with mediaPath
-										throw `STOPPED ON PURPOSE AFTER SEEN FILENAME ${filename} BUT NOT FILESIZE ${filesize} THIS SYNC`; // DEBUG
-									}
-								} else { // Not seen filename this sync
-									seenFilenames[filename] = {};
+							if (!docTypes[doctype]) {return;}
 
-									// Check if media content with filename exists from previous sync
-									const mediaPath = `/${path}/${filename}`;
-									const exisitingMedia = getContentByKey({key: mediaPath});
-									if (exisitingMedia) {
-										// Check if assetHref matches
-										const {
-											x: {
-												[X_APP_NAME]: {
-													fotoWare: {
-														filesize: exisitingMediaFilesize,
-														hrefs: exisitingMediaHrefs
-													} = {}
+							const mediaName = sanitize(`${filename}.${filesize}`); // This should be unique most of the time
+							const mediaPath = `/${path}/${mediaName}`;
+							const exisitingMedia = getContentByKey({key: mediaPath});
+
+							// Try to program in chronolicial order of what will happen from first sync and onwards.
+
+							// 1. No media with same name and size has been synced before.
+							if (!exisitingMedia) {
+								return sinceMediaDoesNotExistCreateIt({
+									accessToken,
+									assetHref,
+									fields,
+									//filename,
+									//filesize,
+									mediaName,
+									metadata,
+									path,
+									renditionRequest,
+									renditions,
+									//seenFilenames,
+									url
+								});
+							}
+
+							const attachmentStream = getAttachmentStream({
+								key: mediaPath,
+								name: mediaName
+							});
+
+							const md5sum = md5(attachmentStream.readText);
+							log.info(`existing mediaName:${mediaName} md5sum:${md5sum}`);
+
+							// Check if assetHref matches
+							let {
+								x: {
+									[X_APP_NAME]: {
+										fotoWare: {
+											//filesize: exisitingMediaFilesize,
+											hrefs: exisitingMediaHrefs
+										} = {}
+									} = {}
+								} = {}
+							} = exisitingMedia;
+							if (!exisitingMediaHrefs) {
+								log.warning(`A media was created without reference to it's assetUrl mediaPath:${mediaPath}`);
+								exisitingMediaHrefs = [];
+								//return;
+							} else if (!Array.isArray(exisitingMediaHrefs)) {
+								exisitingMediaHrefs = [exisitingMediaHrefs];
+							}
+							if (!exisitingMediaHrefs.includes(assetHref)) {
+								// 2. A media with same name and size has been synced before add missing href
+								return sinceMediaExistWithFilesizeButMissingHrefAddHref({
+									assetHref,
+									exisitingMediaHrefs,
+									mediaPath
+								});
+							}
+
+							// 3. A media with same name and size has been synced before and already contains the assetHref
+							// So do nothing :)
+
+							/*if (seenFilenames[filename]) {
+								// filename seen before this sync, check if filesize matches
+								if (seenFilenames[filename][filesize]) {
+									// Yup that filename with same filesize has been seen before this sync
+									// Thus we should already have an unique mediaPath
+									// TODO Open that unique mediaPath and add assetHref
+									throw `STOPPED ON PURPOSE AFTER SEEN FILENAME ${filename} AND FILESIZE ${filesize} THIS SYNC`; // DEBUG
+								} else {
+									// We have seen the filename, but not that filesize this sync
+									// TODO Check if media content exists from previous sync?
+									// TODO Create new media content
+									// TODO Update seenFilenames with mediaPath
+									throw `STOPPED ON PURPOSE AFTER SEEN FILENAME ${filename} BUT NOT FILESIZE ${filesize} THIS SYNC`; // DEBUG
+								}
+							} else { // Not seen filename this sync
+								seenFilenames[filename] = {};
+
+								// Check if media content with filename exists from previous sync
+								const mediaPath = `/${path}/${filename}`;
+								const exisitingMedia = getContentByKey({key: mediaPath});
+								if (exisitingMedia) {
+									// Check if assetHref matches
+									const {
+										x: {
+											[X_APP_NAME]: {
+												fotoWare: {
+													//filesize: exisitingMediaFilesize,
+													hrefs: exisitingMediaHrefs
 												} = {}
 											} = {}
-										} = exisitingMedia;
-										if (filesize === exisitingMediaFilesize) {
-											const exisitingMediaHrefsArray = forceArray(exisitingMediaHrefs);
-											if (exisitingMediaHrefs && exisitingMediaHrefsArray.includes(assetHref)) {
-												sinceMediaExistWithFileSizeAndHrefJustRememberIt({
-													assetHref,
-													filename,
-													filesize,
-													mediaPath,
-													seenFilenames
-												});
-											} else {
-												sinceMediaExistWithFilesizeButMissingHrefAddHref({
-													assetHref,
-													exisitingMediaHrefsArray,
-													mediaPath
-												});
-											}
-										} else { // Media does not match filesize
-											// TODO Does media reference other media with generated names?
-											sinceMediaExistButNotFilesizeCreateMediaAndAddReferenceInFirstMedia({});
+										} = {}
+									} = exisitingMedia;
+									if (filesize === exisitingMediaFilesize) {
+										const exisitingMediaHrefs = forceArray(exisitingMediaHrefs);
+										if (exisitingMediaHrefs && exisitingMediaHrefs.includes(assetHref)) {
+											sinceMediaExistWithFileSizeAndHrefJustRememberIt({
+												assetHref,
+												filename,
+												filesize,
+												mediaPath,
+												seenFilenames
+											});
+										} else {
+											sinceMediaExistWithFilesizeButMissingHrefAddHref({
+												assetHref,
+												exisitingMediaHrefs,
+												mediaPath
+											});
 										}
-
-										const exisitingMediaHrefsArray = forceArray(exisitingMediaHrefs);
-										if ( exisitingMediaHrefs && exisitingMediaHrefsArray.includes(assetHref)) {
-																					} else { // Filename not seen this sync, but filename media exist (from previous sync), but media is missing this assetHref
-											throw 'DO WE GET HERE?'; // DEBUG
-											//log.warning(`filename:${filename} exists, but hrefs:${toStr(exisitingMediaHrefs)} doesn't include assetHref:${assetHref}!`);
-											if(filesize === exisitingMediaFilesize) {
-												// Probably same image, add new href
-											} else {
-												// Not the same image!
-												log.error(`filename:${filename} exists, but hrefs:${toStr(exisitingMediaHrefs)} doesn't include assetHref:${assetHref}! and filesize:${filesize} !== exisitingMediaFilesize:${exisitingMediaFilesize}`);
-											}
-										}
-									} else {
-										sinceMediaDoesNotExistCreateIt({
-											accessToken,
-											assetHref,
-											fields,
-											filename,
-											filesize,
-											metadata,
-											path,
-											renditionRequest,
-											renditions,
-											seenFilenames,
-											url
-										});
+									} else { // Media does not match filesize
+										// TODO Does media reference other media with generated names?
+										sinceMediaExistButNotFilesizeCreateMediaAndAddReferenceInFirstMedia({});
 									}
+
+									const exisitingMediaHrefs = forceArray(exisitingMediaHrefs);
+									if ( exisitingMediaHrefs && exisitingMediaHrefs.includes(assetHref)) {
+																				} else { // Filename not seen this sync, but filename media exist (from previous sync), but media is missing this assetHref
+										throw 'DO WE GET HERE?'; // DEBUG
+										//log.warning(`filename:${filename} exists, but hrefs:${toStr(exisitingMediaHrefs)} doesn't include assetHref:${assetHref}!`);
+										if(filesize === exisitingMediaFilesize) {
+											// Probably same image, add new href
+										} else {
+											// Not the same image!
+											log.error(`filename:${filename} exists, but hrefs:${toStr(exisitingMediaHrefs)} doesn't include assetHref:${assetHref}! and filesize:${filesize} !== exisitingMediaFilesize:${exisitingMediaFilesize}`);
+										}
+									}
+								} else {
+									sinceMediaDoesNotExistCreateIt({
+										accessToken,
+										assetHref,
+										fields,
+										filename,
+										filesize,
+										metadata,
+										path,
+										renditionRequest,
+										renditions,
+										seenFilenames,
+										url
+									});
 								}
-							} // if doctype
+							} */
 						}); // forEach asset
 					} // fnHandleAssets
 				}); // getAndPaginateAssetList
