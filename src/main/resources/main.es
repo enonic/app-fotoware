@@ -12,7 +12,7 @@ Object.keys(sitesConfigs).forEach((site) => {
 		docTypes,
 		path,
 		project,
-		remoteAddresses,
+		//remoteAddresses,
 		url
 	} = sitesConfigs[site];
 	run({
@@ -31,7 +31,8 @@ Object.keys(sitesConfigs).forEach((site) => {
 			docTypesJson: JSON.stringify(docTypes),
 			path,
 			project,
-			remoteAddressesJson: JSON.stringify(remoteAddresses),
+			//remoteAddressesJson: JSON.stringify(remoteAddresses),
+			site,
 			url
 		}
 	})); // run

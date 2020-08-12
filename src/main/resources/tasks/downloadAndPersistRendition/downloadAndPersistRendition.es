@@ -18,7 +18,7 @@ import {
 	modify as modifyContent
 } from '/lib/xp/content';
 import {readText} from '/lib/xp/io';
-//import {progress} from '/lib/xp/task';
+import {progress} from '/lib/xp/task';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 
 const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
@@ -47,6 +47,12 @@ function downloadAndReturnStreamAndMd5({
 
 export function run(params) {
 	//log.info(`params:${toStr(params)}`);
+	progress({
+		current: 0,
+		total: 1,
+		info: 'Initializing'
+	});
+
 	const {
 		// From config
 		hostname,
@@ -93,11 +99,21 @@ export function run(params) {
 	//log.info(`exisitingMedia:${toStr(exisitingMedia)}`);
 
 	if (!exisitingMedia) {
+		progress({
+			current: 1,
+			total: 5,
+			info: `Polling rendition ${renditionUrl}`
+		});
 		const {stream, md5sum} = downloadAndReturnStreamAndMd5({
 			accessToken,
 			hostname,
 			renditionServiceShortAbsolutePath,
 			renditionUrl
+		});
+		progress({
+			current: 2,
+			total: 5,
+			info: `Creating media ${mediaPath}`
 		});
 		const createMediaResult = createMedia({
 			name: mediaName,
@@ -110,6 +126,12 @@ export function run(params) {
 			log.error(errMsg);
 			throw new Error(errMsg);
 		}
+
+		progress({
+			current: 3,
+			total: 5,
+			info: `Processing metadata for ${assetHref}`
+		});
 		const metadataArray = Object.keys(metadata).map((k) => {
 			if (!fields[k]) {
 				log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])} assetHref:${assetHref}`);
@@ -133,6 +155,11 @@ export function run(params) {
 		}).filter((x) => x); // remove null entries
 		//log.info(`metadataArray:${toStr(metadataArray)}`);
 
+		progress({
+			current: 4,
+			total: 5,
+			info: `Adding xdata to ${mediaPath}`
+		});
 		modifyContent({
 			key: createMediaResult._id,
 			editor: (node) => {
@@ -163,6 +190,11 @@ export function run(params) {
 			requireValid: false // Not under site so there is no x-data definitions
 		}); // modifyContent
 		//log.info(`modifiedMedia:${toStr(modifiedMedia)}`);
+		progress({
+			current: 5,
+			total: 5,
+			info: `Finished processing ${assetHref} to ${mediaPath}`
+		});
 		return; // Finish task successfully
 	} // !exisitingMedia
 
@@ -184,9 +216,19 @@ export function run(params) {
 	}
 	if(exisitingMediaHrefs.includes(assetHref)) {
 		log.info(`Skipping assetHref:${assetHref} already found in mediaPath:${mediaPath}`);
+		progress({
+			current: 1,
+			total: 1,
+			info: `Skipped ${assetHref} already found in mediaPath:${mediaPath}`
+		});
 		return; // Finish task
 	}
 
+	progress({
+		current: 1,
+		total: 4,
+		info: `Polling rendition ${renditionUrl}`
+	});
 	const {md5sum} = downloadAndReturnStreamAndMd5({
 		accessToken,
 		hostname,
@@ -194,6 +236,11 @@ export function run(params) {
 		renditionUrl
 	});
 
+	progress({
+		current: 2,
+		total: 4,
+		info: `Checking md5 for ${mediaPath}`
+	});
 	if (exisitingMediaMd5sum && exisitingMediaMd5sum !== md5sum) {
 		const errMsg = `Hash collision for mediaName:${mediaName} exisitingMediaMd5sum:${exisitingMediaMd5sum} md5sumOfDownload:${md5sum}!`;
 		log.error(errMsg);
@@ -202,12 +249,29 @@ export function run(params) {
 
 	// At this point media exist, matches md5sum, but is missing assetHref
 	exisitingMediaHrefs.push(assetHref);
+	progress({
+		current: 3,
+		total: 4,
+		info: `Adding ${assetHref} to ${mediaPath}`
+	});
 	modifyContent({
 		key: mediaPath,
 		editor: (node) => {
-			node.x[X_APP_NAME].fotoWare.hrefs = exisitingMediaHrefs;
+			try {
+				node.x[X_APP_NAME].fotoWare.hrefs = exisitingMediaHrefs;
+			} catch (e) {
+				// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+				log.error(`Unable to add assetHref:${assetHref} in node:${toStr(node)}`);
+				//throw e;
+			}
+			return node;
 		},
 		requireValid: false // Not under site so there is no x-data definitions
 	}); // modifyContent
 	// Let task finish successfully
+	progress({
+		current: 4,
+		total: 4,
+		info: `Finished processing ${assetHref} to ${mediaPath}`
+	});
 } // function run
