@@ -1,8 +1,42 @@
+import {run} from '/lib/xp/context';
+import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {submitNamed} from '/lib/xp/task';
-submitNamed({
-	name: 'sync',
-	config: {}
-});
+
+const sitesConfigs = getConfigFromAppCfg();
+//log.info(`sitesConfigs:${toStr(sitesConfigs)}`);
+
+Object.keys(sitesConfigs).forEach((site) => {
+	const {
+		clientId,
+		clientSecret,
+		docTypes,
+		path,
+		project,
+		remoteAddresses,
+		url
+	} = sitesConfigs[site];
+	run({
+		repository: `com.enonic.cms.${project}`,
+		branch: 'draft',
+		user: {
+			login: 'su', // So Livetrace Tasks reports correct user
+			idProvider: 'system'
+		},
+		principals: ['role:system.admin']
+	}, () => submitNamed({
+		name: 'syncSite',
+		config: {
+			clientId,
+			clientSecret,
+			docTypesJson: JSON.stringify(docTypes),
+			path,
+			project,
+			remoteAddressesJson: JSON.stringify(remoteAddresses),
+			url
+		}
+	})); // run
+}); // foreach
+
 /*
 
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';

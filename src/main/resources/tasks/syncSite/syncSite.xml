@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<task>
+	<description>Sync a FotoWare site</description>
+	<form>
+		<input name="clientId" type="TextLine">
+			<label>clientId</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="clientSecret" type="TextLine">
+			<label>clientSecret</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="docTypesJson" type="TextLine">
+			<label>docTypes JSON</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="path" type="TextLine">
+			<label>path</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="project" type="TextLine">
+			<label>project</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="remoteAddressesJson" type="TextLine">
+			<label>remoteAddresses JSON</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="url" type="TextLine">
+			<label>url</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+	</form>
+</task>

@@ -206,7 +206,7 @@ function sinceMediaDoesNotExistCreateIt({
 } // sinceMediaDoesNotExistCreateIt
 
 
-export function syncSiteFlat({siteConfig}) {
+export function syncSiteFlat(siteConfig) {
 	const {
 		/*
 		remoteAddresses,
@@ -276,10 +276,11 @@ export function syncSiteFlat({siteConfig}) {
 				} = {}
 			} = {}
 		} = folderContent;
-		log.info(`Loaded storedState:${toStr(storedState)}`);
+		log.debug(`Loaded storedState:${toStr(storedState)}`);
 
 		function fnHandleCollections(collections) {
 			collections = [collections[0]]; // DEBUG
+			//log.info(`collections:${toStr(collections)}`);
 			collections.forEach((collection) => {
 				const {
 					href: collectionHref,
@@ -331,18 +332,20 @@ export function syncSiteFlat({siteConfig}) {
 					shortAbsolutePath: collectionHref,
 					doPaginate: false, // DEBUG
 					fnHandleAssets: (assets) => {
-						assets = [assets[0]]; // DEBUG
+						assets = [assets[1]]; // DEBUG
+						//log.info(`assets:${toStr(assets)}`);
 						assets.forEach((asset) => {
 							const innerFolderContent = getContentByKey({key: `/${path}`});
 							const {
 								x: {
 									[X_APP_NAME]: {
 										fotoWare: {
-											shouldStop = true
+											shouldStop = false
 										} = {}
 									} = {}
 								} = {}
 							} = innerFolderContent;
+							//log.info(`shouldStop:${toStr(shouldStop)}`);
 							if (shouldStop) {
 								throw new Error(`shouldStop:true`);
 							}
@@ -355,35 +358,60 @@ export function syncSiteFlat({siteConfig}) {
 								metadata,
 								renditions
 							} = asset;
-							if (!docTypes[doctype]) {return;}
+							if (!docTypes[doctype]) {
+								log.debug(`Skipping assetHref:${assetHref} doctype:${doctype} not included.`);
+								return;
+							}
 
 							const mediaName = sanitize(`${filename}.${filesize}`).replace(/\./g, '-'); // This should be unique most of the time
 							/*if (storedState[mediaName] && forceArray(storedState[mediaName].assetHrefs).includes(assetHref)) {
 								log.info(`Skipping assetHref:${assetHref}, synced before`);
 								return;
 							}*/
-							const taskId = submitNamed({
+
+							const {
+								href: renditionHref/*,
+								display_name: displayName,
+								description,
+								width,
+								height,
+								default: isDefault,
+								original,
+								sizeFixed,
+								profile*/
+							} = renditions
+								.filter(({original}) => original === true)[0];
+
+							const submitNamedParams = {
 								name: 'downloadAndPersistRendition',
 								//name: `${app.name}:downloadAndPersistRendition`,
 								config: {
 									hostname: url,
 									path,
 									accessToken,
-									fields,
+									fields: JSON.stringify(fields),
 									renditionServiceShortAbsolutePath: renditionRequest,
 									assetHref,
 									mediaName,
-									metadata,
+									metadata: JSON.stringify(metadata),
 									renditionUrl: renditionHref
 								}
-							});
+							};
+							//log.debug(`submitNamedParams:${toStr(submitNamedParams)}`);
+
+							const taskId = submitNamed(submitNamedParams);
 							log.info(`taskId:${taskId}`);
+
+							// WARNING These only works if task context!
 							while(isRunning(taskId)) { // WAITING | RUNNING | FINISHED | FAILED
 								sleep(100);
 							}
+
 							const notRunningTask = getTask(taskId);
-							log.info(`notRunningTasxk:${notRunningTask}`);
-							throw 'DEBUG'; // DEBUG
+							log.info(`notRunningTasxk:${toStr(notRunningTask)}`);
+
+							throw new Error('DEBUG'); // DEBUG
+
 							// TODO Get md5sum from exisiting media attachmentStream if has assetHref? Only required to resume if storedState is broken.
 							const mediaPath = `/${path}/${mediaName}`;
 							const exisitingMedia = getContentByKey({key: mediaPath});
@@ -444,7 +472,7 @@ export function syncSiteFlat({siteConfig}) {
 								} // exisitingMediaHrefs includes assetHref
 							} // if exisitingMedia*/
 
-							const {
+							/*const {
 								href: renditionHref/*,
 								display_name: displayName,
 								description,
@@ -453,9 +481,9 @@ export function syncSiteFlat({siteConfig}) {
 								default: isDefault,
 								original,
 								sizeFixed,
-								profile*/
+								profile
 							} = renditions
-								.filter(({original}) => original === true)[0];
+								.filter(({original}) => original === true)[0];*/
 
 							const downloadRenditionResponse = requestRendition({
 								accessToken,
@@ -561,7 +589,7 @@ export function syncSiteFlat({siteConfig}) {
 			log.error(`Something went wrong during sync e:${toStr(e)}`);
 			throw e; // Finally should run before this re-throw ends the task.
 		} finally {
-			log.info(`Storing storedState:${toStr(storedState)}`);
+			log.debug(`Storing storedState:${toStr(storedState)}`);
 			modifyContent({
 				key: folderContent._id,
 				editor: (node) => {
