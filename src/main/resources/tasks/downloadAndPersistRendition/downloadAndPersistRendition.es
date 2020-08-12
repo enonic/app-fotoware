@@ -7,7 +7,7 @@ IF exist
 	  IF md5match -> add href
 */
 
-import {md5} from '/lib/text-encoding';
+//import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
 import {
@@ -17,7 +17,7 @@ import {
 	get as getContentByKey,
 	modify as modifyContent
 } from '/lib/xp/content';
-import {readText} from '/lib/xp/io';
+//import {readText} from '/lib/xp/io';
 import {progress} from '/lib/xp/task';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 
@@ -38,10 +38,10 @@ function downloadAndReturnStreamAndMd5({
 	if (!downloadRenditionResponse) {
 		throw new Error(`Something went wrong when downloading rendition for renditionUrl:${renditionUrl}!`);
 	}
-	const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
+	//const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
 	return {
-		stream: downloadRenditionResponse.bodyStream,
-		md5sum: md5sumOfDownload
+		stream: downloadRenditionResponse.bodyStream//,
+		//md5sum: md5sumOfDownload
 	};
 } // function downloadAndReturnStreamAndMd5
 
@@ -49,7 +49,7 @@ export function run(params) {
 	//log.info(`params:${toStr(params)}`);
 	progress({
 		current: 0,
-		total: 1,
+		total: 2,
 		info: 'Initializing'
 	});
 
@@ -62,6 +62,7 @@ export function run(params) {
 		renditionServiceShortAbsolutePath,
 		// From asset
 		assetHref,
+		filename,
 		mediaName,
 		renditionUrl
 	} = params;
@@ -98,13 +99,23 @@ export function run(params) {
 	const exisitingMedia = getContentByKey({key: mediaPath});
 	//log.info(`exisitingMedia:${toStr(exisitingMedia)}`);
 
+	if (exisitingMedia) {
+		//log.debug(`Skipped ${assetHref} already found in mediaPath:${mediaPath}`);
+		progress({
+			current: 1,
+			total: 1,
+			info: `Skipped ${assetHref} already found in mediaPath:${mediaPath}`
+		});
+		return; // Finish task successfully
+	}
+
 	if (!exisitingMedia) {
 		progress({
 			current: 1,
 			total: 5,
 			info: `Polling rendition ${renditionUrl}`
 		});
-		const {stream, md5sum} = downloadAndReturnStreamAndMd5({
+		const {stream/*, md5sum*/} = downloadAndReturnStreamAndMd5({
 			accessToken,
 			hostname,
 			renditionServiceShortAbsolutePath,
@@ -116,8 +127,9 @@ export function run(params) {
 			info: `Creating media ${mediaPath}`
 		});
 		const createMediaResult = createMedia({
-			name: mediaName,
 			parentPath: `/${path}`,
+			name: mediaName,
+			//displayName: filename, // Not a parameter
 			data: stream
 		});
 		if (!createMediaResult) {
@@ -166,14 +178,15 @@ export function run(params) {
 				//log.info(`node:${toStr(node)}`);
 				let fotoWareXData;
 				try {
+					node.displayName = filename;
 					if (!node.x) {
 						node.x = {}; // eslint-disable-line no-param-reassign
 					}
 					fotoWareXData = {
 						fotoWare: {
-							hrefs: assetHref, // NOTE Might be multiple
-							metadata: metadataArray,
-							md5sum
+							//hrefs: assetHref, // NOTE Might be multiple
+							metadata: metadataArray//,
+							//md5sum
 						}
 					}
 					node.x[X_APP_NAME] = fotoWareXData; // eslint-disable-line no-param-reassign
@@ -198,7 +211,7 @@ export function run(params) {
 		return; // Finish task successfully
 	} // !exisitingMedia
 
-	let {
+	/*let {
 		x: {
 			[X_APP_NAME]: {
 				fotoWare: {
@@ -274,4 +287,5 @@ export function run(params) {
 		total: 4,
 		info: `Finished processing ${assetHref} to ${mediaPath}`
 	});
+	*/
 } // function run

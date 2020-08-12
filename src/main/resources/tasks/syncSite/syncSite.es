@@ -238,8 +238,8 @@ export function run(params) {
 					}
 				}
 
-				//const boolProcessSubCollections = true;
-				const boolProcessSubCollections = false; // DEBUG
+				const boolProcessSubCollections = true;
+				//const boolProcessSubCollections = false; // DEBUG
 				if (boolProcessSubCollections) {
 					const {
 						childCount,
@@ -268,7 +268,7 @@ export function run(params) {
 					accessToken,
 					hostname: url,
 					shortAbsolutePath: collectionHref,
-					doPaginate: false, // DEBUG
+					//doPaginate: false, // DEBUG
 					fnHandleAssets: (assets) => {
 						//assets = [assets[0]]; // DEBUG
 						//log.info(`assets:${toStr(assets)}`);
@@ -343,7 +343,7 @@ export function run(params) {
 					assetHref,
 					doctype,
 					filename,
-					filesize,
+					//filesize,
 					metadata,
 					renditionHref
 				} = queue.shift();
@@ -354,7 +354,8 @@ export function run(params) {
 				//state.incrementIncludedCount().addToIncludedSize(filesize);
 				//state.incrementProcessedCount().addToProcessedSize(filesize);
 				if (docTypes[doctype]) {
-					const mediaName = sanitize(`${filename}.${filesize}`).replace(/\./g, '-'); // This should be unique most of the time
+					//const mediaName = sanitize(`${filename}.${filesize}`).replace(/\./g, '-'); // This should be unique most of the time
+					const mediaName = sanitize(assetHref.replace(/\.info$/, '')).replace(/\./g, '-');
 					const submitNamedParams = {
 						name: 'downloadAndPersistRendition',
 						//name: `${app.name}:downloadAndPersistRendition`,
@@ -365,6 +366,7 @@ export function run(params) {
 							fields: JSON.stringify(fields),
 							renditionServiceShortAbsolutePath: renditionRequest,
 							assetHref,
+							filename,
 							mediaName,
 							metadata: JSON.stringify(metadata),
 							renditionUrl: renditionHref
@@ -387,7 +389,7 @@ export function run(params) {
 						log.debug(`notRunningTask:${toStr(notRunningTask)}`);
 					}
 				} else {
-					log.debug(`Skipping assetHref:${assetHref} doctype:${doctype} not included.`);
+					//log.debug(`Skipping assetHref:${assetHref} doctype:${doctype} not included.`);
 					skipped.push({
 						assetHref,
 						reason: `doctype:${doctype} not included`
@@ -397,6 +399,7 @@ export function run(params) {
 				// Progress should be [16/115] (5/5 global 10/10 collections 1/100 assets)
 				// Progress should be [115/115] (5/5 global 10/10 collections 100/100 assets)
 			} // while queue.length
+			log.debug(`skipped:${skipped}`);
 			progress.setInfo(`Finished syncing site ${site}`).report();
 			// Progress should still be [115/115] (5/5 global 10/10 collections 100/100 assets)
 		} catch (e) {

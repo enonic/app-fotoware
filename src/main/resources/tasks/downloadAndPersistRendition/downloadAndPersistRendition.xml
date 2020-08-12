@@ -29,6 +29,10 @@
 			<label>Asset href</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
+		<input name="filename" type="TextLine">
+			<label>Filename</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
 		<input name="mediaName" type="TextLine">
 			<label>Media name</label>
 			<occurrences minimum="1" maximum="1"/>
