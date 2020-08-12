@@ -1,3 +1,10 @@
+import {submitNamed} from '/lib/xp/task';
+submitNamed({
+	name: 'sync',
+	config: {}
+});
+/*
+
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 //import {toStr} from '/lib/util';
 import {submit} from '/lib/xp/task';
