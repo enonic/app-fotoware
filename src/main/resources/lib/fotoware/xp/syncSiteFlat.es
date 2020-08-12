@@ -364,6 +364,7 @@ export function syncSiteFlat({siteConfig}) {
 							}*/
 							const taskId = submitNamed({
 								name: 'downloadAndPersistRendition',
+								//name: `${app.name}:downloadAndPersistRendition`,
 								config: {
 									hostname: url,
 									path,
