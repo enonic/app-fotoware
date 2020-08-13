@@ -236,9 +236,7 @@ export function run(params) {
 					if (docTypes[doctype]) {
 						//state.incrementIncludedCount().addToIncludedSize(filesize);
 						//state.incrementProcessedCount().addToProcessedSize(filesize);
-						const mediaName = sanitize(filename);
-						//const mediaName = sanitize(`${filename}.${filesize}`).replace(/\./g, '-'); // This should be unique most of the time
-						//const mediaName = sanitize(assetHref.replace(/\.info$/, '')).replace(/\./g, '-');
+						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
 						const mediaPath = `/${path}/${mediaName}`;
 						const exisitingMedia = getContentByKey({key: mediaPath});
 						if (exisitingMedia) {
@@ -254,13 +252,11 @@ export function run(params) {
 							if (!downloadRenditionResponse) {
 								throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
 							}
-							log.debug('HERE1');
 							const createMediaResult = createMedia({
 								parentPath: `/${path}`,
 								name: mediaName,
 								data: downloadRenditionResponse.bodyStream
 							});
-							log.debug('HERE2');
 							if (!createMediaResult) {
 								const mediaPath = `/${path}/${mediaName}`;
 								const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
@@ -273,15 +269,9 @@ export function run(params) {
 									//log.info(`node:${toStr(node)}`);
 									let fotoWareXData;
 									try {
-										//node.displayName = filename;
-										/*if (!node.x) {
-											node.x = {}; // eslint-disable-line no-param-reassign
-										}*/
 										fotoWareXData = {
 											fotoWare: {
-												//hrefs: assetHref, // NOTE Might be multiple
-												metadata: metadataArray//,
-												//md5sum
+												metadata: metadataArray
 											}
 										}
 										node.x[X_APP_NAME] = fotoWareXData; // eslint-disable-line no-param-reassign
