@@ -1,6 +1,5 @@
 //import {toStr} from '/lib/util';
 import {deepen} from '/lib/fotoware/xp/deepen';
-//import {deepen} from './deepen';
 
 export function getConfigFromAppCfg() {
 	//log.info(`app.config:${toStr(app.config)}`);
@@ -20,6 +19,10 @@ export function getConfigFromAppCfg() {
 	Object.keys(sites).forEach((site) => {
 		//log.info(`site:${toStr(site)}`);
 		const {
+			collections: {
+				blacklist = {},
+				whitelist = {}
+			} = {},
 			docTypes = {},
 			url = `https://${site}.fotoware.cloud`,
 			remoteAddresses = {},
@@ -38,7 +41,19 @@ export function getConfigFromAppCfg() {
 			project
 		})}`);*/
 
+		const blacklistedCollections = {};
+		Object.keys(blacklist).forEach((collectionName) => {
+			blacklistedCollections[collectionName] = true;
+		});
+
+		const whitelistedCollections = {};
+		Object.keys(whitelist).forEach((collectionName) => {
+			whitelistedCollections[collectionName] = true;
+		});
+
 		siteConfigs[site] = {
+			blacklistedCollections,
+			whitelistedCollections,
 			docTypes: {
 				document: docTypes.document === 'true',
 				graphic: docTypes.graphic !== 'false',
@@ -53,7 +68,6 @@ export function getConfigFromAppCfg() {
 			clientId,
 			project
 		};
-		//log.info(`siteConfigs:${toStr(siteConfigs)}`);
 	}); // foreach
 
 	//log.info(`siteConfigs:${toStr(siteConfigs)}`);

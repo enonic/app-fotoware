@@ -28,9 +28,11 @@ export function get(request) {
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 	const {
+		blacklistedCollections,
 		clientId,
 		clientSecret,
-		url
+		url,
+		whitelistedCollections
 	} = sitesConfigs[site];
 	//log.debug(`url:${toStr(url)}`);
 
@@ -51,9 +53,11 @@ export function get(request) {
 	return {
 		body: query({
 			accessToken,
+			blacklistedCollections,
 			hostname: url,
 			q,
-			searchURL
+			searchURL,
+			whitelistedCollections
 		}),
 		contentType: 'application/json;charset=utf-8'
 	};

@@ -1,9 +1,10 @@
+//import {toStr} from '/lib/util';
 import {run} from '/lib/xp/context';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {submitNamed} from '/lib/xp/task';
 
 const sitesConfigs = getConfigFromAppCfg();
-//log.info(`sitesConfigs:${toStr(sitesConfigs)}`);
+//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 //Object.keys(sitesConfigs)
 [].forEach((site) => {
