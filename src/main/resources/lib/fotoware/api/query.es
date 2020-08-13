@@ -45,19 +45,21 @@ export function query(params) {
 	}
 
 	let assetCountTotal = 0;
+	const fields = {};
+	const unknownFields = {};
+	const metadataHrefs = {};
+
 	const collections = collectionList.data.map(({
-		//name,
-		originalURL, // "/fotoweb/archives/5000-Archive/"
-		//_searchString,
 		assetCount,
-		href/*,
-		metadataEditor,
-		searchURL,
-		searchString,
-		searchQuery*/
+		href,
+		metadataEditor: {
+			href: collectionMetadataHref
+		},
+		originalURL
 	}) => ({
 		assetCount,
 		collectionId: originalURL.replace(/\/$/, '').replace(/^.*\//, ''),
+		collectionMetadataHref,
 		href
 	})).filter(({
 		assetCount,
@@ -80,14 +82,23 @@ export function query(params) {
 	}).map(({
 		assetCount,
 		collectionId,
+		collectionMetadataHref,
 		href
 	}) => {
+		if (!metadataHrefs[collectionMetadataHref]) {
+			//log.debug(`New metadataEditor in collection ${collectionId} href:${collectionMetadataHref}`);
+			metadataHrefs[collectionMetadataHref] = true;
+			getMetadataView({
+				accessToken,
+				fields,
+				hostname,
+				shortAbsolutePath: collectionMetadataHref
+			});
+		}
 		// NOTE 17.7 seconds when processing metadata, 1.6 seconds when not
 		// Skipping the deepEqual wasn't good enough, still 17.6 seconds
 		// Skipping filter 17.3
 		// Skipping previous metadataHrefs 2.74 // I'm happy with this result
-		const fields = {};
-		const metadataHrefs = {};
 		//const metaDataViews = {};
 		const collectionObj = {
 			collectionId,
@@ -109,27 +120,19 @@ export function query(params) {
 					href,
 					metadata,
 					metadataEditor: {
-						href: metadataHref
+						href: assetMetadataHref
 					},
 					renditions
 				}) => {
-					if (!metadataHrefs[metadataHref]) {
-						metadataHrefs[metadataHref] = true;
-						/*const {
-						fields: metaDataViewFields,
-						id: metaDataViewId
-						} =*/
+					if (!metadataHrefs[assetMetadataHref]) {
+						log.debug(`New metadataEditor in asset ${href} href:${assetMetadataHref}`); // Haven's seen this happen yet.
+						metadataHrefs[assetMetadataHref] = true;
 						getMetadataView({
 							accessToken,
 							fields,
 							hostname,
-							shortAbsolutePath: metadataHref
+							shortAbsolutePath: assetMetadataHref
 						});
-						/*if (metaDataViews[metaDataViewId]) {
-							if (!deepEqual(metaDataViews[metaDataViewId], {metaDataViewFields})) {
-								throw new Error(`metaDataViews:${toStr(metaDataViews)} metaDataViewFields:${toStr(metaDataViewFields)} metaDataViewId:${metaDataViewId} already exist!`);
-							}
-						}*/
 					}
 					const metadataArray = [];
 					Object.keys(metadata).forEach((k) => {
@@ -139,10 +142,12 @@ export function query(params) {
 								label: fields[k].label,
 								values: metadata[k].value
 							});
+						} else {
+							if (!unknownFields[k]) {
+								unknownFields[k] = true;
+								//log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])} assetHref:${href} editorHref:${assetMetadataHref}`);
+							}
 						}
-						/* else {
-							//log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])}`); // Too many
-						} */
 					});
 					//log.debug(`metadataArray:${toStr(metadataArray)}`);
 					collectionObj.assets.push({
@@ -170,6 +175,10 @@ export function query(params) {
 		}); // paginate
 		return collectionObj;
 	}); // collectionList.data.map
+
+	if (Object.keys(unknownFields).length) {
+		log.warning(`unknownFields:${toStr(Object.keys(unknownFields))}`);
+	}
 
 	return {
 		assetCountTotal,
