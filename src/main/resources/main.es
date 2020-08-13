@@ -6,16 +6,17 @@ import {submitNamed} from '/lib/xp/task';
 const sitesConfigs = getConfigFromAppCfg();
 //log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-//Object.keys(sitesConfigs)
-[].forEach((site) => {
+Object.keys(sitesConfigs).forEach((site) => {
 	const {
+		blacklistedCollections,
 		clientId,
 		clientSecret,
 		docTypes,
 		path,
 		project,
 		//remoteAddresses,
-		url
+		url,
+		whitelistedCollections
 	} = sitesConfigs[site];
 	run({
 		repository: `com.enonic.cms.${project}`,
@@ -28,6 +29,7 @@ const sitesConfigs = getConfigFromAppCfg();
 	}, () => submitNamed({
 		name: 'syncSite',
 		config: {
+			blacklistedCollectionsJson: JSON.stringify(blacklistedCollections),
 			clientId,
 			clientSecret,
 			docTypesJson: JSON.stringify(docTypes),
@@ -35,7 +37,8 @@ const sitesConfigs = getConfigFromAppCfg();
 			project,
 			//remoteAddressesJson: JSON.stringify(remoteAddresses),
 			site,
-			url
+			url,
+			whitelistedCollectionsJson: JSON.stringify(whitelistedCollections)
 		}
 	})); // run
 }); // foreach

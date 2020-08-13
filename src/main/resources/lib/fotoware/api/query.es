@@ -85,6 +85,7 @@ export function query(params) {
 		collectionMetadataHref,
 		href
 	}) => {
+		//log.debug(`href:${toStr(href)}`); // /fotoweb/archives/5000-Archive/?q=
 		assetCountTotal += assetCount;
 		if (!metadataHrefs[collectionMetadataHref]) {
 			//log.debug(`New metadataEditor in collection ${collectionId} href:${collectionMetadataHref}`);

@@ -1,33 +1,17 @@
-import deepEqual from 'fast-deep-equal';
-//import getIn from 'get-value';
-//import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-//import {forceArray} from '/lib/util/data';
 import {sanitize} from '/lib/xp/common';
 import {
 	create as createContent,
-	//createMedia,
-	//getAttachmentStream,
-	get as getContentByKey//,
-	//modify as modifyContent
+	createMedia,
+	get as getContentByKey,
+	modify as modifyContent
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
-//import {readText} from '/lib/xp/io';
-import {
-	get as getTask,
-	//isRunning,
-	sleep,
-	submitNamed
-} from '/lib/xp/task';
 
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
-import {getAndPaginateCollectionList} from '/lib/fotoware/api/collectionList/getAndPaginate';
-import {getMetadataView} from '/lib/fotoware/api/metadata/get';
-import {getCollection} from '/lib/fotoware/api/collection/get';
-import {paginateCollectionList} from '/lib/fotoware/api/collectionList/paginate';
-import {getAndPaginateAssetList} from '/lib/fotoware/api/assetList/getAndPaginate';
-//import {requestRendition} from '/lib/fotoware/api/requestRendition';
+import {query} from '/lib/fotoware/api/query';
+import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {Progress} from './Progress';
 
 const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
@@ -79,6 +63,7 @@ export function run(params) {
 	//log.debug(`params:${toStr(params)}`);
 
 	const {
+		blacklistedCollectionsJson,
 		clientId,
 		clientSecret,
 		docTypesJson,
@@ -86,7 +71,8 @@ export function run(params) {
 		project,
 		//remoteAddressesJson,
 		site,
-		url
+		url,
+		whitelistedCollectionsJson
 	} = params;
 
 	if(!site) { throw new Error(`Required param site missing! params:${toStr(params)}`); }
@@ -98,6 +84,21 @@ export function run(params) {
 	// Progress should be [0/5] Initializing Sync FotoWare site collicare
 
 	//const state = new StateClass();
+
+	if(!blacklistedCollectionsJson) { throw new Error(`Required param blacklistedCollectionsJson missing! params:${toStr(params)}`); }
+	let blacklistedCollections;
+	try {
+		blacklistedCollections = JSON.parse(blacklistedCollectionsJson)
+	} catch (e) {
+		throw new Error(`Something went wrong when trying to parse blacklistedCollectionsJson:${toStr(params)}`);
+	}
+	if(!whitelistedCollectionsJson) { throw new Error(`Required param whitelistedCollectionsJson missing! params:${toStr(params)}`); }
+	let whitelistedCollections;
+	try {
+		whitelistedCollections = JSON.parse(whitelistedCollectionsJson)
+	} catch (e) {
+		throw new Error(`Something went wrong when trying to parse blacklistedCollectionsJson:${toStr(params)}`);
+	}
 
 	if(!clientId) { throw new Error(`Required param clientId missing! params:${toStr(params)}`); }
 	if(!clientSecret) { throw new Error(`Required param clientSecret missing! params:${toStr(params)}`); }
@@ -173,249 +174,139 @@ export function run(params) {
 		// Progress should be [3/5] Getting API Descriptor
 
 		const {
-			archivesPath,
+			//archivesPath,
+			searchURL,
 			renditionRequest
 		} = getPrivateFullAPIDescriptor({
 			accessToken,
 			hostname: url
 		});
 
-		// These will become undefined if moved below getAndPaginateCollectionList
-		const fields = {};
-		const metaDataViews = {};
+		progress.finishItem(/*'apiDescriptor'*/).setInfo(`Querying for assets`).report();
 
-		// TODO Load storedState from previous sync
-		/*const {
-			x: {
-				[X_APP_NAME]: {
-					fotoWare: {
-						storedState = {}
-					} = {}
-				} = {}
-			} = {}
-		} = folderContent;
-		log.debug(`Loaded storedState:${toStr(storedState)}`);*/
+		const res = query({
+			accessToken,
+			blacklistedCollections,
+			hostname: url,
+			//q: `(dt:generic OR dt:graphic OR dt:movie OR dt:audio OR dt:document OR dt:image) AND fst:1000`,
+			//q: '(dt:graphic OR dt:image) AND fst:1000',
+			q: 'dt:image',
+			searchURL,
+			whitelistedCollections
+		});
 
-		const queue = [/*{
-			assetHref,
-			doctype,
-			filename,
-			filesize,
-			metadata,
-			renditionHref
-		}*/];
+		progress.finishItem(/*'Finished querying for assets'*/)//.report();
 
-		function fnHandleCollections(collections) {
-			//collections = [collections[0]]; // DEBUG
-			//log.info(`collections:${toStr(collections)}`);
-			//log.info(`collections.length:${toStr(collections.length)}`);
-			progress.addItems(collections.length); // Found collections to process
-			// Lets say 10 collections are added then progress should be [4/15] Current: ProcessCollectionLists
+		const {
+			assetCountTotal,
+			collections
+		} = res;
 
-			collections.forEach((collection) => {
-				const {
-					href: collectionHref,
-					metadataEditor: {
-						href: metadataHref
-					}
-				} = collection;
-
-				progress.setInfo(`Processing collection ${collectionHref}`).report();
-				// Progress should still be [4/15] Current: ProcessCollectionLists
-
-				const {
-					fields: metaDataViewFields,
-					id: metaDataViewId
-				} = getMetadataView({
-					accessToken,
-					fields,
-					hostname: url,
-					shortAbsolutePath: metadataHref
-				});
-				if (metaDataViews[metaDataViewId]) {
-					if (!deepEqual(metaDataViews[metaDataViewId], {metaDataViewFields})) {
-						throw new Error(`metaDataViews:${toStr(metaDataViews)} metaDataViewFields:${toStr(metaDataViewFields)} metaDataViewId:${metaDataViewId} already exist!`);
-					}
-				}
-
-				const boolProcessSubCollections = true;
-				//const boolProcessSubCollections = false; // DEBUG
-				if (boolProcessSubCollections) {
-					const {
-						childCount,
-						children // collection list (object)
-					} = getCollection({
-						accessToken,
-						hostname: url,
-						shortAbsolutePath: collectionHref
-					});
-					if (childCount) {
-						//log.info(`childCount:${toStr(childCount)}`);
-						//log.info(`children:${toStr(children)}`);
-						paginateCollectionList({
-							accessToken,
-							hostname: url,
-							collectionList: {
-								collections: children.data,
-								paging: children.paging
-							},
-							fnHandleCollections // NOTE selfreference
-						});
-					} // childCount
-				} // boolProcessSubCollections
-
-				getAndPaginateAssetList({
-					accessToken,
-					hostname: url,
-					shortAbsolutePath: collectionHref,
-					//doPaginate: false, // DEBUG
-					fnHandleAssets: (assets) => {
-						//assets = [assets[0]]; // DEBUG
-						//log.info(`assets:${toStr(assets)}`);
-
-						//log.info(`assets.length:${toStr(assets.length)}`);
-						progress.addItems(assets.length); // Found assets to process
-						// Lets say 100 assets gets added, progress should be [4/115] 4/5 global 0/10 collections 0/100 assets
-
-						//state.addToAssetsCount(assets.length);
-						assets.forEach((asset) => {
-							const innerFolderContent = getContentByKey({key: `/${path}`});
-							const {
-								x: {
-									[X_APP_NAME]: {
-										fotoWare: {
-											shouldStop = false
-										} = {}
-									} = {}
-								} = {}
-							} = innerFolderContent;
-							//log.info(`shouldStop:${toStr(shouldStop)}`);
-							if (shouldStop) {
-								throw new Error(`shouldStop:true`);
-							}
-							//log.info(`asset:${toStr(asset)}`);
-							const {
-								doctype,
-								filename,
-								filesize,
-								href: assetHref,
-								metadata,
-								renditions
-							} = asset;
-							queue.push({
-								assetHref,
-								doctype,
-								filename,
-								filesize,
-								metadata,
-								renditionHref: renditions
-									.filter(({original}) => original === true)[0].href
-							});
-							// Not finishing an asset item here
-						}); // forEach asset
-					} // fnHandleAssets
-				}); // getAndPaginateAssetList
-				progress.finishItem(`Finished processing collection ${collectionHref}`);//.report();
-				// Progress should be [5/115] (4/5 global 1/10 collections 0/100 assets) Current Global: ProcessCollectionLists
-				// Progress should be [14/115] (4/5 global 10/10 collections 0/100 assets) Current Global: ProcessCollectionLists
-			}); // forEach collection
-		} // function fnHandleCollections
+		progress.addItems(assetCountTotal); // Found assets to process
 
 		try {
-			progress.finishItem(/*'apiDescriptor'*/).setInfo(`Getting collection lists`).report();
-			// Progress should be [4/5] Getting collection lists
+			collections.forEach(({assets}) => {
+				assets.forEach((asset) => {
+					const innerFolderContent = getContentByKey({key: `/${path}`});
+					const {
+						x: {
+							[X_APP_NAME]: {
+								fotoWare: {
+									shouldStop = false
+								} = {}
+							} = {}
+						} = {}
+					} = innerFolderContent;
+					//log.info(`shouldStop:${toStr(shouldStop)}`);
+					if (shouldStop) {
+						throw new Error(`shouldStop:true`);
+					}
+					//log.info(`asset:${toStr(asset)}`);
+					const {
+						doctype,
+						filename,
+						//filesize,
+						href: assetHref,
+						metadataArray,
+						renditionHref
+					} = asset;
 
-			getAndPaginateCollectionList({
-				accessToken,
-				hostname: url,
-				shortAbsolutePath: archivesPath,
-				fnHandleCollections
-			});
-			progress.finishItem(`Finished processing collections`);//.report();
-			// Progress should be [15/115] (5/5 global 10/10 collections 0/100 assets) Current: Start processing assets
-
-			const skipped = [/*
-				assetHref,
-				reason: '...'
-			*/];
-			while (queue.length) {
-				const {
-					assetHref,
-					doctype,
-					filename,
-					//filesize,
-					metadata,
-					renditionHref
-				} = queue.shift();
-				progress.setInfo(`Processing asset ${assetHref}`).report();
-				// Progress should still be [15/115] (5/5 global 10/10 collections 0/100 assets)
-
-				//state.addToAssetsSize(filesize);
-				//state.incrementIncludedCount().addToIncludedSize(filesize);
-				//state.incrementProcessedCount().addToProcessedSize(filesize);
-				if (docTypes[doctype]) {
-					//const mediaName = sanitize(`${filename}.${filesize}`).replace(/\./g, '-'); // This should be unique most of the time
-					const mediaName = sanitize(assetHref.replace(/\.info$/, '')).replace(/\./g, '-');
-					const submitNamedParams = {
-						name: 'downloadAndPersistRendition',
-						//name: `${app.name}:downloadAndPersistRendition`,
-						config: {
-							hostname: url,
-							path,
-							accessToken,
-							fields: JSON.stringify(fields),
-							renditionServiceShortAbsolutePath: renditionRequest,
-							assetHref,
-							filename,
-							mediaName,
-							metadata: JSON.stringify(metadata),
-							renditionUrl: renditionHref
+					progress.setInfo(`Processing asset ${assetHref}`).report();
+					//state.addToAssetsSize(filesize);
+					if (docTypes[doctype]) {
+						//state.incrementIncludedCount().addToIncludedSize(filesize);
+						//state.incrementProcessedCount().addToProcessedSize(filesize);
+						const mediaName = sanitize(filename);
+						//const mediaName = sanitize(`${filename}.${filesize}`).replace(/\./g, '-'); // This should be unique most of the time
+						//const mediaName = sanitize(assetHref.replace(/\.info$/, '')).replace(/\./g, '-');
+						const mediaPath = `/${path}/${mediaName}`;
+						const exisitingMedia = getContentByKey({key: mediaPath});
+						if (exisitingMedia) {
+							log.warning(`mediaPath:${mediaPath} already exist, collision?`);
 						}
-					};
-					//log.debug(`submitNamedParams:${toStr(submitNamedParams)}`);
-
-					const taskId = submitNamed(submitNamedParams);
-					//log.info(`taskId:${taskId}`);
-
-					// WARNING isRunning can't be used here because it can temporarily become false when state is WAITING
-					let taskState = getTask(taskId).state;
-					while(['WAITING', 'RUNNING'].includes(taskState)) { // WAITING | RUNNING | FINISHED | FAILED
-						sleep(250); // Check if task is FINISHED or FAILED every 250 ms.
-						taskState = getTask(taskId).state;
-					}
-
-					const notRunningTask = getTask(taskId);
-					if (notRunningTask.state !== 'FINISHED') {
-						log.debug(`notRunningTask:${toStr(notRunningTask)}`);
-					}
-				} else {
-					//log.debug(`Skipping assetHref:${assetHref} doctype:${doctype} not included.`);
-					skipped.push({
-						assetHref,
-						reason: `doctype:${doctype} not included`
-					});
-				}
-				progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
-				// Progress should be [16/115] (5/5 global 10/10 collections 1/100 assets)
-				// Progress should be [115/115] (5/5 global 10/10 collections 100/100 assets)
-			} // while queue.length
-			log.debug(`skipped:${skipped}`);
+						if (!exisitingMedia) {
+							const downloadRenditionResponse = requestRendition({
+								accessToken,
+								hostname: url,
+								renditionServiceShortAbsolutePath: renditionRequest,
+								renditionUrl: renditionHref
+							});
+							if (!downloadRenditionResponse) {
+								throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
+							}
+							log.debug('HERE1');
+							const createMediaResult = createMedia({
+								parentPath: `/${path}`,
+								name: mediaName,
+								data: downloadRenditionResponse.bodyStream
+							});
+							log.debug('HERE2');
+							if (!createMediaResult) {
+								const mediaPath = `/${path}/${mediaName}`;
+								const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
+								log.error(errMsg);
+								throw new Error(errMsg);
+							}
+							modifyContent({
+								key: createMediaResult._id,
+								editor: (node) => {
+									//log.info(`node:${toStr(node)}`);
+									let fotoWareXData;
+									try {
+										//node.displayName = filename;
+										/*if (!node.x) {
+											node.x = {}; // eslint-disable-line no-param-reassign
+										}*/
+										fotoWareXData = {
+											fotoWare: {
+												//hrefs: assetHref, // NOTE Might be multiple
+												metadata: metadataArray//,
+												//md5sum
+											}
+										}
+										node.x[X_APP_NAME] = fotoWareXData; // eslint-disable-line no-param-reassign
+									} catch (e) {
+										// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+										log.error(`node:${toStr(node)}`);
+										log.error(`fotoWareXData:${toStr(fotoWareXData)}`);
+										log.error(`e:${toStr(e)}`);
+										log.error(e);
+										throw e;
+									}
+									return node;
+								}, // editor
+								requireValid: false // Not under site so there is no x-data definitions
+							}); // modifyContent
+						} // if !exisitingMedia
+					} // if docType
+					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
+				}); // forEach asset
+			}); // collections.forEach
+			//progress.finishItem(`Finished processing collections`);//.report();
 			progress.setInfo(`Finished syncing site ${site}`).report();
-			// Progress should still be [115/115] (5/5 global 10/10 collections 100/100 assets)
 		} catch (e) {
 			log.error(`Something went wrong during sync e:${toStr(e)}`);
 			throw e; // Finally should run before this re-throw ends the task.
-		} finally {
-			/*log.debug(`Storing storedState:${toStr(storedState)}`);
-			modifyContent({
-				key: folderContent._id,
-				editor: (node) => {
-					node.x[X_APP_NAME].fotoWare.storedState = storedState; // NOTE Property name cannot contain .
-					return node;
-				},
-				requireValid: false // Not under site so there is no x-data definitions
-			});*/
 		}
-
 	}); // runInContext
 } // export function run
