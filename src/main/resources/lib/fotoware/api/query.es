@@ -69,15 +69,15 @@ export function query(params) {
 			//log.debug(`No hits collectionId:${toStr(collectionId)}`);
 			return false;
 		}
-		if (Object.keys(whitelistedCollections).length && !whitelistedCollections[collectionId]) {
-			//log.debug(`Not whitelisted collectionId:${toStr(collectionId)}`);
-			return false;
+		if (Object.keys(whitelistedCollections).length) {
+			const whiteListed = whitelistedCollections[collectionId];
+			//log.debug(`collectionId:${toStr(collectionId)} whiteListed:${toStr(whiteListed)}`);
+			return whiteListed;
 		}
 		if (Object.keys(blacklistedCollections).length && blacklistedCollections[collectionId]) {
 			//log.debug(`Blacklisted collectionId:${toStr(collectionId)}`);
 			return false;
 		}
-		assetCountTotal += assetCount;
 		return true;
 	}).map(({
 		assetCount,
@@ -85,6 +85,7 @@ export function query(params) {
 		collectionMetadataHref,
 		href
 	}) => {
+		assetCountTotal += assetCount;
 		if (!metadataHrefs[collectionMetadataHref]) {
 			//log.debug(`New metadataEditor in collection ${collectionId} href:${collectionMetadataHref}`);
 			metadataHrefs[collectionMetadataHref] = true;
