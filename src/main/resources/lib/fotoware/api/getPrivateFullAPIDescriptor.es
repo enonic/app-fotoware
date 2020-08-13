@@ -33,6 +33,7 @@ export const getPrivateFullAPIDescriptor = ({
 
 	const {
 		archives: archivesPath,
+		searchURL,
 		services: {
 			//login,
 			//search,
@@ -41,7 +42,6 @@ export const getPrivateFullAPIDescriptor = ({
 		server,
 		href,
 		background_tasks: backgroundTasks,
-		searchURL,
 		albums,
 		taxonomies,
 		screens,
@@ -93,6 +93,7 @@ export const getPrivateFullAPIDescriptor = ({
 	//log.info(`renditionRequest:${toStr(renditionRequest)}`);
 	return {
 		archivesPath,
+		searchURL,
 		renditionRequest
 	};
 }; // export const getPrivateFullAPIDescriptor

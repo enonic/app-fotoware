@@ -1,0 +1,15 @@
+<service>
+	<allow>
+		<!--
+			<principal>role:cms.admin</principal>
+			<principal>role:cms.cm.app</principal>
+			<principal>role:cms.expert</principal>
+		-->
+		<principal>role:system.admin</principal>
+		<!--
+			<principal>role:system.admin.login</principal>
+			<principal>role:system.authenticated</principal>
+			<principal>role:system.everyone</principal>
+		-->
+	</allow>
+</service>
