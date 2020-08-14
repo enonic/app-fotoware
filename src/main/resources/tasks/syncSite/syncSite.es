@@ -186,13 +186,19 @@ export function run(params) {
 
 		progress.finishItem(/*'apiDescriptor'*/).setInfo(`Querying for assets`).report();
 
+		const q = Object.keys(docTypes).filter((k) => docTypes[k]).map((docType) => `dt:${docType}`).join('|');
+		log.debug(`q:${toStr(q)}`)
+		if (!q) {
+			const errMsg = 'Invalid Application Configuration File: No docTypes are included, nothing to query!';
+			log.error(errMsg);
+			throw new Error(errMsg);
+		}
+
 		const res = query({
 			accessToken,
 			blacklistedCollections: {}, // NOTE Intentional hardcode
 			hostname: url,
-			//q: `(dt:generic OR dt:graphic OR dt:movie OR dt:audio OR dt:document OR dt:image) AND fst:1000`,
-			//q: '(dt:graphic OR dt:image) AND fst:1000',
-			q: 'dt:image', // TODO
+			q,
 			searchURL,
 			whitelistedCollections: { // NOTE Intentional hardcode
 				'5000-Archive': true
