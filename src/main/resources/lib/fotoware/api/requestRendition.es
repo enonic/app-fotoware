@@ -67,12 +67,12 @@ export const requestRendition = ({
 		};*/
 	}
 	if (cookies) {
-		//log.info(`cookies:${toStr(cookies)}`);
+		//log.debug(`cookies:${toStr(cookies)}`);
 		renditionServiceRequestParams.headers.Cookie = cookies.map(({name, value}) => `${name}=${value}`).join('; ');
 	}
-	//log.info(`renditionServiceRequestParams:${toStr(renditionServiceRequestParams)}`);
+	//log.debug(`renditionServiceRequestParams:${toStr(renditionServiceRequestParams)}`);
 	const rendtitionServiceResponse = request(renditionServiceRequestParams);
-	//log.info(`rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
+	//log.debug(`rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
 
 	if (rendtitionServiceResponse.status !== 202) {
 		//if (rendtitionServiceResponse.status !== 415) {
@@ -88,13 +88,13 @@ export const requestRendition = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
 	}
-	//log.info(`rendtitionServiceResponseBodyObj:${toStr(rendtitionServiceResponseBodyObj)}`);
+	//log.debug(`rendtitionServiceResponseBodyObj:${toStr(rendtitionServiceResponseBodyObj)}`);
 
 	const {
 		href
 	} = rendtitionServiceResponseBodyObj;
 	const rendtitionRequestUrl = `${hostname}${href}`;
-	//log.info(`rendtitionRequestUrl:${toStr(rendtitionRequestUrl)}`);
+	//log.debug(`rendtitionRequestUrl:${toStr(rendtitionRequestUrl)}`);
 
 	const pollAndDownloadRenditionRequestParams = {
 		method: 'GET',
@@ -103,7 +103,7 @@ export const requestRendition = ({
 	if (accessToken) {
 		pollAndDownloadRenditionRequestParams.headers = { Authorization: `bearer ${accessToken}` };
 	}
-	//log.info(`pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)}`);
+	//log.debug(`pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)}`);
 
 	let pollAndDownloadRenditionResponse = {
 		status: 202
@@ -119,7 +119,7 @@ export const requestRendition = ({
 		log.error(`Something went wrong while trying to poll and download rendition rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)} pollAndDownloadRenditionResponse:${toStr(pollAndDownloadRenditionResponse)}`);
 		throw new Error(`Something went wrong while trying to poll and download rendition renditionUrl:${renditionUrl}`);
 	}
-	/*log.info(`debug rendition service and download:${toStr({
+	/*log.debug(`debug rendition service and download:${toStr({
 		renditionServiceRequestParams,
 		rendtitionServiceResponse,
 		rendtitionServiceResponseBodyObj,

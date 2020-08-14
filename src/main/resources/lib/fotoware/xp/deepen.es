@@ -5,16 +5,16 @@
 export function deepen(o) {
 	const oo = {};
 	Object.keys(o).forEach((k) => {
-		//log.info(`k:${toStr(k)}`);
+		//log.debug(`k:${toStr(k)}`);
 		let t = oo;
-		//log.info(`t1:${toStr(t)}`);
+		//log.debug(`t1:${toStr(t)}`);
 		//const parts = k.split('.'); // This will fail on '' and ""
 		/*const parts = k.split(/['"]\.|\.['"]/).map((a) => {
-			log.info(`a:${toStr(a)}`);
+			log.debug(`a:${toStr(a)}`);
 			if (a.search(/'|"/) !== -1) {
 			//if (a.includes('"') || a.includes("'")) {
 				const p = a.replace(/['"]/, '').replace(/\./g, '#');
-				log.info(`p:${toStr(p)}`);
+				log.debug(`p:${toStr(p)}`);
 				return p;
 			}
 			return a;
@@ -27,20 +27,20 @@ export function deepen(o) {
 				.split('.')
 				.map((a) => a.replace(/#/g, '.'))
 			: k.split('.');
-		//log.info(`parts:${toStr(parts)}`);
+		//log.debug(`parts:${toStr(parts)}`);
 		const key = parts.pop();
-		//log.info(`key:${toStr(key)}`);
+		//log.debug(`key:${toStr(key)}`);
 		while (parts.length) {
 			const part = parts.shift();
-			//log.info(`part:${toStr(part)}`);
+			//log.debug(`part:${toStr(part)}`);
 			t[part] = t[part] || {};
-			//log.info(`t2:${toStr(t)}`);
+			//log.debug(`t2:${toStr(t)}`);
 			t = t[part];
-			//log.info(`t3:${toStr(t)}`);
+			//log.debug(`t3:${toStr(t)}`);
 		}
 		t[key] = o[k];
-		//log.info(`t4:${toStr(t)}`);
+		//log.debug(`t4:${toStr(t)}`);
 	});
-	//log.info(`oo:${toStr(oo)}`);
+	//log.debug(`oo:${toStr(oo)}`);
 	return oo;
 }

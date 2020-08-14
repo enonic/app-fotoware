@@ -116,7 +116,7 @@ export function run(params) {
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to parse docTypesJson:${toStr(params)}`);
 	}
-	//log.info(`docTypes:${toStr(docTypes)}`);
+	//log.debug(`docTypes:${toStr(docTypes)}`);
 
 	/*let remoteAddresses;
 	try {
@@ -124,7 +124,7 @@ export function run(params) {
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to parse remoteAddressesJson:${toStr(params)}`);
 	}
-	//log.info(`remoteAddresses:${toStr(remoteAddresses)}`);*/
+	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);*/
 
 	runInContext({
 		repository: `com.enonic.cms.${project}`,
@@ -221,11 +221,11 @@ export function run(params) {
 							} = {}
 						} = {}
 					} = innerFolderContent;
-					//log.info(`shouldStop:${toStr(shouldStop)}`);
+					//log.debug(`shouldStop:${toStr(shouldStop)}`);
 					if (shouldStop) {
 						throw new Error(`shouldStop:true`);
 					}
-					//log.info(`asset:${toStr(asset)}`);
+					//log.debug(`asset:${toStr(asset)}`);
 					const {
 						doctype,
 						filename,
@@ -271,7 +271,7 @@ export function run(params) {
 								modifyContent({
 									key: createMediaResult._id,
 									editor: (node) => {
-										//log.info(`node:${toStr(node)}`);
+										//log.debug(`node:${toStr(node)}`);
 										node.x[X_APP_NAME] = {
 											fotoWare: {
 												metadata: metadataObj

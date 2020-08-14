@@ -18,9 +18,9 @@ export const getCollectionList = ({
 			access_token: accessToken
 		};
 	}
-	//log.info(`collectionListRequestParams:${toStr(collectionListRequestParams)}`);
+	//log.debug(`collectionListRequestParams:${toStr(collectionListRequestParams)}`);
 	const collectionListResponse = request(collectionListRequestParams);
-	//log.info(`collectionListResponse:${toStr(collectionListResponse)}`);
+	//log.debug(`collectionListResponse:${toStr(collectionListResponse)}`);
 
 	if (collectionListResponse.status !== 200) {
 		throw new Error(`Something went wrong when trying to get assetList collectionListRequestParams:${toStr(collectionListRequestParams)} collectionListResponse:${toStr(collectionListResponse)}`);
@@ -32,7 +32,7 @@ export const getCollectionList = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! collectionListResponse:${toStr(collectionListResponse)}`);
 	}
-	//log.info(`collectionListResponseBodyObj:${toStr(collectionListResponseBodyObj)}`);
+	//log.debug(`collectionListResponseBodyObj:${toStr(collectionListResponseBodyObj)}`);
 
 	const {
 		//add,
@@ -41,8 +41,8 @@ export const getCollectionList = ({
 		//reorder,
 		//searchURL
 	} = collectionListResponseBodyObj;
-	//log.info(`collections:${toStr(collections)}`);
-	//log.info(`paging:${toStr(paging)}`);
+	//log.debug(`collections:${toStr(collections)}`);
+	//log.debug(`paging:${toStr(paging)}`);
 	return {
 		collections,
 		paging

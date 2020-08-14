@@ -2,22 +2,22 @@
 import {deepen} from '/lib/fotoware/xp/deepen';
 
 export function getConfigFromAppCfg() {
-	//log.info(`app.config:${toStr(app.config)}`);
+	//log.debug(`app.config:${toStr(app.config)}`);
 
 	const config = deepen(app.config);
-	//log.info(`config:${toStr(config)}`);
+	//log.debug(`config:${toStr(config)}`);
 
 	const {
 		fotoware: {
 			sites = {}
 		} = {}
 	} = config;
-	//log.info(`sites:${toStr(sites)}`);
+	//log.debug(`sites:${toStr(sites)}`);
 
 	const siteConfigs = {};
 
 	Object.keys(sites).forEach((site) => {
-		//log.info(`site:${toStr(site)}`);
+		//log.debug(`site:${toStr(site)}`);
 		const {
 			collections: {
 				blacklist = {},
@@ -31,7 +31,7 @@ export function getConfigFromAppCfg() {
 			clientId,
 			project = 'default'
 		} = sites[site];
-		/*log.info(`${toStr({
+		/*log.debug(`${toStr({
 			docTypes,
 			url,
 			remoteAddresses,
@@ -70,6 +70,6 @@ export function getConfigFromAppCfg() {
 		};
 	}); // foreach
 
-	//log.info(`siteConfigs:${toStr(siteConfigs)}`);
+	//log.debug(`siteConfigs:${toStr(siteConfigs)}`);
 	return siteConfigs;
 } // function getConfigFromAppCfg

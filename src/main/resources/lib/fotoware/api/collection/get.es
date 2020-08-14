@@ -20,9 +20,9 @@ export const getCollection = ({
 			access_token: accessToken
 		};
 	}
-	//log.info(`collectionRequestParams:${toStr(collectionRequestParams)}`);
+	//log.debug(`collectionRequestParams:${toStr(collectionRequestParams)}`);
 	const collectionResponse = request(collectionRequestParams);
-	//log.info(`collectionResponse:${toStr(collectionResponse)}`);
+	//log.debug(`collectionResponse:${toStr(collectionResponse)}`);
 
 	let collectionResponseBodyObj;
 	try {
@@ -30,7 +30,7 @@ export const getCollection = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! collectionListResponse:${toStr(collectionResponse)}`);
 	}
-	//log.info(`collectionResponseBodyObj:${toStr(collectionResponseBodyObj)}`);
+	//log.debug(`collectionResponseBodyObj:${toStr(collectionResponseBodyObj)}`);
 
 	const {
 		childCount,
@@ -95,10 +95,10 @@ export const getCollection = ({
 		props,
 		...rest*/
 	} = collectionResponseBodyObj;
-	//log.info(`rest:${toStr(rest)}`);
-	//log.info(`hasChildren:${toStr(hasChildren)}`);
-	//log.info(`childCount:${toStr(childCount)}`);
-	//log.info(`children:${toStr(children)}`);
+	//log.debug(`rest:${toStr(rest)}`);
+	//log.debug(`hasChildren:${toStr(hasChildren)}`);
+	//log.debug(`childCount:${toStr(childCount)}`);
+	//log.debug(`children:${toStr(children)}`);
 	return {
 		//assets, // Using getAndPaginateAssetList instead
 		childCount,

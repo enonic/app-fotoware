@@ -13,10 +13,10 @@ export const getPublicAPIDescriptor = ({
 		},
 		url: `${hostname}/fotoweb/`
 	};
-	//log.info(`publicAPIDescriptorRequestParams:${toStr(publicAPIDescriptorRequestParams)}`);
+	//log.debug(`publicAPIDescriptorRequestParams:${toStr(publicAPIDescriptorRequestParams)}`);
 
 	const publicAPIDescriptorResponse = request(publicAPIDescriptorRequestParams);
-	//log.info(`publicAPIDescriptorResponse:${toStr(publicAPIDescriptorResponse)}`);
+	//log.debug(`publicAPIDescriptorResponse:${toStr(publicAPIDescriptorResponse)}`);
 
 	let publicAPIDescriptorResponseBodyObj;
 	try {
@@ -24,7 +24,7 @@ export const getPublicAPIDescriptor = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! publicAPIDescriptorResponse:${toStr(publicAPIDescriptorResponse)}`);
 	}
-	//log.info(`publicAPIDescriptorResponseBodyObj:${toStr(publicAPIDescriptorResponseBodyObj)}`);
+	//log.debug(`publicAPIDescriptorResponseBodyObj:${toStr(publicAPIDescriptorResponseBodyObj)}`);
 
 	const {
 		archives: archivesPath, //"/fotoweb/archives/",
@@ -43,9 +43,9 @@ export const getPublicAPIDescriptor = ({
 		utc_offset: utcOffset, //0
 		...rest*/
 	} = publicAPIDescriptorResponseBodyObj;
-	//log.info(`rest:${toStr(rest)}`);
-	//log.info(`archivesPath:${toStr(archivesPath)}`);
-	//log.info(`renditionRequest:${toStr(renditionRequest)}`);
+	//log.debug(`rest:${toStr(rest)}`);
+	//log.debug(`archivesPath:${toStr(archivesPath)}`);
+	//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
 	return {
 		archivesPath,
 		renditionRequest

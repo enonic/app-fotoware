@@ -8,23 +8,23 @@ import {toStr} from '/lib/util';
 
 /*function decodeAccessToken(accessToken) {
 	//const a = JWT.AccessToken.verify(accessToken);
-	//log.info(`a:${toStr(a)}`);
+	//log.debug(`a:${toStr(a)}`);
 	//const b = verify(accessToken);
-	//log.info(`b:${toStr(b)}`);
+	//log.debug(`b:${toStr(b)}`);
 	const jwtParts = accessToken.split('.').map((base64url) => {
-		//log.info(`base64url:${toStr(base64url)}`);
+		//log.debug(`base64url:${toStr(base64url)}`);
 		const stream = base64UrlDecode(base64url);
 		const decoded = readText(stream);
-		//log.info(`decoded:${toStr(decoded)}`);
+		//log.debug(`decoded:${toStr(decoded)}`);
 		return decoded;
 	});
-	//log.info(`jwtParts:${toStr(jwtParts)}`);
+	//log.debug(`jwtParts:${toStr(jwtParts)}`);
 	const jwt = {
 		header: JSON.parse(jwtParts[0]),
 		payload: JSON.parse(jwtParts[1]),
 		signature: jwtParts[2] // binary :(
 	};
-	//log.info(`jwt:${toStr(jwt)}`);
+	//log.debug(`jwt:${toStr(jwt)}`);
 	return jwt;
 } // function decodeAccessToken*/
 
@@ -42,9 +42,9 @@ export const getAccessToken = ({
 		},
 		url: `${hostname}/fotoweb/oauth2/token`
 	};
-	//log.info(`tokenRequestParams:${toStr(tokenRequestParams)}`);
+	//log.debug(`tokenRequestParams:${toStr(tokenRequestParams)}`);
 	const tokenResponse = request(tokenRequestParams);
-	//log.info(`tokenResponse:${toStr(tokenResponse)}`);
+	//log.debug(`tokenResponse:${toStr(tokenResponse)}`);
 	const {
 		//cookies,
 		//contentType, // application/json
@@ -52,7 +52,7 @@ export const getAccessToken = ({
 		//message,
 		status
 	} = tokenResponse;
-	//log.info(`cookies:${toStr(cookies)}`);
+	//log.debug(`cookies:${toStr(cookies)}`);
 	if (status !== 200) {
 		throw new Error(`Status !== 200 tokenResponse:${toStr(tokenResponse)}`);
 	}
@@ -68,18 +68,18 @@ export const getAccessToken = ({
 		//refresh_token//,
 		//token_type: tokenType // bearer
 	} = tokenResponseObj;
-	//log.info(`accessToken:${toStr(accessToken)}`);
+	//log.debug(`accessToken:${toStr(accessToken)}`);
 
 	/*const jwt = decodeAccessToken(accessToken);
-	log.info(`jwt:${toStr(jwt)}`);
+	log.debug(`jwt:${toStr(jwt)}`);
 	const {
 		payload: {
 			iss//, //Contains the api url
 			//jti
 		}
 	} = jwt;
-	log.info(`iss:${toStr(iss)}`);
-	//log.info(`jti:${toStr(jti)}`);*/
+	log.debug(`iss:${toStr(iss)}`);
+	//log.debug(`jti:${toStr(jti)}`);*/
 
 	return {
 		accessToken

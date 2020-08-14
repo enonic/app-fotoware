@@ -18,16 +18,16 @@ export const getAssetList = ({
 			access_token: accessToken
 		};
 	}
-	//log.info(`assetListRequestParams:${toStr(assetListRequestParams)}`);
+	//log.debug(`assetListRequestParams:${toStr(assetListRequestParams)}`);
 	const assetListResponse = request(assetListRequestParams);
-	//log.info(`assetListResponse:${toStr(assetListResponse)}`);
+	//log.debug(`assetListResponse:${toStr(assetListResponse)}`);
 
 	if (assetListResponse.status !== 200) {
 		throw new Error(`Something went wrong when trying to get assetList assetListRequestParams:${toStr(assetListRequestParams)} assetListListResponse:${toStr(assetListResponse)}`);
 	}
 
 	const {cookies} = assetListResponse;
-	//log.info(`cookies:${toStr(cookies)}`);
+	//log.debug(`cookies:${toStr(cookies)}`);
 
 	let assetListResponseBodyObj;
 	try {
@@ -35,13 +35,13 @@ export const getAssetList = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! assetListListResponse:${toStr(assetListResponse)}`);
 	}
-	//log.info(`assetListResponseBodyObj:${toStr(assetListResponseBodyObj)}`);
+	//log.debug(`assetListResponseBodyObj:${toStr(assetListResponseBodyObj)}`);
 
 	const {
 		data: assets,
 		paging
 	} = assetListResponseBodyObj;
-	//log.info(`assets:${toStr(assets)}`);
+	//log.debug(`assets:${toStr(assets)}`);
 	return {
 		assets,
 		cookies,

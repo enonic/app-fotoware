@@ -18,10 +18,10 @@ export const getPrivateFullAPIDescriptor = ({
 		},
 		url: `${hostname}/fotoweb/me/`
 	};
-	//log.info(`privateFullAPIDescriptorRequestParams:${toStr(privateFullAPIDescriptorRequestParams)}`);
+	//log.debug(`privateFullAPIDescriptorRequestParams:${toStr(privateFullAPIDescriptorRequestParams)}`);
 
 	const privateFullAPIDescriptorResponse = request(privateFullAPIDescriptorRequestParams);
-	//log.info(`privateFullAPIDescriptorResponse:${toStr(privateFullAPIDescriptorResponse)}`);
+	//log.debug(`privateFullAPIDescriptorResponse:${toStr(privateFullAPIDescriptorResponse)}`);
 
 	let privateFullAPIDescriptorResponseBodyObj;
 	try {
@@ -29,7 +29,7 @@ export const getPrivateFullAPIDescriptor = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! privateFullAPIDescriptorResponse:${toStr(privateFullAPIDescriptorResponse)}`);
 	}
-	//log.info(`privateFullAPIDescriptorResponseBodyObj:${toStr(privateFullAPIDescriptorResponseBodyObj)}`);
+	//log.debug(`privateFullAPIDescriptorResponseBodyObj:${toStr(privateFullAPIDescriptorResponseBodyObj)}`);
 
 	const {
 		archives: archivesPath,
@@ -88,9 +88,9 @@ export const getPrivateFullAPIDescriptor = ({
 
 		...rest*/
 	} = privateFullAPIDescriptorResponseBodyObj;
-	//log.info(`rest:${toStr(rest)}`);
-	//log.info(`archives:${toStr(archives)}`);
-	//log.info(`renditionRequest:${toStr(renditionRequest)}`);
+	//log.debug(`rest:${toStr(rest)}`);
+	//log.debug(`archives:${toStr(archives)}`);
+	//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
 	return {
 		archivesPath,
 		searchURL,

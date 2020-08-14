@@ -23,9 +23,9 @@ export const getMetadataView = ({
 			access_token: accessToken
 		};
 	}
-	//log.info(`metadataViewRequestParams:${toStr(metadataViewRequestParams)}`);
+	//log.debug(`metadataViewRequestParams:${toStr(metadataViewRequestParams)}`);
 	const metadataViewResponse = request(metadataViewRequestParams);
-	//log.info(`metadataViewResponse:${toStr(metadataViewResponse)}`);
+	//log.debug(`metadataViewResponse:${toStr(metadataViewResponse)}`);
 
 	let metadataViewResponseBodyObj;
 	try {
@@ -33,7 +33,7 @@ export const getMetadataView = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! metadataViewListResponse:${toStr(metadataViewResponse)}`);
 	}
-	//log.info(`metadataViewResponseBodyObj:${toStr(metadataViewResponseBodyObj)}`);
+	//log.debug(`metadataViewResponseBodyObj:${toStr(metadataViewResponseBodyObj)}`);
 
 	const {
 		id,
@@ -45,14 +45,14 @@ export const getMetadataView = ({
 		//preserveModificationTime,
 		//...rest
 	} = metadataViewResponseBodyObj;
-	//log.info(`rest:${toStr(rest)}`);
+	//log.debug(`rest:${toStr(rest)}`);
 
 	//const fields = {};
 
-	//log.info(`builtinFields:${toStr(builtinFields)}`);
+	//log.debug(`builtinFields:${toStr(builtinFields)}`);
 	Object.keys(builtinFields).forEach((k) => {
-		//log.info(`k:${toStr(k)}`);
-		//log.info(`builtinFields[${k}]:${toStr(builtinFields[k])}`);
+		//log.debug(`k:${toStr(k)}`);
+		//log.debug(`builtinFields[${k}]:${toStr(builtinFields[k])}`);
 		const {
 			id: fieldId,
 			...fieldRest
@@ -105,7 +105,7 @@ export const getMetadataView = ({
 		});
 	});
 
-	//log.info(`thumbnailFields:${toStr(thumbnailFields)}`);
+	//log.debug(`thumbnailFields:${toStr(thumbnailFields)}`);
 	/*[
 		'secondLine', // single
 		'additionalFields', // array
@@ -130,7 +130,7 @@ export const getMetadataView = ({
 			}
 		}); // aThumbnailFieldsArray.forEach
 	});
-	//log.info(`fields:${toStr(fields)}`);
+	//log.debug(`fields:${toStr(fields)}`);
 
 	const getMetadataViewReturnValue = {
 		id,
@@ -140,7 +140,7 @@ export const getMetadataView = ({
 		detailRegions: detailRegionsObj,
 		thumbnailFields
 	};
-	//log.info(`getMetadataViewReturnValue:${toStr(getMetadataViewReturnValue)}`);
+	//log.debug(`getMetadataViewReturnValue:${toStr(getMetadataViewReturnValue)}`);
 
 	return getMetadataViewReturnValue;
 }; // getMetadataView

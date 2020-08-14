@@ -13,10 +13,10 @@ export const getAndPaginateAssetList = ({
 		accessToken,
 		url: `${hostname}${shortAbsolutePath}`
 	});
-	//log.info(`assetList:${toStr(assetList)}`);
+	//log.debug(`assetList:${toStr(assetList)}`);
 	fnHandleAssets(assetList.assets);
 	if (doPaginate && assetList.paging) {
-		//log.info(`paging:${toStr(assetList.paging)}`);
+		//log.debug(`paging:${toStr(assetList.paging)}`);
 		//prev, // URL of previous page. If null, then there is no previous page, and the current representation is the first page.
 		//next, // URL of next page. If null, then there is no next page, and the current representation is the last page.
 		//first, // URL of first page. This attribute is never null and can be used for restarting navigation at the beginning of the list.
@@ -64,7 +64,7 @@ assets.forEach(({
 	props,
 	...assetRest
 }) => {
-	log.info(`assetRest:${toStr(assetRest)}`);
-	log.info(`assetHref:${toStr(assetHref)}`);
+	log.debug(`assetRest:${toStr(assetRest)}`);
+	log.debug(`assetHref:${toStr(assetHref)}`);
 }); // assets.forEach
 */
