@@ -228,7 +228,7 @@ export function run(params) {
 						filename,
 						//filesize,
 						href: assetHref,
-						metadataArray,
+						metadataObj,
 						renditionHref
 					} = asset;
 
@@ -272,7 +272,7 @@ export function run(params) {
 									try {
 										fotoWareXData = {
 											fotoWare: {
-												metadata: metadataArray
+												metadata: metadataObj
 											}
 										}
 										node.x[X_APP_NAME] = fotoWareXData; // eslint-disable-line no-param-reassign

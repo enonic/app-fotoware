@@ -4,6 +4,12 @@ import {paginate} from '/lib/fotoware/api/paginate';
 import {request} from '/lib/http-client';
 import {toStr} from '/lib/util';
 
+function camelize(str) {
+  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+    return index === 0 ? word.toLowerCase() : word.toUpperCase();
+  }).replace(/\s+/g, '');
+}
+
 export function query(params) {
 	const {
 		accessToken,
@@ -136,14 +142,10 @@ export function query(params) {
 							shortAbsolutePath: assetMetadataHref
 						});
 					}
-					const metadataArray = [];
+					const metadataObj = {};
 					Object.keys(metadata).forEach((k) => {
 						if (fields[k]) {
-							metadataArray.push({
-								id: k,
-								label: fields[k].label,
-								values: metadata[k].value
-							});
+							metadataObj[camelize(fields[k].label.toLowerCase())] = metadata[k].value;
 						} else {
 							if (!unknownFields[k]) {
 								unknownFields[k] = true;
@@ -158,7 +160,7 @@ export function query(params) {
 						filesize,
 						href,
 						//metadata,
-						metadataArray,
+						metadataObj,
 						renditionHref: renditions
 							.filter(({original}) => original === true)[0].href
 					});

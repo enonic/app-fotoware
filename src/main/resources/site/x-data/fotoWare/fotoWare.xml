@@ -3,20 +3,60 @@
 	<form>
 		<item-set name="metadata">
 			<label>Metadata</label>
-			<occurrences minimum="0" maximum="0"/>
+			<occurrences minimum="0" maximum="1"/>
 			<items>
-				<input name="id" type="TextLine">
-					<label>Id</label>
-					<occurrences minimum="1" maximum="1"/>
+				<!-- Built-ins -->
+				<input name="title" type="TextLine">
+					<label>Title</label>
+					<occurrences minimum="0" maximum="1"/>
 				</input>
-				<input name="label" type="TextLine">
-					<label>Label</label>
-					<occurrences minimum="1" maximum="1"/>
+				<input name="description" type="TextLine">
+					<label>Description</label>
+					<occurrences minimum="0" maximum="1"/>
 				</input>
-				<input name="values" type="TextLine">
-					<label>Values</label>
+				<input name="tags" type="TextLine">
+					<label>Tags</label>
+					<occurrences minimum="0" maximum="1"/>
+				</input>
+				<input name="status" type="TextLine">
+					<label>Status</label>
+					<occurrences minimum="0" maximum="1"/>
+				</input>
+				<input name="rating" type="TextLine">
+					<label>Rating</label>
+					<occurrences minimum="0" maximum="1"/>
+				</input>
+				<input name="notes" type="TextLine">
+					<label>Notes</label>
+					<occurrences minimum="0" maximum="1"/>
+				</input>
+				<!-- Common? -->
+				<input name="keywords" type="TextLine">
+					<label>Keywords</label>
 					<occurrences minimum="0" maximum="0"/>
 				</input>
+				<input name="country" type="TextLine">
+					<label>Country</label>
+					<occurrences minimum="0" maximum="1"/>
+				</input>
+				<input name="year" type="TextLine">
+					<label>Year</label>
+					<occurrences minimum="0" maximum="1"/>
+				</input>
+				<input name="category" type="TextLine">
+					<label>Category</label>
+					<occurrences minimum="0" maximum="1"/>
+				</input>
+				<input name="archive" type="TextLine">
+					<label>Archive</label>
+					<occurrences minimum="0" maximum="1"/>
+				</input>
+				<!-- Specific to customer?
+					<input name="copyrightString" type="TextLine">
+						<label>Copyright string</label>
+						<occurrences minimum="0" maximum="1"/>
+					</input>
+				-->
 			</items>
 		</item-set>
 	</form>
