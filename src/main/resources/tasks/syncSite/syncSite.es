@@ -73,7 +73,7 @@ export function run(params) {
 		project,
 		//remoteAddressesJson,
 		site,
-		url,
+		url//,
 		//whitelistedCollectionsJson
 	} = params;
 
@@ -187,7 +187,7 @@ export function run(params) {
 		progress.finishItem(/*'apiDescriptor'*/).setInfo(`Querying for assets`).report();
 
 		const q = Object.keys(docTypes).filter((k) => docTypes[k]).map((docType) => `dt:${docType}`).join('|');
-		log.debug(`q:${toStr(q)}`)
+		//log.debug(`q:${toStr(q)}`)
 		if (!q) {
 			const errMsg = 'Invalid Application Configuration File: No docTypes are included, nothing to query!';
 			log.error(errMsg);
@@ -246,57 +246,63 @@ export function run(params) {
 					if (docTypes[doctype]) {
 						//state.incrementIncludedCount().addToIncludedSize(filesize);
 						//state.incrementProcessedCount().addToProcessedSize(filesize);
-						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
-						const mediaPath = `/${path}/${mediaName}`;
-						const exisitingMedia = getContentByKey({key: mediaPath});
-						/*if (exisitingMedia) { // Only useful on first sync
-							log.warning(`mediaPath:${mediaPath} already exist, collision?`);
-						}*/
-						if (!exisitingMedia) {
-							const downloadRenditionResponse = requestRendition({
-								accessToken,
-								hostname: url,
-								renditionServiceShortAbsolutePath: renditionRequest,
-								renditionUrl: renditionHref
-							});
-							if (!downloadRenditionResponse) {
-								throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
-							}
-							const createMediaResult = createMedia({
-								parentPath: `/${path}`,
-								name: mediaName,
-								data: downloadRenditionResponse.bodyStream
-							});
-							if (!createMediaResult) {
-								const mediaPath = `/${path}/${mediaName}`;
-								const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
-								log.error(errMsg);
-								throw new Error(errMsg);
-							}
-							try {
-								modifyContent({
-									key: createMediaResult._id,
-									editor: (node) => {
-										//log.debug(`node:${toStr(node)}`);
-										node.x[X_APP_NAME] = {
-											fotoWare: {
-												metadata: metadataObj
-											}
-										}; // eslint-disable-line no-param-reassign
-										return node;
-									}, // editor
-									requireValid: false // May contain extra undefined x-data
-								}); // modifyContent
-							} catch (e) {
-								log.error(`Something went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
-								// This happens on a psd file, perhaps bad metadata?
-								// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-								log.error(`metadataObj:${toStr(metadataObj)}`);
-								deleteContent({ // So it will be retried on next sync
-									key: createMediaResult._id
+						if (filename.startsWith('.')) {
+							log.warning(`Skipping filename:${filename} because it starts with a dot, so probabbly a hidden file.`);
+						} else if (filename.split('.').length < 2) {
+							log.warning(`Skipping filename:${filename} because it has no extention.`);
+						} else {
+							const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
+							const mediaPath = `/${path}/${mediaName}`;
+							const exisitingMedia = getContentByKey({key: mediaPath});
+							/*if (exisitingMedia) { // Only useful on first sync
+								log.warning(`mediaPath:${mediaPath} already exist, collision?`);
+							}*/
+							if (!exisitingMedia) {
+								const downloadRenditionResponse = requestRendition({
+									accessToken,
+									hostname: url,
+									renditionServiceShortAbsolutePath: renditionRequest,
+									renditionUrl: renditionHref
 								});
-							}
-						} // if !exisitingMedia
+								if (!downloadRenditionResponse) {
+									throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
+								}
+								const createMediaResult = createMedia({
+									parentPath: `/${path}`,
+									name: mediaName,
+									data: downloadRenditionResponse.bodyStream
+								});
+								if (!createMediaResult) {
+									const mediaPath = `/${path}/${mediaName}`;
+									const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
+									log.error(errMsg);
+									throw new Error(errMsg);
+								}
+								try {
+									modifyContent({
+										key: createMediaResult._id,
+										editor: (node) => {
+											//log.debug(`node:${toStr(node)}`);
+											node.x[X_APP_NAME] = {
+												fotoWare: {
+													metadata: metadataObj
+												}
+											}; // eslint-disable-line no-param-reassign
+											return node;
+										}, // editor
+										requireValid: false // May contain extra undefined x-data
+									}); // modifyContent
+								} catch (e) {
+									log.error(`Something went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
+									// This happens on a psd file, perhaps bad metadata?
+									// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+									log.error(`metadataObj:${toStr(metadataObj)}`);
+									deleteContent({ // So it will be retried on next sync
+										key: createMediaResult._id
+									});
+								}
+							} // if !exisitingMedia
+						} // valid filename
 					} // if docType
 					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
 				}); // forEach asset
