@@ -14,6 +14,7 @@ import {query} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {Progress} from './Progress';
 
+const CT_COLLECTION = `${app.name}:collection`;
 const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 
 /*class StateClass {
@@ -139,15 +140,15 @@ export function run(params) {
 		// Progress should be [1/5] Creating target folder /FotoWare (if needed)
 
 		const folderContent = getContentByKey({key: folderPath});
-		if (folderContent && !folderContent.type === 'base:folder') {
-			throw new Error(`Content path:${path} not a folder!`);
+		if (folderContent && !folderContent.type === CT_COLLECTION) {
+			throw new Error(`Content path:${path} not a ${CT_COLLECTION}!`);
 		}
 		if (!folderContent) {
 			createContent({
 				parentPath: '/',
 				name: path,
 				displayName: path,
-				contentType: 'base:folder',
+				contentType: CT_COLLECTION,
 				data: {},
 				requireValid: false,
 				x: {
