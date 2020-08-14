@@ -1,11 +1,13 @@
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {toStr} from '/lib/util';
+import {run} from '/lib/xp/context';
 import {
 	getBaseUri,
 	getLauncherPath,
 	getLauncherUrl
 } from '/lib/xp/admin';
 import {assetUrl} from '/lib/xp/portal';
+import {submitNamed} from '/lib/xp/task';
 
 export function get(request) {
 	//log.debug(`request:${toStr(request)}`);
@@ -17,7 +19,7 @@ export function get(request) {
 		}
 	} = request;
 	//log.debug(`params:${toStr(params)}`);
-	log.debug(`site:${toStr(site)}`);
+	//log.debug(`site:${toStr(site)}`);
 
 	let mainHtml = '';
 
@@ -113,10 +115,55 @@ export function post(request) {
 		}
 	} = request;
 	//log.debug(`params:${toStr(params)}`);
-	log.debug(`site:${toStr(site)}`);
+	//log.debug(`site:${toStr(site)}`);
+
+	if (site !== '_all') {
+		return {
+			applyFilters: false,
+			postProcess: false,
+			redirect: ''
+		};
+	}
 
 	const sitesConfigs = getConfigFromAppCfg();
-	log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
+	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
+
+	Object.keys(sitesConfigs).forEach((site) => {
+		const {
+			blacklistedCollections,
+			clientId,
+			clientSecret,
+			docTypes,
+			path,
+			project,
+			//remoteAddresses,
+			url,
+			whitelistedCollections
+		} = sitesConfigs[site];
+		run({
+			repository: `com.enonic.cms.${project}`,
+			branch: 'draft',
+			user: {
+				login: 'su', // So Livetrace Tasks reports correct user
+				idProvider: 'system'
+			},
+			principals: ['role:system.admin']
+		}, () => submitNamed({
+			name: 'syncSite',
+			config: {
+				blacklistedCollectionsJson: JSON.stringify(blacklistedCollections),
+				clientId,
+				clientSecret,
+				docTypesJson: JSON.stringify(docTypes),
+				path,
+				project,
+				//remoteAddressesJson: JSON.stringify(remoteAddresses),
+				site,
+				url,
+				whitelistedCollectionsJson: JSON.stringify(whitelistedCollections)
+			}
+		})); // run
+	}); // foreach
 
 	return {
 		applyFilters: false,
