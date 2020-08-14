@@ -258,7 +258,7 @@ const STYLE_CONFIG = {
 };
 //console.log(`STYLE_CONFIG:${JSON.stringify(STYLE_CONFIG, null, 4)}`);
 
-WEBPACK_CONFIG.push(STYLE_CONFIG);
+//WEBPACK_CONFIG.push(STYLE_CONFIG);
 
 //──────────────────────────────────────────────────────────────────────────────
 const ESM_ASSETS_GLOB = `${SRC_DIR}/${ASSETS_PATH_GLOB_BRACE}/**/*.{jsx,mjs}`;
@@ -331,7 +331,7 @@ if (ESM_ASSETS_FILES.length) {
 		stats
 	};
 	//console.log(`ASSETS_ESM_CONFIG:${toStr(ASSETS_ESM_CONFIG)}`);
-	WEBPACK_CONFIG.push(ASSETS_ESM_CONFIG);
+	//WEBPACK_CONFIG.push(ASSETS_ESM_CONFIG);
 }
 
 

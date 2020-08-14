@@ -21,6 +21,7 @@ app {
 	vendorName = 'Enonic AS'
 	vendorUrl = 'http://enonic.com'
 	systemVersion = "${xpVersion}"
+	systemApp = true
 }
 
 
@@ -28,7 +29,7 @@ dependencies {
 	compile "com.enonic.xp:core-api:${xpVersion}"
 	compile "com.enonic.xp:portal-api:${xpVersion}"
 
-	//include "com.enonic.xp:lib-admin:${xpVersion}"
+	include "com.enonic.xp:lib-admin:${xpVersion}"
 	//include "com.enonic.xp:lib-auth:${xpVersion}"
 	//include "com.enonic.xp:lib-cluster:${xpVersion}"
 	include "com.enonic.xp:lib-common:${xpVersion}"
@@ -40,13 +41,14 @@ dependencies {
 	//include "com.enonic.xp:lib-mail:${xpVersion}"
 	//include "com.enonic.xp:lib-mustache:${xpVersion}"
 	//include "com.enonic.xp:lib-node:${xpVersion}"
-	//include "com.enonic.xp:lib-portal:${xpVersion}"
+	include "com.enonic.xp:lib-portal:${xpVersion}"
 	//include "com.enonic.xp:lib-repo:${xpVersion}"
 	include "com.enonic.xp:lib-task:${xpVersion}"
 	//include "com.enonic.xp:lib-thymeleaf:${xpVersion}"
 	//include "com.enonic.xp:lib-websocket:${xpVersion}"
 	//include "com.enonic.xp:lib-xslt:${xpVersion}"
 
+	include "com.enonic.lib:lib-admin-ui:3.0.0"
 	//include 'com.enonic.lib:lib-cache:2.1.1'
 	include 'com.enonic.lib:lib-galimatias:1.0.0-B1'
 	//include 'com.enonic.lib:lib-guillotine:1.0.1'
@@ -90,7 +92,7 @@ sourceSets {
 			srcDir 'src/main/java'
 		}
 		resources { // Paths relative to src/main/resources
-			exclude 'assets/**/*.svg'
+			//exclude 'assets/**/*.svg'
 		}
 	}
 }
@@ -124,6 +126,7 @@ processResources {
 
 	// Let gradle copy these
 	//include '**/*.mjs'
+	//include '**/*.svg'
 	//include '**/*.xml'
 
 	// Let webpack handle these (rather than gradle)

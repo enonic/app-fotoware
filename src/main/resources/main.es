@@ -6,7 +6,8 @@ import {submitNamed} from '/lib/xp/task';
 const sitesConfigs = getConfigFromAppCfg();
 //log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-Object.keys(sitesConfigs).forEach((site) => {
+//Object.keys(sitesConfigs)
+[].forEach((site) => {
 	const {
 		blacklistedCollections,
 		clientId,
