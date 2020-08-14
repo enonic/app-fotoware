@@ -98,6 +98,7 @@ module.exports = {
 		'no-underscore-dangle': ['error', {
 			allow: [
 				'_id', // content-type property
+				'_name', // content-type property
 				'_path', // content-type property
 				'_selected' // option-set property
 			],

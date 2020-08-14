@@ -281,25 +281,36 @@ export function run(params) {
 								try {
 									modifyContent({
 										key: createMediaResult._id,
-										editor: (node) => {
-											//log.debug(`node:${toStr(node)}`);
-											node.x[X_APP_NAME] = {
+										editor: (content) => {
+											//log.debug(`content:${toStr(content)}`);
+											content.x[X_APP_NAME] = {
 												fotoWare: {
 													metadata: metadataObj
 												}
 											}; // eslint-disable-line no-param-reassign
-											return node;
+											//log.debug(`modified content:${toStr(content)}`);
+											return content;
 										}, // editor
 										requireValid: false // May contain extra undefined x-data
 									}); // modifyContent
 								} catch (e) {
-									log.error(`Something went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
-									// This happens on a psd file, perhaps bad metadata?
-									// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-									log.error(`metadataObj:${toStr(metadataObj)}`);
-									deleteContent({ // So it will be retried on next sync
-										key: createMediaResult._id
-									});
+									if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
+										// Known problem on psd, svg, ai, jpf, pdf
+										log.error(`Unable to modify ${createMediaResult._name}`);
+										deleteContent({ // So it will be retried on next sync
+											key: createMediaResult._id
+										});
+									} else {
+										log.error(`Something unkown went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
+										log.error(`metadataObj:${toStr(metadataObj)}`);
+										log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+										//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException
+										//log.error(e.message); // Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+										deleteContent({ // So it will be retried on next sync
+											key: createMediaResult._id
+										});
+										throw(e); // NOTE Only known way to get stacktrace
+									}
 								}
 							} // if !exisitingMedia
 						} // valid filename
