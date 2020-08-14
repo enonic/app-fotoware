@@ -64,7 +64,7 @@ export function run(params) {
 	//log.debug(`params:${toStr(params)}`);
 
 	const {
-		blacklistedCollectionsJson,
+		//blacklistedCollectionsJson,
 		clientId,
 		clientSecret,
 		docTypesJson,
@@ -73,7 +73,7 @@ export function run(params) {
 		//remoteAddressesJson,
 		site,
 		url,
-		whitelistedCollectionsJson
+		//whitelistedCollectionsJson
 	} = params;
 
 	if(!site) { throw new Error(`Required param site missing! params:${toStr(params)}`); }
@@ -86,20 +86,20 @@ export function run(params) {
 
 	//const state = new StateClass();
 
-	if(!blacklistedCollectionsJson) { throw new Error(`Required param blacklistedCollectionsJson missing! params:${toStr(params)}`); }
+	/*if(!blacklistedCollectionsJson) { throw new Error(`Required param blacklistedCollectionsJson missing! params:${toStr(params)}`); }
 	let blacklistedCollections;
 	try {
 		blacklistedCollections = JSON.parse(blacklistedCollectionsJson)
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to parse blacklistedCollectionsJson:${toStr(params)}`);
-	}
-	if(!whitelistedCollectionsJson) { throw new Error(`Required param whitelistedCollectionsJson missing! params:${toStr(params)}`); }
+	}*/
+	/*if(!whitelistedCollectionsJson) { throw new Error(`Required param whitelistedCollectionsJson missing! params:${toStr(params)}`); }
 	let whitelistedCollections;
 	try {
 		whitelistedCollections = JSON.parse(whitelistedCollectionsJson)
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to parse blacklistedCollectionsJson:${toStr(params)}`);
-	}
+	}*/
 
 	if(!clientId) { throw new Error(`Required param clientId missing! params:${toStr(params)}`); }
 	if(!clientSecret) { throw new Error(`Required param clientSecret missing! params:${toStr(params)}`); }
@@ -187,13 +187,15 @@ export function run(params) {
 
 		const res = query({
 			accessToken,
-			blacklistedCollections,
+			blacklistedCollections: {}, // NOTE Intentional hardcode
 			hostname: url,
 			//q: `(dt:generic OR dt:graphic OR dt:movie OR dt:audio OR dt:document OR dt:image) AND fst:1000`,
 			//q: '(dt:graphic OR dt:image) AND fst:1000',
-			q: 'dt:image',
+			q: 'dt:image', // TODO
 			searchURL,
-			whitelistedCollections
+			whitelistedCollections: { // NOTE Intentional hardcode
+				'5000-Archive': true
+			}
 		});
 
 		progress.finishItem(/*'Finished querying for assets'*/)//.report();
