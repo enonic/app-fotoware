@@ -21,7 +21,7 @@ app {
 	vendorName = 'Enonic AS'
 	vendorUrl = 'http://enonic.com'
 	systemVersion = "${xpVersion}"
-	systemApp = true
+	//systemApp = true
 }
 
 
