@@ -3,6 +3,7 @@ import {sanitize} from '/lib/xp/common';
 import {
 	create as createContent,
 	createMedia,
+	delete as deleteContent,
 	get as getContentByKey,
 	modify as modifyContent
 } from '/lib/xp/content';
@@ -242,9 +243,9 @@ export function run(params) {
 						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
 						const mediaPath = `/${path}/${mediaName}`;
 						const exisitingMedia = getContentByKey({key: mediaPath});
-						if (exisitingMedia) {
+						/*if (exisitingMedia) { // Only useful on first sync
 							log.warning(`mediaPath:${mediaPath} already exist, collision?`);
-						}
+						}*/
 						if (!exisitingMedia) {
 							const downloadRenditionResponse = requestRendition({
 								accessToken,
@@ -266,30 +267,29 @@ export function run(params) {
 								log.error(errMsg);
 								throw new Error(errMsg);
 							}
-							modifyContent({
-								key: createMediaResult._id,
-								editor: (node) => {
-									//log.info(`node:${toStr(node)}`);
-									let fotoWareXData;
-									try {
-										fotoWareXData = {
+							try {
+								modifyContent({
+									key: createMediaResult._id,
+									editor: (node) => {
+										//log.info(`node:${toStr(node)}`);
+										node.x[X_APP_NAME] = {
 											fotoWare: {
 												metadata: metadataObj
 											}
-										}
-										node.x[X_APP_NAME] = fotoWareXData; // eslint-disable-line no-param-reassign
-									} catch (e) {
-										// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-										log.error(`node:${toStr(node)}`);
-										log.error(`fotoWareXData:${toStr(fotoWareXData)}`);
-										log.error(`e:${toStr(e)}`);
-										log.error(e);
-										throw e;
-									}
-									return node;
-								}, // editor
-								requireValid: false // Not under site so there is no x-data definitions
-							}); // modifyContent
+										}; // eslint-disable-line no-param-reassign
+										return node;
+									}, // editor
+									requireValid: false // May contain extra undefined x-data
+								}); // modifyContent
+							} catch (e) {
+								log.error(`Something went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
+								// This happens on a psd file, perhaps bad metadata?
+								// Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+								log.error(`metadataObj:${toStr(metadataObj)}`);
+								deleteContent({ // So it will be retried on next sync
+									key: createMediaResult._id
+								});
+							}
 						} // if !exisitingMedia
 					} // if docType
 					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
