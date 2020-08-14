@@ -49,7 +49,7 @@
 				</input>
 				<input name="archive" type="TextLine">
 					<label>Archive</label>
-					<occurrences minimum="0" maximum="1"/>
+					<occurrences minimum="0" maximum="0"/>
 				</input>
 				<!-- Specific to customer?
 					<input name="copyrightString" type="TextLine">
