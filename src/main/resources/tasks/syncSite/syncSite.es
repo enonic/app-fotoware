@@ -281,6 +281,14 @@ export function run(params) {
 									deleteContent({ // So it will be retried on next sync
 										key: createMediaResult._id
 									});
+									//throw(e);
+								} else if (e.class.name === 'java.lang.RuntimeException' && e.message === 'Failed to read BufferedImage from InputStream') {
+									// c.e.x.e.impl.BinaryExtractorImpl - Error extracting binary: TIKA-198: Illegal IOException from org.apache.tika.parser.jpeg.JpegParser@44c1fc82
+									//java.lang.RuntimeException: Failed to read BufferedImage from InputStream
+									log.warning(`Deleting corrupt image ${createMediaResult._name}`);
+									deleteContent({ // We don't want corrupt files
+										key: createMediaResult._id
+									});
 								} else {
 									log.error(`Something unkown went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
 									log.error(`metadataObj:${toStr(metadataObj)}`);
