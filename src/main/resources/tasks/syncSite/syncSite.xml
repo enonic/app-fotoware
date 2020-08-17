@@ -14,16 +14,16 @@
 			<label>clientSecret</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
-		<input name="docTypesJson" type="TextLine">
-			<label>docTypes JSON</label>
-			<occurrences minimum="1" maximum="1"/>
-		</input>
 		<input name="path" type="TextLine">
 			<label>path</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="project" type="TextLine">
 			<label>project</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="query" type="TextLine">
+			<label>query</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<!--input name="remoteAddressesJson" type="TextLine">

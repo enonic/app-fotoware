@@ -46,11 +46,7 @@ fotoware.sites.sitename.clientSecret = ...
 # These are the defaults, but they can be overridden:
 #fotoware.sites.sitename.project = default
 #fotoware.sites.sitename.path = FotoWare
-#fotoware.sites.sitename.docTypes.graphic = true
-#fotoware.sites.sitename.docTypes.document = false
-#fotoware.sites.sitename.docTypes.generic = false
-#fotoware.sites.sitename.docTypes.image = true
-#fotoware.sites.sitename.docTypes.movie = false
+#fotoware.sites.sitename.query = fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg
 
 # Only allow webhooks from these ips:
 #fotoware.sites.sitename.remoteAddresses.'127.0.0.1'
@@ -133,9 +129,9 @@ export function post(request) {
 			blacklistedCollections,
 			clientId,
 			clientSecret,
-			docTypes,
 			path,
 			project,
+			query,
 			//remoteAddresses,
 			url,
 			whitelistedCollections
@@ -154,9 +150,9 @@ export function post(request) {
 				blacklistedCollectionsJson: JSON.stringify(blacklistedCollections),
 				clientId,
 				clientSecret,
-				docTypesJson: JSON.stringify(docTypes),
 				path,
 				project,
+				query,
 				//remoteAddressesJson: JSON.stringify(remoteAddresses),
 				site,
 				url,

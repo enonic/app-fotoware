@@ -23,10 +23,10 @@ export function getConfigFromAppCfg() {
 				blacklist = {},
 				whitelist = {}
 			} = {},
-			docTypes = {},
 			url = `https://${site}.fotoware.cloud`,
 			remoteAddresses = {},
 			path = 'FotoWare',
+			query = 'fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg',
 			clientSecret,
 			clientId,
 			project = 'default'
@@ -54,19 +54,13 @@ export function getConfigFromAppCfg() {
 		siteConfigs[site] = {
 			blacklistedCollections,
 			whitelistedCollections,
-			docTypes: {
-				document: docTypes.document === 'true',
-				graphic: docTypes.graphic !== 'false',
-				generic: docTypes.generic === 'true',
-				image: docTypes.image !== 'false',
-				movie: docTypes.movie === 'true'
-			},
 			url,
 			remoteAddresses,
 			path,
 			clientSecret,
 			clientId,
-			project
+			project,
+			query
 		};
 	}); // foreach
 

@@ -56,21 +56,11 @@ export const post = (request) => {
 	const {
 		href, // FQDN
 		data: {
-			//archiveHREF,
-			//doctype,
-			filename//,
-			//filesize,
-			//metadata,
-			//renditions
+			filename
 		}
 	} = body;
 	//log.debug(`href:${toStr(href)}`);
-	//log.debug(`archiveHREF:${toStr(archiveHREF)}`);
-	//log.debug(`doctype:${toStr(doctype)}`);
 	//log.debug(`filename:${toStr(filename)}`);
-	//log.debug(`filesize:${toStr(filesize)}`);
-	//log.debug(`metadata:${toStr(metadata)}`);
-	//log.debug(`renditions:${toStr(renditions)}`);
 
 	if (filename.startsWith('.')) {
 		log.warning(`Skipping filename:${filename} because it starts with a dot, so probabbly a hidden file.`);
@@ -88,7 +78,6 @@ export const post = (request) => {
 	const {
 		clientId,
 		clientSecret,
-		docTypes,
 		path,
 		project,
 		remoteAddresses,
@@ -159,7 +148,6 @@ export const post = (request) => {
 				log.error(`Querying for filename:${filename} returned more than one asset!`);
 			} else {
 				const {
-					doctype,
 					filename: filenameFromQuery, // Should match or query is weird
 					//filesize,
 					//href,
@@ -169,63 +157,59 @@ export const post = (request) => {
 				if (filename !== filenameFromQuery) {
 					throw new Error(`filename:${filename} from assetModified does not match filename:${filenameFromQuery} from query result`);
 				}
-				if (!docTypes[doctype]) {
-					log.warning(`Skipping filename:${filename} because it's doctype:${doctype} is not included.`);
-				} else {
-					const downloadRenditionResponse = requestRendition({
-						accessToken,
-						hostname: url,
-						renditionServiceShortAbsolutePath: renditionRequest,
-						renditionUrl: renditionHref
+				const downloadRenditionResponse = requestRendition({
+					accessToken,
+					hostname: url,
+					renditionServiceShortAbsolutePath: renditionRequest,
+					renditionUrl: renditionHref
+				});
+				if (!downloadRenditionResponse) {
+					throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
+				}
+				if (!exisitingMedia) {
+					const createMediaResult = createMedia({
+						parentPath: `/${path}`,
+						name: filename,
+						data: downloadRenditionResponse.bodyStream
 					});
-					if (!downloadRenditionResponse) {
-						throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
+					if (!createMediaResult) {
+						const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
+						log.error(errMsg);
+						throw new Error(errMsg);
 					}
-					if (!exisitingMedia) {
-						const createMediaResult = createMedia({
-							parentPath: `/${path}`,
-							name: filename,
-							data: downloadRenditionResponse.bodyStream
+				}
+				try {
+					modifyContent({
+						key: mediaPath,
+						editor: (content) => {
+							//log.debug(`content:${toStr(content)}`);
+							content.x[X_APP_NAME] = {
+								fotoWare: {
+									metadata: metadataObj
+								}
+							}; // eslint-disable-line no-param-reassign
+							//log.debug(`modified content:${toStr(content)}`);
+							return content;
+						}, // editor
+						requireValid: false // May contain extra undefined x-data
+					}); // modifyContent
+				} catch (e) {
+					if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
+						// Known problem on psd, svg, ai, jpf, pdf
+						log.error(`Unable to modify ${exisitingMedia._name}`);
+						deleteContent({ // So it will be retried on next sync
+							key: mediaPath
 						});
-						if (!createMediaResult) {
-							const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
-							log.error(errMsg);
-							throw new Error(errMsg);
-						}
-					}
-					try {
-						modifyContent({
-							key: mediaPath,
-							editor: (content) => {
-								//log.debug(`content:${toStr(content)}`);
-								content.x[X_APP_NAME] = {
-									fotoWare: {
-										metadata: metadataObj
-									}
-								}; // eslint-disable-line no-param-reassign
-								//log.debug(`modified content:${toStr(content)}`);
-								return content;
-							}, // editor
-							requireValid: false // May contain extra undefined x-data
-						}); // modifyContent
-					} catch (e) {
-						if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
-							// Known problem on psd, svg, ai, jpf, pdf
-							log.error(`Unable to modify ${exisitingMedia._name}`);
-							deleteContent({ // So it will be retried on next sync
-								key: mediaPath
-							});
-						} else {
-							log.error(`Something unkown went wrong when trying to modifyContent exisitingMedia:${toStr(exisitingMedia)}`);
-							log.error(`metadataObj:${toStr(metadataObj)}`);
-							log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-							//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException
-							//log.error(e.message); // Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-							deleteContent({ // So it will be retried on next sync
-								key: mediaPath
-							});
-							throw(e); // NOTE Only known way to get stacktrace
-						}
+					} else {
+						log.error(`Something unkown went wrong when trying to modifyContent exisitingMedia:${toStr(exisitingMedia)}`);
+						log.error(`metadataObj:${toStr(metadataObj)}`);
+						log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+						//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException
+						//log.error(e.message); // Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+						deleteContent({ // So it will be retried on next sync
+							key: mediaPath
+						});
+						throw(e); // NOTE Only known way to get stacktrace
 					}
 				}
 			} // if assetCountTotal
