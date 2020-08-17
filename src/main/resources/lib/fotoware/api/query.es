@@ -1,14 +1,8 @@
 //import deepEqual from 'fast-deep-equal';
-import {getMetadataView} from '/lib/fotoware/api/metadata/get';
+//import {getMetadataView} from '/lib/fotoware/api/metadata/get';
 import {paginate} from '/lib/fotoware/api/paginate';
 import {request} from '/lib/http-client';
 import {toStr} from '/lib/util';
-
-function camelize(str) {
-	return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
-		return index === 0 ? word.toLowerCase() : word.toUpperCase();
-	}).replace(/\s+/g, '');
-}
 
 export function query(params) {
 	const {
@@ -51,21 +45,21 @@ export function query(params) {
 	}
 
 	let assetCountTotal = 0;
-	const fields = {};
-	const unknownFields = {};
-	const metadataHrefs = {};
+	//const fields = {};
+	//const unknownFields = {};
+	//const metadataHrefs = {};
 
 	const collections = collectionList.data.map(({
 		assetCount,
 		href,
-		metadataEditor: {
+		/*metadataEditor: {
 			href: collectionMetadataHref
-		},
+		},*/
 		originalURL
 	}) => ({
 		assetCount,
 		collectionId: originalURL.replace(/\/$/, '').replace(/^.*\//, ''),
-		collectionMetadataHref,
+		//collectionMetadataHref,
 		href
 	})).filter(({
 		assetCount,
@@ -88,12 +82,12 @@ export function query(params) {
 	}).map(({
 		assetCount,
 		collectionId,
-		collectionMetadataHref,
+		//collectionMetadataHref,
 		href
 	}) => {
 		//log.debug(`href:${toStr(href)}`); // /fotoweb/archives/5000-Archive/?q=
 		assetCountTotal += assetCount;
-		if (!metadataHrefs[collectionMetadataHref]) {
+		/*if (!metadataHrefs[collectionMetadataHref]) {
 			//log.debug(`New metadataEditor in collection ${collectionId} href:${collectionMetadataHref}`);
 			metadataHrefs[collectionMetadataHref] = true;
 			getMetadataView({
@@ -102,7 +96,7 @@ export function query(params) {
 				hostname,
 				shortAbsolutePath: collectionMetadataHref
 			});
-		}
+		}*/
 		// NOTE 17.7 seconds when processing metadata, 1.6 seconds when not
 		// Skipping the deepEqual wasn't good enough, still 17.6 seconds
 		// Skipping filter 17.3
@@ -127,12 +121,12 @@ export function query(params) {
 					filesize,
 					href,
 					metadata,
-					metadataEditor: {
+					/*metadataEditor: {
 						href: assetMetadataHref
-					},
+					},*/
 					renditions
 				}) => {
-					if (!metadataHrefs[assetMetadataHref]) {
+					/*if (!metadataHrefs[assetMetadataHref]) {
 						log.debug(`New metadataEditor in asset ${href} href:${assetMetadataHref}`); // Haven's seen this happen yet.
 						metadataHrefs[assetMetadataHref] = true;
 						getMetadataView({
@@ -152,15 +146,15 @@ export function query(params) {
 								//log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])} assetHref:${href} editorHref:${assetMetadataHref}`);
 							}
 						}
-					});
+					});*/
 					//log.debug(`metadataArray:${toStr(metadataArray)}`);
 					collectionObj.assets.push({
 						doctype,
 						filename,
 						filesize,
 						href,
-						//metadata,
-						metadataObj,
+						metadata,
+						//metadataObj,
 						renditionHref: renditions
 							.filter(({original}) => original === true)[0].href
 					});
@@ -180,9 +174,11 @@ export function query(params) {
 		return collectionObj;
 	}); // collectionList.data.map
 
-	if (Object.keys(unknownFields).length) {
+	/*if (Object.keys(unknownFields).length) {
 		log.warning(`unknownFields:${toStr(Object.keys(unknownFields))}`);
 	}
+
+	log.debug(`fields:${toStr(fields)}`);*/
 
 	return {
 		assetCountTotal,

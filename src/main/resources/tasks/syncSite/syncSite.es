@@ -13,6 +13,7 @@ import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
+import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
@@ -219,7 +220,8 @@ export function run(params) {
 						filename,
 						//filesize,
 						href: assetHref,
-						metadataObj,
+						metadata,
+						//metadataObj,
 						renditionHref
 					} = asset;
 
@@ -238,6 +240,7 @@ export function run(params) {
 						/*if (exisitingMedia) { // Only useful on first sync
 							log.warning(`mediaPath:${mediaPath} already exist, collision?`);
 						}*/
+
 						if (!exisitingMedia) {
 							const downloadRenditionResponse = requestRendition({
 								accessToken,
@@ -262,16 +265,10 @@ export function run(params) {
 							try {
 								modifyContent({
 									key: createMediaResult._id,
-									editor: (content) => {
-										//log.debug(`content:${toStr(content)}`);
-										content.x[X_APP_NAME] = {
-											fotoWare: {
-												metadata: metadataObj
-											}
-										}; // eslint-disable-line no-param-reassign
-										//log.debug(`modified content:${toStr(content)}`);
-										return content;
-									}, // editor
+									editor: (content) => addMetadataToContent({
+										metadata,
+										content
+									}),
 									requireValid: false // May contain extra undefined x-data
 								}); // modifyContent
 							} catch (e) {
@@ -291,7 +288,7 @@ export function run(params) {
 									});
 								} else {
 									log.error(`Something unkown went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
-									log.error(`metadataObj:${toStr(metadataObj)}`);
+									//log.error(`metadataObj:${toStr(metadataObj)}`);
 									log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
 									//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException
 									//log.error(e.message); // Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]

@@ -5,58 +5,82 @@
 			<label>Metadata</label>
 			<occurrences minimum="0" maximum="1"/>
 			<items>
-				<!-- Built-ins -->
-				<input name="title" type="TextLine">
-					<label>Title</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<input name="description" type="TextLine">
-					<label>Description</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<input name="tags" type="TextLine">
-					<label>Tags</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<input name="status" type="TextLine">
-					<label>Status</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<input name="rating" type="TextLine">
-					<label>Rating</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<input name="notes" type="TextLine">
-					<label>Notes</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<!-- Common? -->
-				<input name="keywords" type="TextLine">
-					<label>Keywords</label>
+				<input name="10" type="TextLine">
+					<label>10</label>
 					<occurrences minimum="0" maximum="0"/>
 				</input>
-				<input name="country" type="TextLine">
-					<label>Country</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<input name="year" type="TextLine">
-					<label>Year</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<input name="category" type="TextLine">
-					<label>Category</label>
-					<occurrences minimum="0" maximum="1"/>
-				</input>
-				<input name="archive" type="TextLine">
-					<label>Archive</label>
+				<input name="101" type="TextLine">
+					<label>101</label>
 					<occurrences minimum="0" maximum="0"/>
 				</input>
-				<!-- Specific to customer?
-					<input name="copyrightString" type="TextLine">
-						<label>Copyright string</label>
-						<occurrences minimum="0" maximum="1"/>
-					</input>
-				-->
+				<input name="105" type="TextLine">
+					<label>105</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="230" type="TextLine">
+					<label>230</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="320" type="TextLine">
+					<label>320</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="801" type="TextLine">
+					<label>801</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="802" type="TextLine">
+					<label>802</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="803" type="TextLine">
+					<label>803</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="804" type="TextLine">
+					<label>804</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="806" type="TextLine">
+					<label>806</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="807" type="TextLine">
+					<label>807</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="808" type="TextLine">
+					<label>808</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="809" type="TextLine">
+					<label>809</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="810" type="TextLine">
+					<label>810</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="811" type="TextLine">
+					<label>811</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="812" type="TextLine">
+					<label>812</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="813" type="TextLine">
+					<label>813</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="820" type="TextLine">
+					<label>820</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
+				<input name="821" type="TextLine">
+					<label>821</label>
+					<occurrences minimum="0" maximum="0"/>
+				</input>
 			</items>
 		</item-set>
 	</form>
