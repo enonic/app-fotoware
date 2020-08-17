@@ -9,6 +9,11 @@ import {
 import {assetUrl} from '/lib/xp/portal';
 import {submitNamed} from '/lib/xp/task';
 
+const capitalize = (s) => {
+	if (typeof s !== 'string') return ''
+	return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
 export function get(request) {
 	//log.debug(`request:${toStr(request)}`);
 
@@ -23,6 +28,13 @@ export function get(request) {
 
 	let mainHtml = '';
 
+	const sitesConfigs = getConfigFromAppCfg();
+
+	const sitesHtml = Object.keys(sitesConfigs).map((site) => `<form method="post">
+<input name="site" type="hidden" value="${site}"/>
+<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Sync ${capitalize(site)}"/>
+</form>`);
+
 	if (site) {
 		mainHtml = `<h1>Sync started</h1>
 <form>
@@ -33,6 +45,7 @@ export function get(request) {
 	<input name="site" type="hidden" value="_all"/>
 	<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Sync all configured FotoWare sites"/>
 </form>
+${sitesHtml}
 
 <h2>Example com.enonic.app.fotoware.cfg</h2>
 <pre style="background-color: #eee;border-radius: 3px;font-family: courier, monospace;padding: 5px;">
@@ -57,6 +70,24 @@ fotoware.sites.anothersitename.clientId = ...
 fotoware.sites.anothersitename.clientSecret = ...
 fotoware.sites.anothersitename.project = MaybeAnotherProject
 fotoware.sites.anothersitename.path = AtLeastADifferentPath
+
+# Or you can sync different queries from the same FotoWare site:
+
+fotoware.sites.sitenameDocuments.clientId = ...
+fotoware.sites.sitenameDocuments.clientSecret = ...
+# In this example it's important to set url, because sitenameDocuments is not part of the actual url
+fotoware.sites.sitenameDocuments.url = https://sitename.fotoware.cloud
+fotoware.sites.sitenameDocuments.path = FotoWare Documents
+fotoware.sites.sitenameDocuments.path = fn:*.pdf
+
+fotoware.sites.sitenameVideos.clientId = ...
+fotoware.sites.sitenameVideos.clientSecret = ...
+# In this example it's important to set url, because sitenameVideos is not part of the actual url
+fotoware.sites.sitenameVideos.url = https://sitename.fotoware.cloud
+fotoware.sites.sitenameVideos.path = FotoWare Videos
+fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
+
+
 </pre>`;
 	}
 
@@ -113,18 +144,12 @@ export function post(request) {
 	//log.debug(`params:${toStr(params)}`);
 	//log.debug(`site:${toStr(site)}`);
 
-	if (site !== '_all') {
-		return {
-			applyFilters: false,
-			postProcess: false,
-			redirect: ''
-		};
-	}
-
 	const sitesConfigs = getConfigFromAppCfg();
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-	Object.keys(sitesConfigs).forEach((site) => {
+	const sites = site === '_all' ? Object.keys(sitesConfigs) : [site];
+
+	sites.forEach((site) => {
 		const {
 			blacklistedCollections,
 			clientId,
