@@ -265,62 +265,67 @@ export function run(params) {
 							//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
 
 							const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'];
-							const downloadRenditionResponse = requestRendition({
-								accessToken,
-								hostname: url,
-								renditionServiceShortAbsolutePath: renditionRequest,
-								renditionUrl
-							});
-							if (!downloadRenditionResponse) {
-								throw new Error(`Something went wrong when downloading rendition for renditionUrl:${renditionUrl}!`);
-							}
-							const createMediaResult = createMedia({
-								parentPath: `/${path}`,
-								name: mediaName,
-								data: downloadRenditionResponse.bodyStream
-							});
-							if (!createMediaResult) {
-								const mediaPath = `/${path}/${mediaName}`;
-								const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
-								log.error(errMsg);
-								throw new Error(errMsg);
-							}
+							let downloadRenditionResponse;
 							try {
-								modifyContent({
-									key: createMediaResult._id,
-									editor: (content) => addMetadataToContent({
-										metadata,
-										content
-									}),
-									requireValid: false // May contain extra undefined x-data
-								}); // modifyContent
+								downloadRenditionResponse = requestRendition({
+									accessToken,
+									hostname: url,
+									renditionServiceShortAbsolutePath: renditionRequest,
+									renditionUrl
+								});
 							} catch (e) {
-								if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
-									// Known problem on psd, svg, ai, jpf, pdf
-									log.error(`Unable to modify ${createMediaResult._name}`);
-									/*deleteContent({ // So it will be retried on next sync
-										key: createMediaResult._id
-									});*/
-									//throw(e);
-								} else if (e.class.name === 'java.lang.RuntimeException' && e.message === 'Failed to read BufferedImage from InputStream') {
-									// c.e.x.e.impl.BinaryExtractorImpl - Error extracting binary: TIKA-198: Illegal IOException from org.apache.tika.parser.jpeg.JpegParser@44c1fc82
-									//java.lang.RuntimeException: Failed to read BufferedImage from InputStream
-									log.warning(`Deleting corrupt image ${createMediaResult._name}`);
-									deleteContent({ // We don't want corrupt files
-										key: createMediaResult._id
-									});
-								} else {
-									log.error(`Something unkown went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
-									//log.error(`metadataObj:${toStr(metadataObj)}`);
-									log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-									//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException
-									//log.error(e.message); // Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-									deleteContent({ // So it will be retried on next sync
-										key: createMediaResult._id
-									});
-									throw(e); // NOTE Only known way to get stacktrace
-								}
+								// Errors are already logged, simply skip and continue
 							}
+
+							if (downloadRenditionResponse) {
+								const createMediaResult = createMedia({
+									parentPath: `/${path}`,
+									name: mediaName,
+									data: downloadRenditionResponse.bodyStream
+								});
+								if (!createMediaResult) {
+									const mediaPath = `/${path}/${mediaName}`;
+									const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
+									log.error(errMsg);
+									throw new Error(errMsg);
+								}
+								try {
+									modifyContent({
+										key: createMediaResult._id,
+										editor: (content) => addMetadataToContent({
+											metadata,
+											content
+										}),
+										requireValid: false // May contain extra undefined x-data
+									}); // modifyContent
+								} catch (e) {
+									if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
+										// Known problem on psd, svg, ai, jpf, pdf
+										log.error(`Unable to modify ${createMediaResult._name}`);
+										/*deleteContent({ // So it will be retried on next sync
+											key: createMediaResult._id
+										});*/
+										//throw(e);
+									} else if (e.class.name === 'java.lang.RuntimeException' && e.message === 'Failed to read BufferedImage from InputStream') {
+										// c.e.x.e.impl.BinaryExtractorImpl - Error extracting binary: TIKA-198: Illegal IOException from org.apache.tika.parser.jpeg.JpegParser@44c1fc82
+										//java.lang.RuntimeException: Failed to read BufferedImage from InputStream
+										log.warning(`Deleting corrupt image ${createMediaResult._name}`);
+										deleteContent({ // We don't want corrupt files
+											key: createMediaResult._id
+										});
+									} else {
+										log.error(`Something unkown went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
+										//log.error(`metadataObj:${toStr(metadataObj)}`);
+										log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+										//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException
+										//log.error(e.message); // Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
+										deleteContent({ // So it will be retried on next sync
+											key: createMediaResult._id
+										});
+										throw(e); // NOTE Only known way to get stacktrace
+									}
+								} // catch
+							} // if downloadRenditionResponse
 						} // if !exisitingMedia
 					} // valid filename
 					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
