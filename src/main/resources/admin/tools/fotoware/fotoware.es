@@ -61,27 +61,11 @@ export function get(request) {
 <input type="submit" style="margin-bottom: 15px;padding: 5px" value="Sync ${capitalize(site)}"/>
 </form>`);
 
-	let metaHtml = '';
-
 	if (site) {
-		metaHtml = '<meta http-equiv="refresh" content="5"/>';
 		mainHtml = `<h1>Sync started</h1>
 <form>
 	<input type="submit" style="margin-bottom: 15px;margin-top: 15px;padding: 5px" value="Go back to FotoWare admin"/>
-</form>
-<table style="width:100%">
-	<thead>
-		<tr>
-			<th>State</th>
-			<th>Info</th>
-			<!--th>Current</th>
-			<th>Total</th-->
-			<th>StartTime</th>
-			<th>Progress</th>
-		</tr>
-	</thead>
-	<tbody>${tasksHtml}</tbody>
-</table>`
+</form>`
 	} else {
 		const allForm = Object.keys(sitesConfigs).length > 1 ? `<form method="post">
 	<input name="site" type="hidden" value="_all"/>
@@ -89,50 +73,7 @@ export function get(request) {
 </form>` : '';
 		mainHtml = `
 ${allForm}
-${sitesHtml}
-
-<h2>Example com.enonic.app.fotoware.cfg</h2>
-<pre style="background-color: #eee;border-radius: 3px;font-family: courier, monospace;padding: 5px;">
-# Required
-fotoware.sites.sitename.clientId = ...
-fotoware.sites.sitename.clientSecret = ...
-
-# This is automatically generated, but can be overridden:
-#fotoware.sites.sitename.url = https://sitename.fotoware.cloud
-
-# These are the defaults, but they can be overridden:
-#fotoware.sites.sitename.project = default
-#fotoware.sites.sitename.path = FotoWare
-#fotoware.sites.sitename.query = fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg
-
-# Only allow webhooks from these ips:
-#fotoware.sites.sitename.remoteAddresses.'127.0.0.1'
-#fotoware.sites.sitename.remoteAddresses.'127.0.0.2'
-
-# You may configure multiple FotoWare sites:
-fotoware.sites.anothersitename.clientId = ...
-fotoware.sites.anothersitename.clientSecret = ...
-fotoware.sites.anothersitename.project = MaybeAnotherProject
-fotoware.sites.anothersitename.path = AtLeastADifferentPath
-
-# Or you can sync different queries from the same FotoWare site:
-
-fotoware.sites.sitenameDocuments.clientId = ...
-fotoware.sites.sitenameDocuments.clientSecret = ...
-# In this example it's important to set url, because sitenameDocuments is not part of the actual url
-fotoware.sites.sitenameDocuments.url = https://sitename.fotoware.cloud
-fotoware.sites.sitenameDocuments.path = FotoWare Documents
-fotoware.sites.sitenameDocuments.path = fn:*.pdf
-
-fotoware.sites.sitenameVideos.clientId = ...
-fotoware.sites.sitenameVideos.clientSecret = ...
-# In this example it's important to set url, because sitenameVideos is not part of the actual url
-fotoware.sites.sitenameVideos.url = https://sitename.fotoware.cloud
-fotoware.sites.sitenameVideos.path = FotoWare Videos
-fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
-
-
-</pre>`;
+${sitesHtml}`;
 	}
 
 	const assetsUrl = assetUrl({path: ''});
@@ -144,7 +85,7 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<meta name="theme-color" content="#ffffff">
-		${metaHtml}
+		<meta http-equiv="refresh" content="5"/>
 
 		<title>FotoWare Admin</title>
 
@@ -179,7 +120,22 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 				<span class="app-name">FotoWare Admin</span>
 			</div>
 		</div>
-		<main style="padding: 59px 15px 0px 15px">${mainHtml}</main>
+		<main style="padding: 59px 15px 0px 15px">${mainHtml}
+			<h2>Tasks</h2>
+			<table style="width:100%">
+				<thead>
+					<tr>
+						<th>State</th>
+						<th>Info</th>
+						<!--th>Current</th>
+						<th>Total</th-->
+						<th>StartTime</th>
+						<th>Progress</th>
+					</tr>
+				</thead>
+				<tbody>${tasksHtml}</tbody>
+			</table>
+		</main>
 		<script type="text/javascript">
 			var CONFIG = {
 				//adminUrl: '${getBaseUri()}',
@@ -222,6 +178,7 @@ export function post(request) {
 			project,
 			query,
 			//remoteAddresses,
+			rendition,
 			url,
 			whitelistedCollections
 		} = sitesConfigs[site];
@@ -243,6 +200,7 @@ export function post(request) {
 				project,
 				query,
 				//remoteAddressesJson: JSON.stringify(remoteAddresses),
+				rendition,
 				site,
 				url,
 				whitelistedCollectionsJson: JSON.stringify(whitelistedCollections)
