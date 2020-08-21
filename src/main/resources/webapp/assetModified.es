@@ -22,7 +22,7 @@ import {
 	submit
 } from '/lib/xp/task';
 
-export const post = (request) => {
+export const assetModified = (request) => {
 	//log.debug(`request:${toStr(request)}`);
 
 	const sitesConfigs = getConfigFromAppCfg();

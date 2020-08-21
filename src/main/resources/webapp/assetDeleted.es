@@ -1,6 +1,6 @@
 import {toStr} from '/lib/util';
 
-export const post = (request) => {
+export const assetDeleted = (request) => {
 	log.info(`request:${toStr(request)}`);
 	return {
 		body: {},
