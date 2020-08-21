@@ -29,7 +29,8 @@ export function getConfigFromAppCfg() {
 			query = 'fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg',
 			clientSecret,
 			clientId,
-			project = 'default'
+			project = 'default',
+			rendition = 'Original File'
 		} = sites[site];
 		/*log.debug(`${toStr({
 			docTypes,
@@ -60,7 +61,8 @@ export function getConfigFromAppCfg() {
 			clientSecret,
 			clientId,
 			project,
-			query
+			query,
+			rendition
 		};
 	}); // foreach
 

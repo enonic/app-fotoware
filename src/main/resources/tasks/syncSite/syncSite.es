@@ -73,6 +73,7 @@ export function run(params) {
 		project,
 		query,
 		//remoteAddressesJson,
+		rendition,
 		site,
 		url//,
 		//whitelistedCollectionsJson
@@ -107,6 +108,8 @@ export function run(params) {
 	if(!clientSecret) { throw new Error(`Required param clientSecret missing! params:${toStr(params)}`); }
 	if(!path) { throw new Error(`Required param path missing! params:${toStr(params)}`); }
 	if(!project) { throw new Error(`Required param project missing! params:${toStr(params)}`); }
+	if(!rendition) { throw new Error(`Required param rendition missing! params:${toStr(params)}`); }
+	if(!site) { throw new Error(`Required param site missing! params:${toStr(params)}`); }
 	//if(!remoteAddressesJson) { throw new Error(`Required param remoteAddressesJson missing! params:${toStr(params)}`); }
 	if(!url) { throw new Error(`Required param url missing! params:${toStr(params)}`); }
 
@@ -222,7 +225,8 @@ export function run(params) {
 						href: assetHref,
 						metadata,
 						//metadataObj,
-						renditionHref
+						renditions
+						//renditionHref
 					} = asset;
 
 					progress.setInfo(`Processing asset ${assetHref}`).report();
@@ -242,14 +246,33 @@ export function run(params) {
 						}*/
 
 						if (!exisitingMedia) {
+							//log.debug(`renditions:${toStr(renditions)}`);
+							const renditionsObj = {};
+							renditions.forEach(({
+								//default,
+								//description,
+								display_name,
+								//height,
+								href//,
+								//original,
+								//profile,
+								//sizeFixed,
+								//width
+							}) => {
+								//log.debug(`display_name:${display_name} href:${href} height:${height} width:${width}`);
+								renditionsObj[display_name] = href;
+							});
+							//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
+
+							const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'];
 							const downloadRenditionResponse = requestRendition({
 								accessToken,
 								hostname: url,
 								renditionServiceShortAbsolutePath: renditionRequest,
-								renditionUrl: renditionHref
+								renditionUrl
 							});
 							if (!downloadRenditionResponse) {
-								throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
+								throw new Error(`Something went wrong when downloading rendition for renditionUrl:${renditionUrl}!`);
 							}
 							const createMediaResult = createMedia({
 								parentPath: `/${path}`,

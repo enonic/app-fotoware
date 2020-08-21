@@ -34,6 +34,13 @@ export function query(params) {
 	const queryRequestResponse = request(queryRequest);
 	//log.debug(`queryRequestResponse:${toStr(queryRequestResponse)}`);
 
+	if (queryRequestResponse.status !== 200) {
+		log.error(`Something went wrong when querying:${q} response:${toStr(queryRequestResponse)}`);
+		throw new Error(`Something went wrong when querying:${q} HTTP Status:${queryRequestResponse.status}!`);
+	}
+
+	//log.debug(`body:${toStr(queryRequestResponse.body)}`);
+
 	const collectionList = JSON.parse(queryRequestResponse.body);
 	//log.debug(`collectionList:${toStr(collectionList)}`);
 
@@ -155,8 +162,9 @@ export function query(params) {
 						href,
 						metadata,
 						//metadataObj,
-						renditionHref: renditions
-							.filter(({original}) => original === true)[0].href
+						renditions
+						/*renditionHref: renditions
+							.filter(({original}) => original === true)[0].href*/
 					});
 				}); // assets forEach
 			}, // fnHandlePage
