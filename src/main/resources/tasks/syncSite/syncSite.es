@@ -298,9 +298,9 @@ export function run(params) {
 								if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
 									// Known problem on psd, svg, ai, jpf, pdf
 									log.error(`Unable to modify ${createMediaResult._name}`);
-									deleteContent({ // So it will be retried on next sync
+									/*deleteContent({ // So it will be retried on next sync
 										key: createMediaResult._id
-									});
+									});*/
 									//throw(e);
 								} else if (e.class.name === 'java.lang.RuntimeException' && e.message === 'Failed to read BufferedImage from InputStream') {
 									// c.e.x.e.impl.BinaryExtractorImpl - Error extracting binary: TIKA-198: Illegal IOException from org.apache.tika.parser.jpeg.JpegParser@44c1fc82
