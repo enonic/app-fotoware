@@ -1,5 +1,5 @@
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 import {run} from '/lib/xp/context';
 import {
 	getBaseUri,
@@ -56,10 +56,18 @@ export function get(request) {
 
 	const sitesConfigs = getConfigFromAppCfg();
 
-	const sitesHtml = Object.keys(sitesConfigs).map((site) => `<form method="post">
-<input name="site" type="hidden" value="${site}"/>
-<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Sync ${capitalize(site)}"/>
-</form>`);
+	const sitesHtml = Object.keys(sitesConfigs).map((site) => `<div>
+	<form method="post">
+		<input name="resume" type="hidden" value="true"/>
+		<input name="site" type="hidden" value="${site}"/>
+		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Refresh ${capitalize(site)}"/>
+	</form>
+	<form method="post">
+		<input name="resume" type="hidden" value="false"/>
+		<input name="site" type="hidden" value="${site}"/>
+		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync ${capitalize(site)}"/>
+	</form>
+</div>`);
 
 	if (site) {
 		mainHtml = `<h1>Sync started</h1>
@@ -67,10 +75,18 @@ export function get(request) {
 	<input type="submit" style="margin-bottom: 15px;margin-top: 15px;padding: 5px" value="Go back to FotoWare admin"/>
 </form>`
 	} else {
-		const allForm = Object.keys(sitesConfigs).length > 1 ? `<form method="post">
-	<input name="site" type="hidden" value="_all"/>
-	<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Sync all configured FotoWare sites"/>
-</form>` : '';
+		const allForm = Object.keys(sitesConfigs).length > 1 ? `<div>
+	<form method="post">
+		<input name="resume" type="hidden" value="true"/>
+		<input name="site" type="hidden" value="_all"/>
+		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Refresh all configured FotoWare sites"/>
+	</form>
+	<form method="post">
+		<input name="resume" type="hidden" value="false"/>
+		<input name="site" type="hidden" value="_all"/>
+		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync all configured FotoWare sites"/>
+	</form>
+</div>` : '';
 		mainHtml = `
 ${allForm}
 ${sitesHtml}`;
@@ -94,6 +110,9 @@ ${sitesHtml}`;
 		<link rel="stylesheet" type="text/css" href="${assetsUrl}/admin/common/styles/lib.css">
 		<script defer src="${assetsUrl}/admin/common/js/lib.js" type="text/javascript"></script>
 		<style>
+			form {
+				display: inline-block;
+			}
 			td, th {
 				border: 1px solid gray;
 				padding: 2px;
@@ -158,9 +177,13 @@ export function post(request) {
 	const {
 		//params,
 		params: {
+			resume = 'true',
 			site
 		}
 	} = request;
+	//log.debug(`resume:${toStr(resume)}`);
+	const boolResume = resume !== 'false';
+	//log.debug(`boolResume:${toStr(boolResume)}`);
 	//log.debug(`params:${toStr(params)}`);
 	//log.debug(`site:${toStr(site)}`);
 
@@ -194,6 +217,7 @@ export function post(request) {
 			name: 'syncSite',
 			config: {
 				blacklistedCollectionsJson: JSON.stringify(blacklistedCollections),
+				boolResume,
 				clientId,
 				clientSecret,
 				path,

@@ -12,13 +12,14 @@ import {
 	removeAttachment
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
+import {readText} from '/lib/xp/io';
 
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
-import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
+import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
@@ -286,7 +287,7 @@ export function run(params) {
 							}
 
 							if (downloadRenditionResponse) {
-								const md5sum = md5(downloadRenditionResponse.bodyStream);
+								const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
 								const createMediaResult = createMedia({
 									parentPath: `/${path}`,
 									name: mediaName,
@@ -316,15 +317,15 @@ export function run(params) {
 									} = {}
 								} = {}
 							} = exisitingMediaContent;
-							log.debug(`mediaPath:${mediaPath} md5sumFromXdata:${md5sumFromXdata}`);
+							//log.debug(`mediaPath:${mediaPath} md5sumFromXdata:${md5sumFromXdata}`);
 
-							const md5sumOfExisitingMediaContent = md5sumFromXdata || getAttachmentStream({
+							const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(getAttachmentStream({
 								key: mediaPath,
 								name: mediaName
-							});
-							log.debug(`mediaPath:${mediaPath} md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent}`);
+							})));
+							//log.debug(`mediaPath:${mediaPath} md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent}`);
 							let md5sumToStore = md5sumOfExisitingMediaContent;
-							log.debug(`mediaPath:${mediaPath} md5sumToStore:${md5sumToStore}`);
+							//log.debug(`mediaPath:${mediaPath} md5sumToStore:${md5sumToStore}`);
 
 							if (!boolResume) {
 								let downloadRenditionResponse;
@@ -339,7 +340,7 @@ export function run(params) {
 									// Errors are already logged, simply skip and continue
 								}
 								if (downloadRenditionResponse) {
-									const md5sumOfDownload = md5(downloadRenditionResponse.bodyStream);
+									const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
 									if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
 										log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
 										// TODO Modify attachment
@@ -374,14 +375,14 @@ export function run(params) {
 
 							// NOTE Could generate md5sum from possibly modified attachment here.
 
-							const clonedexisitingMediaContent = JSON.parse(JSON.stringify(exisitingMediaContent));
-							addMetadataToContent({
+							const maybeModifiedMediaContent = addMetadataToContent({
 								md5sum: md5sumToStore,
 								metadata,
-								content: clonedexisitingMediaContent
+								content: JSON.parse(JSON.stringify(exisitingMediaContent))
 							});
-							if (!deepEqual(exisitingMediaContent, clonedexisitingMediaContent)) {
-								const differences = diff(exisitingMediaContent, clonedexisitingMediaContent);
+
+							if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
+								const differences = diff(exisitingMediaContent, maybeModifiedMediaContent);
 								log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
 								modifyMediaContent({
 									exisitingMediaContent,
@@ -390,9 +391,9 @@ export function run(params) {
 									mediaPath,
 									metadata
 								});
-							} else {
+							} /*else {
 								log.debug(`mediaPath:${mediaPath} no differences :)`);
-							}
+							}*/
 						} // else exisitingMediaContent
 					} // valid filename
 					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
