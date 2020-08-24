@@ -5,6 +5,7 @@ import {sanitize} from '/lib/xp/common';
 const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 
 export const addMetadataToContent = ({
+	md5sum,
 	metadata,
 	content
 }) => {
@@ -40,8 +41,9 @@ export const addMetadataToContent = ({
 	});
 
 	content.x[X_APP_NAME] = {
-		fotoWare: {
-			metadata: metadataObj
+		'fotoWare': {
+			'md5sum': md5sum, // https://github.com/enonic/xp/issues/8281#issuecomment-678994176
+			'metadata': metadataObj
 		}
 	}; // eslint-disable-line no-param-reassign
 	//log.debug(`modified content:${toStr(content)}`);

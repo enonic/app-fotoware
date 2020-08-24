@@ -1,11 +1,15 @@
+import {diff} from 'deep-object-diff';
+import deepEqual from 'fast-deep-equal';
+import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
 import {
+	addAttachment,
 	create as createContent,
 	createMedia,
-	delete as deleteContent,
 	get as getContentByKey,
-	modify as modifyContent
+	getAttachmentStream,
+	removeAttachment
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
 
@@ -14,6 +18,7 @@ import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDe
 import {query as doQuery} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
+import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
@@ -67,6 +72,7 @@ export function run(params) {
 
 	const {
 		//blacklistedCollectionsJson,
+		boolResume = true,
 		clientId,
 		clientSecret,
 		path,
@@ -149,8 +155,8 @@ export function run(params) {
 				requireValid: false,
 				x: {
 					[X_APP_NAME]: {
-						fotoWare: {
-							shouldStop: false//,
+						'fotoWare': {
+							'shouldStop': false//,
 							//storedState: {}
 						}
 					}
@@ -208,7 +214,7 @@ export function run(params) {
 					const {
 						x: {
 							[X_APP_NAME]: {
-								fotoWare: {
+								'fotoWare': {
 									shouldStop = false
 								} = {}
 							} = {}
@@ -240,31 +246,33 @@ export function run(params) {
 					} else {
 						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
 						const mediaPath = `/${path}/${mediaName}`;
-						const exisitingMedia = getContentByKey({key: mediaPath});
-						/*if (exisitingMedia) { // Only useful on first sync
-							log.warning(`mediaPath:${mediaPath} already exist, collision?`);
-						}*/
+						const exisitingMediaContent = getContentByKey({key: mediaPath});
 
-						if (!exisitingMedia) {
+						const renditionsObj = {};
+						renditions.forEach(({
+							//default,
+							//description,
+							display_name,
+							//height,
+							href//,
+							//original,
+							//profile,
+							//sizeFixed,
+							//width
+						}) => {
+							//log.debug(`display_name:${display_name} href:${href} height:${height} width:${width}`);
+							renditionsObj[display_name] = href;
+						});
+						//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
+
+						const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'];
+
+						// 1. !exist (resume or not doesn't matter) download and create
+						// 2. exist resume check metadata modify if changes
+						// 3. exist !resume check binary size and md5, modify attachment if changed, same with metadata
+
+						if (!exisitingMediaContent) {
 							//log.debug(`renditions:${toStr(renditions)}`);
-							const renditionsObj = {};
-							renditions.forEach(({
-								//default,
-								//description,
-								display_name,
-								//height,
-								href//,
-								//original,
-								//profile,
-								//sizeFixed,
-								//width
-							}) => {
-								//log.debug(`display_name:${display_name} href:${href} height:${height} width:${width}`);
-								renditionsObj[display_name] = href;
-							});
-							//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
-
-							const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'];
 							let downloadRenditionResponse;
 							try {
 								downloadRenditionResponse = requestRendition({
@@ -278,6 +286,7 @@ export function run(params) {
 							}
 
 							if (downloadRenditionResponse) {
+								const md5sum = md5(downloadRenditionResponse.bodyStream);
 								const createMediaResult = createMedia({
 									parentPath: `/${path}`,
 									name: mediaName,
@@ -289,44 +298,102 @@ export function run(params) {
 									log.error(errMsg);
 									throw new Error(errMsg);
 								}
-								try {
-									modifyContent({
-										key: createMediaResult._id,
-										editor: (content) => addMetadataToContent({
-											metadata,
-											content
-										}),
-										requireValid: false // May contain extra undefined x-data
-									}); // modifyContent
-								} catch (e) {
-									if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
-										// Known problem on psd, svg, ai, jpf, pdf
-										log.error(`Unable to modify ${createMediaResult._name}`);
-										/*deleteContent({ // So it will be retried on next sync
-											key: createMediaResult._id
-										});*/
-										//throw(e);
-									} else if (e.class.name === 'java.lang.RuntimeException' && e.message === 'Failed to read BufferedImage from InputStream') {
-										// c.e.x.e.impl.BinaryExtractorImpl - Error extracting binary: TIKA-198: Illegal IOException from org.apache.tika.parser.jpeg.JpegParser@44c1fc82
-										//java.lang.RuntimeException: Failed to read BufferedImage from InputStream
-										log.warning(`Deleting corrupt image ${createMediaResult._name}`);
-										deleteContent({ // We don't want corrupt files
-											key: createMediaResult._id
-										});
-									} else {
-										log.error(`Something unkown went wrong when trying to modifyContent createMediaResult:${toStr(createMediaResult)}`);
-										//log.error(`metadataObj:${toStr(metadataObj)}`);
-										log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-										//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException
-										//log.error(e.message); // Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-										deleteContent({ // So it will be retried on next sync
-											key: createMediaResult._id
-										});
-										throw(e); // NOTE Only known way to get stacktrace
-									}
-								} // catch
+								modifyMediaContent({
+									exisitingMediaContent,
+									key: createMediaResult._id,
+									md5sum,
+									mediaPath,
+									metadata
+								});
 							} // if downloadRenditionResponse
-						} // if !exisitingMedia
+						} else { // Media exist
+							const {
+								x: {
+									[X_APP_NAME]: {
+										'fotoWare': {
+											'md5sum': md5sumFromXdata
+										} = {}
+									} = {}
+								} = {}
+							} = exisitingMediaContent;
+							log.debug(`mediaPath:${mediaPath} md5sumFromXdata:${md5sumFromXdata}`);
+
+							const md5sumOfExisitingMediaContent = md5sumFromXdata || getAttachmentStream({
+								key: mediaPath,
+								name: mediaName
+							});
+							log.debug(`mediaPath:${mediaPath} md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent}`);
+							let md5sumToStore = md5sumOfExisitingMediaContent;
+							log.debug(`mediaPath:${mediaPath} md5sumToStore:${md5sumToStore}`);
+
+							if (!boolResume) {
+								let downloadRenditionResponse;
+								try {
+									downloadRenditionResponse = requestRendition({
+										accessToken,
+										hostname: url,
+										renditionServiceShortAbsolutePath: renditionRequest,
+										renditionUrl
+									});
+								} catch (e) {
+									// Errors are already logged, simply skip and continue
+								}
+								if (downloadRenditionResponse) {
+									const md5sumOfDownload = md5(downloadRenditionResponse.bodyStream);
+									if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
+										log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
+										// TODO Modify attachment
+										try {
+											addAttachment({
+												key: mediaPath,
+												name: mediaName,
+												data: downloadRenditionResponse.bodyStream
+											});
+										} catch (e) {
+											// Just to see what happens if you try to add an attachment that already exists
+											log.error(e);
+											log.error(e.class.name);
+											log.error(e.message);
+											removeAttachment({
+												key: mediaPath,
+												name: mediaName
+											});
+											// NOTE re-add old attachment with old name? nah, that information is in versions
+											addAttachment({
+												key: mediaPath,
+												name: mediaName,
+												data: downloadRenditionResponse.bodyStream
+											});
+										}
+									} else {
+										log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
+									}
+									md5sumToStore = md5sumOfDownload;
+								}
+							} // if !boolResume
+
+							// NOTE Could generate md5sum from possibly modified attachment here.
+
+							const clonedexisitingMediaContent = JSON.parse(JSON.stringify(exisitingMediaContent));
+							addMetadataToContent({
+								md5sum: md5sumToStore,
+								metadata,
+								content: clonedexisitingMediaContent
+							});
+							if (!deepEqual(exisitingMediaContent, clonedexisitingMediaContent)) {
+								const differences = diff(exisitingMediaContent, clonedexisitingMediaContent);
+								log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
+								modifyMediaContent({
+									exisitingMediaContent,
+									key: mediaPath,
+									md5sum: md5sumToStore,
+									mediaPath,
+									metadata
+								});
+							} else {
+								log.debug(`mediaPath:${mediaPath} no differences :)`);
+							}
+						} // else exisitingMediaContent
 					} // valid filename
 					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
 				}); // forEach asset
