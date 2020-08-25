@@ -9,6 +9,7 @@ import {
 	createMedia,
 	get as getContentByKey,
 	getAttachmentStream,
+	publish,
 	removeAttachment
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
@@ -20,6 +21,7 @@ import {query as doQuery} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
+import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
@@ -210,6 +212,7 @@ export function run(params) {
 
 		try {
 			collections.forEach(({assets}) => {
+				assets = [assets[0]]; // DEBUG
 				assets.forEach((asset) => {
 					const innerFolderContent = getContentByKey({key: `/${path}`});
 					const {
@@ -394,6 +397,20 @@ export function run(params) {
 							} /*else {
 								log.debug(`mediaPath:${mediaPath} no differences :)`);
 							}*/
+							if (isPublished({
+								key: mediaPath,
+								project
+							})) {
+								const publishParams = {
+									includeDependencies: false,
+									keys:[mediaPath],
+									sourceBranch: 'draft',
+									targetBranch: 'master'
+								};
+								log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
+								const publishRes = publish(publishParams);
+								log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
+							}
 						} // else exisitingMediaContent
 					} // valid filename
 					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
