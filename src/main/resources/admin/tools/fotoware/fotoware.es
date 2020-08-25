@@ -1,5 +1,5 @@
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 import {run} from '/lib/xp/context';
 import {
 	getBaseUri,
