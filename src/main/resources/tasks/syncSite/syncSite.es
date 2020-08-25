@@ -212,7 +212,7 @@ export function run(params) {
 
 		try {
 			collections.forEach(({assets}) => {
-				assets = [assets[0]]; // DEBUG
+				//assets = [assets[0]]; // DEBUG
 				assets.forEach((asset) => {
 					const innerFolderContent = getContentByKey({key: `/${path}`});
 					const {
@@ -407,7 +407,7 @@ export function run(params) {
 									sourceBranch: 'draft',
 									targetBranch: 'master'
 								};
-								log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
+								//log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
 								const publishRes = publish(publishParams);
 								log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
 							}
