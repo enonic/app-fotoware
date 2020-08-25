@@ -12,6 +12,8 @@ import {
 	submitNamed
 } from '/lib/xp/task';
 
+const {currentTimeMillis} = Java.type('java.lang.System');
+
 const capitalize = (s) => {
 	if (typeof s !== 'string') return ''
 	return s.charAt(0).toUpperCase() + s.slice(1)
@@ -26,6 +28,7 @@ export function get(request) {
 	});
 	//log.debug(`taskList:${toStr(taskList)}`);
 
+	const currentTime = currentTimeMillis();
 	const tasksHtml = taskList.map(({
 		progress: {
 			current,
@@ -34,14 +37,66 @@ export function get(request) {
 		},
 		startTime,
 		state
-	}) => `<tr>
+	}) => {
+		// WARNING Date objects does not work serverside!
+		//if (!startTime) { startTime = currentTime;}
+		const remainingCount = total - current;
+		//const durationMs = currentTime - startTime;
+		//const averageMs = current ? durationMs / current : durationMs;
+		//const remainingMs = (remainingCount * averageMs);
+		//const etaMs = currentTime + remainingMs;
+		return `<tr>
 	<td class="min">${state}</td>
 	<td class="min">${info}</td>
-	<!--td class="min ta-r">${current}</td>
-	<td class="min ta-r">${total}</td-->
-	<td class="min">${startTime}</td>
-	<td><div class="ta-c" style="background-color:lightgray;width:${current/total*100}%">[${current}/${total}]</div></td>
-</tr>`).join('\n');
+	<!--
+		<td class="min ta-r">${current}</td>
+		<td class="min ta-r">${total}</td>
+	-->
+	<td class="min"><script type="text/javascript">
+	(function() {
+		var scripts= document.getElementsByTagName('script');
+		var script= scripts[scripts.length-1];
+		var div= document.createElement('div');
+		const startTime = (new Date('${startTime}')).getTime();
+		const FORMAT = 'YYYY-MM-DD HH:mm:ss';
+		div.innerHTML= moment(new Date(startTime)).format(FORMAT);
+		script.parentNode.insertBefore(div, script);
+	})();</script></td>
+	<td class="min"><script type="text/javascript">
+	(function() {
+		var scripts= document.getElementsByTagName('script');
+		var script= scripts[scripts.length-1];
+		var div= document.createElement('div');
+		const current = ${current};
+		const remainingCount = ${remainingCount};
+		const currentTime = ${currentTime};
+		const startTime = (new Date('${startTime}')).getTime();
+		const durationMs = currentTime - startTime;
+		const averageMs = current ? durationMs / current : durationMs;
+		const remainingMs = (remainingCount * averageMs);
+		const etaMs = currentTime + remainingMs;
+		const FORMAT = 'YYYY-MM-DD HH:mm:ss';
+		div.innerHTML= moment(new Date(etaMs)).format(FORMAT);
+		script.parentNode.insertBefore(div, script);
+	})();</script></td>
+	<td class="min"><script type="text/javascript">
+	(function() {
+		var scripts= document.getElementsByTagName('script');
+		var script= scripts[scripts.length-1];
+		var div= document.createElement('div');
+		const current = ${current};
+		const remainingCount = ${remainingCount};
+		const currentTime = ${currentTime};
+		const startTime = (new Date('${startTime}')).getTime();
+		const durationMs = currentTime - startTime;
+		const averageMs = current ? durationMs / current : durationMs;
+		const remainingMs = (remainingCount * averageMs);
+		div.innerHTML = moment.utc(moment.duration(remainingMs).asMilliseconds()).format("HH:mm:ss");
+		script.parentNode.insertBefore(div, script);
+	})();</script></td>
+	<td><div class="ta-c" style="background-color:lightgray;width:${current/total*100}%">[${current}/${remainingCount}/${total}]</div></td>
+</tr>`}).join('\n');
+
 
 	const {
 		//params,
@@ -109,6 +164,7 @@ ${sitesHtml}`;
 
 		<link rel="stylesheet" type="text/css" href="${assetsUrl}/admin/common/styles/lib.css">
 		<script defer src="${assetsUrl}/admin/common/js/lib.js" type="text/javascript"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment-with-locales.min.js" type="text/javascript"></script>
 		<style>
 			form {
 				display: inline-block;
@@ -149,6 +205,8 @@ ${sitesHtml}`;
 						<!--th>Current</th>
 						<th>Total</th-->
 						<th>StartTime</th>
+						<th>Eta</th>
+						<th>Remaining</th>
 						<th>Progress</th>
 					</tr>
 				</thead>
