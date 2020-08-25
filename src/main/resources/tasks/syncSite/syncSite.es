@@ -239,7 +239,7 @@ export function run(params) {
 						//renditionHref
 					} = asset;
 
-					progress.setInfo(`Processing asset ${assetHref}`).report();
+					progress.setInfo(`Processing asset ${url}${assetHref}`).report();
 					//state.addToAssetsSize(filesize);
 					//state.incrementIncludedCount().addToIncludedSize(filesize);
 					//state.incrementProcessedCount().addToProcessedSize(filesize);
