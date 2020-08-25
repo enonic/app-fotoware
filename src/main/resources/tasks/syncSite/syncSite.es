@@ -290,7 +290,6 @@ export function run(params) {
 							}
 
 							if (downloadRenditionResponse) {
-								const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
 								const createMediaResult = createMedia({
 									parentPath: `/${path}`,
 									name: mediaName,
@@ -302,6 +301,7 @@ export function run(params) {
 									log.error(errMsg);
 									throw new Error(errMsg);
 								}
+								const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
 								modifyMediaContent({
 									exisitingMediaContent,
 									key: createMediaResult._id,

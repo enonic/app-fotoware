@@ -1,26 +1,35 @@
+// Node modules
+import {diff} from 'deep-object-diff';
+import deepEqual from 'fast-deep-equal';
+
+// Enonic modules
+import {URL} from '/lib/galimatias';
+import {md5} from '/lib/text-encoding';
+import {toStr} from '/lib/util';
+import {sanitize} from '/lib/xp/common';
+import {
+	addAttachment,
+	createMedia,
+	get as getContentByKey,
+	getAttachmentStream,
+	publish,
+	removeAttachment
+} from '/lib/xp/content';
+import {run as runInContext} from '/lib/xp/context';
+import {readText} from '/lib/xp/io';
+import {submit} from '/lib/xp/task';
+
+// FotoWare modules
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
-import {URL} from '/lib/galimatias';
-import {toStr} from '/lib/util';
-import {
-	createMedia,
-	delete as deleteContent,
-	get as getContentByKey,
-	modify as modifyContent//,
-	//query as queryContent
-} from '/lib/xp/content';
-import {
-	//get as getContext,
-	run as runInContext
-} from '/lib/xp/context';
-import {
-	//progress,
-	submit
-} from '/lib/xp/task';
+import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
+import {isPublished} from '/lib/fotoware/xp/isPublished';
+
+const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 
 export const assetModified = (request) => {
 	//log.debug(`request:${toStr(request)}`);
@@ -165,6 +174,8 @@ export const assetModified = (request) => {
 				if (!downloadRenditionResponse) {
 					throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
 				}
+				const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
+
 				if (!exisitingMedia) {
 					const createMediaResult = createMedia({
 						parentPath: `/${path}`,
@@ -176,32 +187,86 @@ export const assetModified = (request) => {
 						log.error(errMsg);
 						throw new Error(errMsg);
 					}
-				}
-				try {
-					modifyContent({
+					modifyMediaContent({
+						exisitingMediaContent: createMediaResult,
 						key: mediaPath,
-						editor: (content) => addMetadataToContent({
-							metadata,
-							content
-						}),
-						requireValid: false // May contain extra undefined x-data
-					}); // modifyContent
-				} catch (e) {
-					if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
-						// Known problem on psd, svg, ai, jpf, pdf
-						log.error(`Unable to modify ${exisitingMedia._name}`);
-						deleteContent({ // So it will be retried on next sync
-							key: mediaPath
-						});
+						md5sum: md5sumOfDownload,
+						mediaPath,
+						metadata
+					});
+				} else { // Media already exist
+					const {
+						x: {
+							[X_APP_NAME]: {
+								'fotoWare': {
+									'md5sum': md5sumFromXdata
+								} = {}
+							} = {}
+						} = {}
+					} = exisitingMedia;
+					const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(getAttachmentStream({
+						key: mediaPath,
+						name: filename
+					})));
+					if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
+						log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
+						// TODO Modify attachment
+						try {
+							addAttachment({
+								key: mediaPath,
+								name: filename,
+								data: downloadRenditionResponse.bodyStream
+							});
+						} catch (e) {
+							// Just to see what happens if you try to add an attachment that already exists
+							log.error(e);
+							log.error(e.class.name);
+							log.error(e.message);
+							removeAttachment({
+								key: mediaPath,
+								name: filename
+							});
+							// NOTE re-add old attachment with old name? nah, that information is in versions
+							addAttachment({
+								key: mediaPath,
+								name: filename,
+								data: downloadRenditionResponse.bodyStream
+							});
+						}
 					} else {
-						log.error(`Something unkown went wrong when trying to modifyContent exisitingMedia:${toStr(exisitingMedia)}`);
-						log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-						//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException
-						//log.error(e.message); // Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
-						deleteContent({ // So it will be retried on next sync
-							key: mediaPath
+						log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
+					}
+					const maybeModifiedMediaContent = addMetadataToContent({
+						md5sum: md5sumOfDownload,
+						metadata,
+						content: JSON.parse(JSON.stringify(exisitingMedia))
+					});
+					if (!deepEqual(exisitingMedia, maybeModifiedMediaContent)) {
+						const differences = diff(exisitingMedia, maybeModifiedMediaContent);
+						log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
+						modifyMediaContent({
+							exisitingMediaContent: exisitingMedia,
+							key: mediaPath,
+							md5sum: md5sumOfDownload,
+							mediaPath,
+							metadata
 						});
-						throw(e); // NOTE Only known way to get stacktrace
+					} /*else {
+						log.debug(`mediaPath:${mediaPath} no differences :)`);
+					}*/
+					if (isPublished({
+						key: mediaPath,
+						project
+					})) {
+						const publishParams = {
+							includeDependencies: false,
+							keys:[mediaPath],
+							sourceBranch: 'draft',
+							targetBranch: 'master'
+						};
+						//log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
+						const publishRes = publish(publishParams);
+						log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
 					}
 				}
 			} // if assetCountTotal
