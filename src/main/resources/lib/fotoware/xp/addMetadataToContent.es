@@ -12,7 +12,11 @@ export const addMetadataToContent = ({
 }) => {
 	//log.debug(`content:${toStr(content)}`);
 	if (metadata[5]) {
-		content.data.caption = unforceArray(metadata[5].value); // Title
+		const title = unforceArray(metadata[5].value); // Title
+		if (title) {
+			content.displayName = title;
+			content.data.caption = title;
+		}
 		delete metadata[5];
 	}
 
