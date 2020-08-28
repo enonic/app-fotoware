@@ -1,3 +1,4 @@
+import {capitalize} from '/lib/fotoware/xp/capitalize';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 //import {toStr} from '/lib/util';
 import {run} from '/lib/xp/context';
@@ -13,11 +14,6 @@ import {
 } from '/lib/xp/task';
 
 const {currentTimeMillis} = Java.type('java.lang.System');
-
-const capitalize = (s) => {
-	if (typeof s !== 'string') return ''
-	return s.charAt(0).toUpperCase() + s.slice(1)
-}
 
 export function get(request) {
 	//log.debug(`request:${toStr(request)}`);
