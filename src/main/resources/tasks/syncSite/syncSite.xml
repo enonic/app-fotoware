@@ -6,16 +6,16 @@
 			<label>Resume?</label>
 			<default>checked</default>
 		</input>
-		<input name="blacklistedCollectionsJson" type="TextLine">
-			<label>blacklistedCollections JSON</label>
-			<occurrences minimum="1" maximum="1"/>
-		</input>
 		<input name="clientId" type="TextLine">
 			<label>clientId</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="clientSecret" type="TextLine">
 			<label>clientSecret</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="importName" type="TextLine">
+			<label>Import name</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 		<input name="path" type="TextLine">
@@ -30,10 +30,6 @@
 			<label>query</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
-		<!--input name="remoteAddressesJson" type="TextLine">
-			<label>remoteAddresses JSON</label>
-			<occurrences minimum="1" maximum="1"/>
-		</input-->
 		<input name="rendition" type="TextLine">
 			<label>rendition</label>
 			<occurrences minimum="1" maximum="1"/>
@@ -44,10 +40,6 @@
 		</input>
 		<input name="url" type="TextLine">
 			<label>url</label>
-			<occurrences minimum="1" maximum="1"/>
-		</input>
-		<input name="whitelistedCollectionsJson" type="TextLine">
-			<label>whitelistedCollections JSON</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
 	</form>

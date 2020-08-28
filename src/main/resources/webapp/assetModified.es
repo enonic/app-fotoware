@@ -22,7 +22,7 @@ import {submit} from '/lib/xp/task';
 // FotoWare modules
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
-import {query} from '/lib/fotoware/api/query';
+import {query as doQuery} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
@@ -34,7 +34,7 @@ const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 export const assetModified = (request) => {
 	//log.debug(`request:${toStr(request)}`);
 
-	const sitesConfigs = getConfigFromAppCfg();
+	const {sitesConfigs} = getConfigFromAppCfg();
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 	const {
@@ -85,10 +85,11 @@ export const assetModified = (request) => {
 	const {
 		clientId,
 		clientSecret,
-		path,
-		project,
+		//path,
+		//project,
 		remoteAddresses,
-		url: hostname
+		url: hostname,
+		imports
 	} = sitesConfigs[site];
 	//log.debug(`clientId:${toStr(clientId)}`);
 	//log.debug(`clientSecret:${toStr(clientSecret)}`);
@@ -98,180 +99,187 @@ export const assetModified = (request) => {
 		return {status: 404};
 	}
 
-	runInContext({
-		repository: `com.enonic.cms.${project}`,
-		branch: 'draft',
-		user: {
-			login: 'su', // So Livetrace Tasks reports correct user
-			idProvider: 'system'
-		},
-		principals: ['role:system.admin']
-	}, () => submit({
-		description: '',
-		task: () => {
-			const mediaPath = `/${path}/${filename}`;
-			const exisitingMedia = getContentByKey({key: mediaPath});
-			if (!exisitingMedia) {
-				log.error(`mediaPath:${mediaPath} not found! Perhaps missed assetIngested, or assetDeleted arrived before assetModified.`);
-			}
-
-			const {accessToken} = getAccessToken({
-				hostname,
-				clientId,
-				clientSecret
-			});
-			//log.debug(`accessToken:${toStr(accessToken)}`);
-
-			const {
-				searchURL,
-				renditionRequest
-			} = getPrivateFullAPIDescriptor({
-				accessToken,
-				hostname
-			});
-			//log.debug(`searchURL:${toStr(searchURL)}`);
-			//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
-
-			const queryResult = query({
-				accessToken,
-				blacklistedCollections: {}, // NOTE Intentional hardcode
-				hostname,
-				q: filename,
-				searchURL,
-				whitelistedCollections: { // NOTE Intentional hardcode
-					'5000-Archive': true
-				}
-			});
-			//log.debug(`queryResult:${toStr(queryResult)}`);
-
-			const {
-				assetCountTotal,
-				collections
-			} = queryResult;
-
-			if (assetCountTotal === 0) {
-				log.error(`filename:${filename} not found when querying!`);
-			} else if (assetCountTotal > 1) {
-				log.error(`Querying for filename:${filename} returned more than one asset!`);
-			} else {
-				const {
-					filename: filenameFromQuery, // Should match or query is weird
-					//filesize,
-					//href,
-					metadata,
-					//metadataObj,
-					renditionHref
-				} = collections[0].assets[0];
-				if (filename !== filenameFromQuery) {
-					throw new Error(`filename:${filename} from assetModified does not match filename:${filenameFromQuery} from query result`);
-				}
-				const downloadRenditionResponse = requestRendition({
-					accessToken,
-					hostname: url,
-					renditionServiceShortAbsolutePath: renditionRequest,
-					renditionUrl: renditionHref
-				});
-				if (!downloadRenditionResponse) {
-					throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
-				}
-				const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
-
+	Object.keys(imports).forEach((importName) => {
+		const {
+			project,
+			path,
+			query
+		} = imports[importName];
+		runInContext({
+			repository: `com.enonic.cms.${project}`,
+			branch: 'draft',
+			user: {
+				login: 'su', // So Livetrace Tasks reports correct user
+				idProvider: 'system'
+			},
+			principals: ['role:system.admin']
+		}, () => submit({
+			description: '',
+			task: () => {
+				const mediaPath = `/${path}/${filename}`;
+				const exisitingMedia = getContentByKey({key: mediaPath});
 				if (!exisitingMedia) {
-					const createMediaResult = createMedia({
-						parentPath: `/${path}`,
-						name: filename,
-						data: downloadRenditionResponse.bodyStream
-					});
-					if (!createMediaResult) {
-						const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
-						log.error(errMsg);
-						throw new Error(errMsg);
+					log.error(`mediaPath:${mediaPath} not found! Perhaps missed assetIngested, or assetDeleted arrived before assetModified.`);
+				}
+
+				const {accessToken} = getAccessToken({
+					hostname,
+					clientId,
+					clientSecret
+				});
+				//log.debug(`accessToken:${toStr(accessToken)}`);
+
+				const {
+					searchURL,
+					renditionRequest
+				} = getPrivateFullAPIDescriptor({
+					accessToken,
+					hostname
+				});
+				//log.debug(`searchURL:${toStr(searchURL)}`);
+				//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
+
+				const queryResult = doQuery({
+					accessToken,
+					blacklistedCollections: {}, // NOTE Intentional hardcode
+					hostname,
+					q: `(${query})&(${filename})`,
+					searchURL,
+					whitelistedCollections: { // NOTE Intentional hardcode
+						'5000-Archive': true
 					}
-					modifyMediaContent({
-						exisitingMediaContent: createMediaResult,
-						key: mediaPath,
-						md5sum: md5sumOfDownload,
-						mediaPath,
-						metadata
-					});
-				} else { // Media already exist
+				});
+				//log.debug(`queryResult:${toStr(queryResult)}`);
+
+				const {
+					assetCountTotal,
+					collections
+				} = queryResult;
+
+				if (assetCountTotal === 0) {
+					log.warning(`filename:${filename} not found when querying!`);
+				} else if (assetCountTotal > 1) {
+					log.error(`Querying for filename:${filename} returned more than one asset!`);
+				} else {
 					const {
-						x: {
-							[X_APP_NAME]: {
-								'fotoWare': {
-									'md5sum': md5sumFromXdata
-								} = {}
-							} = {}
-						} = {}
-					} = exisitingMedia;
-					const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(getAttachmentStream({
-						key: mediaPath,
-						name: filename
-					})));
-					if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
-						log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
-						// TODO Modify attachment
-						try {
-							addAttachment({
-								key: mediaPath,
-								name: filename,
-								data: downloadRenditionResponse.bodyStream
-							});
-						} catch (e) {
-							// Just to see what happens if you try to add an attachment that already exists
-							log.error(e);
-							log.error(e.class.name);
-							log.error(e.message);
-							removeAttachment({
-								key: mediaPath,
-								name: filename
-							});
-							// NOTE re-add old attachment with old name? nah, that information is in versions
-							addAttachment({
-								key: mediaPath,
-								name: filename,
-								data: downloadRenditionResponse.bodyStream
-							});
-						}
-					} else {
-						log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
-					}
-					const maybeModifiedMediaContent = addMetadataToContent({
-						md5sum: md5sumOfDownload,
+						filename: filenameFromQuery, // Should match or query is weird
+						//filesize,
+						//href,
 						metadata,
-						content: JSON.parse(JSON.stringify(exisitingMedia))
+						//metadataObj,
+						renditionHref
+					} = collections[0].assets[0];
+					if (filename !== filenameFromQuery) {
+						throw new Error(`filename:${filename} from assetModified does not match filename:${filenameFromQuery} from query result`);
+					}
+					const downloadRenditionResponse = requestRendition({
+						accessToken,
+						hostname: url,
+						renditionServiceShortAbsolutePath: renditionRequest,
+						renditionUrl: renditionHref
 					});
-					if (!deepEqual(exisitingMedia, maybeModifiedMediaContent)) {
-						const differences = diff(exisitingMedia, maybeModifiedMediaContent);
-						log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
+					if (!downloadRenditionResponse) {
+						throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
+					}
+					const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
+
+					if (!exisitingMedia) {
+						const createMediaResult = createMedia({
+							parentPath: `/${path}`,
+							name: filename,
+							data: downloadRenditionResponse.bodyStream
+						});
+						if (!createMediaResult) {
+							const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
+							log.error(errMsg);
+							throw new Error(errMsg);
+						}
 						modifyMediaContent({
-							exisitingMediaContent: exisitingMedia,
+							exisitingMediaContent: createMediaResult,
 							key: mediaPath,
 							md5sum: md5sumOfDownload,
 							mediaPath,
 							metadata
 						});
-					} /*else {
-						log.debug(`mediaPath:${mediaPath} no differences :)`);
-					}*/
-					if (isPublished({
-						key: mediaPath,
-						project
-					})) {
-						const publishParams = {
-							includeDependencies: false,
-							keys:[mediaPath],
-							sourceBranch: 'draft',
-							targetBranch: 'master'
-						};
-						//log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
-						const publishRes = publish(publishParams);
-						log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
+					} else { // Media already exist
+						const {
+							x: {
+								[X_APP_NAME]: {
+									'fotoWare': {
+										'md5sum': md5sumFromXdata
+									} = {}
+								} = {}
+							} = {}
+						} = exisitingMedia;
+						const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(getAttachmentStream({
+							key: mediaPath,
+							name: filename
+						})));
+						if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
+							log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
+							// TODO Modify attachment
+							try {
+								addAttachment({
+									key: mediaPath,
+									name: filename,
+									data: downloadRenditionResponse.bodyStream
+								});
+							} catch (e) {
+								// Just to see what happens if you try to add an attachment that already exists
+								log.error(e);
+								log.error(e.class.name);
+								log.error(e.message);
+								removeAttachment({
+									key: mediaPath,
+									name: filename
+								});
+								// NOTE re-add old attachment with old name? nah, that information is in versions
+								addAttachment({
+									key: mediaPath,
+									name: filename,
+									data: downloadRenditionResponse.bodyStream
+								});
+							}
+						} else {
+							log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
+						}
+						const maybeModifiedMediaContent = addMetadataToContent({
+							md5sum: md5sumOfDownload,
+							metadata,
+							content: JSON.parse(JSON.stringify(exisitingMedia))
+						});
+						if (!deepEqual(exisitingMedia, maybeModifiedMediaContent)) {
+							const differences = diff(exisitingMedia, maybeModifiedMediaContent);
+							log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
+							modifyMediaContent({
+								exisitingMediaContent: exisitingMedia,
+								key: mediaPath,
+								md5sum: md5sumOfDownload,
+								mediaPath,
+								metadata
+							});
+						} /*else {
+							log.debug(`mediaPath:${mediaPath} no differences :)`);
+						}*/
+						if (isPublished({
+							key: mediaPath,
+							project
+						})) {
+							const publishParams = {
+								includeDependencies: false,
+								keys:[mediaPath],
+								sourceBranch: 'draft',
+								targetBranch: 'master'
+							};
+							//log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
+							const publishRes = publish(publishParams);
+							log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
+						}
 					}
-				}
-			} // if assetCountTotal
-		} // task
-	})); // submit
+				} // if assetCountTotal
+			} // task
+		})); // runInContext
+	}); // forEach import
 	return {
 		body: {},
 		contentType: 'application/json;charset=utf-8'

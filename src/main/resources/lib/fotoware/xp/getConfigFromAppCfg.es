@@ -1,5 +1,6 @@
 //import {toStr} from '/lib/util';
 import {deepen} from '/lib/fotoware/xp/deepen';
+import {capitalize} from '/lib/fotoware/xp/capitalize';
 
 export function getConfigFromAppCfg() {
 	//log.debug(`app.config:${toStr(app.config)}`);
@@ -8,64 +9,76 @@ export function getConfigFromAppCfg() {
 	//log.debug(`config:${toStr(config)}`);
 
 	const {
-		fotoware: {
-			sites = {}
-		} = {}
+		sites = {},
+		imports = {}
 	} = config;
 	//log.debug(`sites:${toStr(sites)}`);
+	//log.debug(`imports:${toStr(imports)}`);
 
-	const siteConfigs = {};
+	const sitesConfigs = {};
 
 	Object.keys(sites).forEach((site) => {
 		//log.debug(`site:${toStr(site)}`);
 		const {
-			collections: {
-				blacklist = {},
-				whitelist = {}
-			} = {},
 			url = `https://${site}.fotoware.cloud`,
 			remoteAddresses = {},
-			path = 'FotoWare',
-			query = 'fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg',
 			clientSecret,
-			clientId,
-			project = 'default',
-			rendition = 'Original File'
+			clientId
 		} = sites[site];
 		/*log.debug(`${toStr({
-			docTypes,
-			url,
-			remoteAddresses,
-			path,
-			clientSecret,
 			clientId,
-			project
+			clientSecret,
+			url,
+			remoteAddresses
 		})}`);*/
+		if (!clientId) {
+			log.error(`Site ${site} is missing clientId!`);
+		} else if(!clientSecret) {
+			log.error(`Site ${site} is missing clientSecret!`);
+		} else {
+			sitesConfigs[site] = {
+				url,
+				remoteAddresses,
+				clientSecret,
+				clientId,
+				imports: {}
+			};
+		}
 
-		const blacklistedCollections = {};
-		Object.keys(blacklist).forEach((collectionName) => {
-			blacklistedCollections[collectionName] = true;
-		});
-
-		const whitelistedCollections = {};
-		Object.keys(whitelist).forEach((collectionName) => {
-			whitelistedCollections[collectionName] = true;
-		});
-
-		siteConfigs[site] = {
-			blacklistedCollections,
-			whitelistedCollections,
-			url,
-			remoteAddresses,
-			path,
-			clientSecret,
-			clientId,
-			project,
-			query,
-			rendition
-		};
 	}); // foreach
+	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-	//log.debug(`siteConfigs:${toStr(siteConfigs)}`);
-	return siteConfigs;
+	const projectPaths = {};
+	Object.keys(imports).forEach((site) => {
+		//log.debug(`site:${toStr(site)}`);
+		if (!sitesConfigs[site]) {
+			log.error(`Unconfigured site ${site}!`);
+		} else {
+			Object.keys(imports[site]).forEach((importName) => {
+				//log.debug(`importName:${toStr(importName)}`);
+				const {
+					rendition = 'Original File',
+					query = 'fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg',
+					project = 'default',
+					path = capitalize(importName)
+				} = imports[site][importName];
+				if (projectPaths[project] && projectPaths[project] === path) {
+					log.error(`Two imports cannot have the same project:${project} and path:${path}!`);
+				} else {
+					projectPaths[project] = path;
+					sitesConfigs[site].imports.[importName] = {
+						rendition,
+						query,
+						project,
+						path
+					}
+				}
+			});
+		}
+	});
+	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
+
+	return {
+		sitesConfigs
+	};
 } // function getConfigFromAppCfg

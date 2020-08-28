@@ -74,44 +74,27 @@ export function run(params) {
 	//log.debug(`params:${toStr(params)}`);
 
 	const {
-		//blacklistedCollectionsJson,
 		boolResume = true,
 		clientId,
 		clientSecret,
+		importName,
 		path,
 		project,
 		query,
-		//remoteAddressesJson,
 		rendition,
 		site,
-		url//,
-		//whitelistedCollectionsJson
+		url
 	} = params;
 
 	if(!site) { throw new Error(`Required param site missing! params:${toStr(params)}`); }
 
 	const progress = new Progress({
-		info: `Initializing Sync FotoWare site ${site}`,
+		info: `Initializing Sync FotoWare site ${site} ${importName}`,
 		total: 5 // Init, CreateFolder, getAccessToken, apiDescriptor, gettingCollectionList
 	}).report();
 	// Progress should be [0/5] Initializing Sync FotoWare site collicare
 
 	//const state = new StateClass();
-
-	/*if(!blacklistedCollectionsJson) { throw new Error(`Required param blacklistedCollectionsJson missing! params:${toStr(params)}`); }
-	let blacklistedCollections;
-	try {
-		blacklistedCollections = JSON.parse(blacklistedCollectionsJson)
-	} catch (e) {
-		throw new Error(`Something went wrong when trying to parse blacklistedCollectionsJson:${toStr(params)}`);
-	}*/
-	/*if(!whitelistedCollectionsJson) { throw new Error(`Required param whitelistedCollectionsJson missing! params:${toStr(params)}`); }
-	let whitelistedCollections;
-	try {
-		whitelistedCollections = JSON.parse(whitelistedCollectionsJson)
-	} catch (e) {
-		throw new Error(`Something went wrong when trying to parse blacklistedCollectionsJson:${toStr(params)}`);
-	}*/
 
 	if(!clientId) { throw new Error(`Required param clientId missing! params:${toStr(params)}`); }
 	if(!clientSecret) { throw new Error(`Required param clientSecret missing! params:${toStr(params)}`); }
@@ -121,14 +104,6 @@ export function run(params) {
 	if(!site) { throw new Error(`Required param site missing! params:${toStr(params)}`); }
 	//if(!remoteAddressesJson) { throw new Error(`Required param remoteAddressesJson missing! params:${toStr(params)}`); }
 	if(!url) { throw new Error(`Required param url missing! params:${toStr(params)}`); }
-
-	/*let remoteAddresses;
-	try {
-		remoteAddresses = JSON.parse(remoteAddressesJson)
-	} catch (e) {
-		throw new Error(`Something went wrong when trying to parse remoteAddressesJson:${toStr(params)}`);
-	}
-	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);*/
 
 	runInContext({
 		repository: `com.enonic.cms.${project}`,
@@ -417,7 +392,7 @@ export function run(params) {
 				}); // forEach asset
 			}); // collections.forEach
 			//progress.finishItem(`Finished processing collections`);//.report();
-			progress.setInfo(`Finished syncing site ${site}`).report();
+			progress.setInfo(`Finished syncing site ${site} ${importName}`).report();
 		} catch (e) {
 			log.error(`Something went wrong during sync e:${toStr(e)}`);
 			throw e; // Finally should run before this re-throw ends the task.

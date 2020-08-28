@@ -105,20 +105,25 @@ export function get(request) {
 
 	let mainHtml = '';
 
-	const sitesConfigs = getConfigFromAppCfg();
+	const {sitesConfigs} = getConfigFromAppCfg();
+	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-	const sitesHtml = Object.keys(sitesConfigs).map((site) => `<div>
+	const sitesHtml = Object.keys(sitesConfigs).map((site) =>
+		Object.keys(sitesConfigs[site].imports).map((importName) => `<div>
 	<form method="post">
 		<input name="resume" type="hidden" value="true"/>
 		<input name="site" type="hidden" value="${site}"/>
-		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Refresh ${capitalize(site)}"/>
+		<input name="importName" type="hidden" value="${importName}"/>
+		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Refresh ${capitalize(site)} ${capitalize(importName)}"/>
 	</form>
 	<form method="post">
 		<input name="resume" type="hidden" value="false"/>
 		<input name="site" type="hidden" value="${site}"/>
-		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync ${capitalize(site)}"/>
+		<input name="importName" type="hidden" value="${importName}"/>
+		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync ${capitalize(site)} ${capitalize(importName)}"/>
 	</form>
-</div>`);
+</div>`).join('\n')
+	).join('\n');
 
 	if (site) {
 		mainHtml = `<h1>Sync started</h1>
@@ -126,7 +131,15 @@ export function get(request) {
 	<input type="submit" style="margin-bottom: 15px;margin-top: 15px;padding: 5px" value="Go back to FotoWare admin"/>
 </form>`
 	} else {
-		const allForm = Object.keys(sitesConfigs).length > 1 ? `<div>
+		let allForm = '';
+		if (
+			Object.keys(sitesConfigs).length > 1 ||
+			(
+				Object.keys(sitesConfigs).length === 1 &&
+				Object.keys(sitesConfigs[Object.keys(sitesConfigs)[0]].imports).length > 1
+			)
+		) {
+			allForm = `<div>
 	<form method="post">
 		<input name="resume" type="hidden" value="true"/>
 		<input name="site" type="hidden" value="_all"/>
@@ -137,7 +150,8 @@ export function get(request) {
 		<input name="site" type="hidden" value="_all"/>
 		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync all configured FotoWare sites"/>
 	</form>
-</div>` : '';
+</div>`;
+		}
 		mainHtml = `
 ${allForm}
 ${sitesHtml}`;
@@ -231,6 +245,7 @@ export function post(request) {
 	const {
 		//params,
 		params: {
+			importName: onlyImportName,
 			resume = 'true',
 			site
 		}
@@ -241,50 +256,64 @@ export function post(request) {
 	//log.debug(`params:${toStr(params)}`);
 	//log.debug(`site:${toStr(site)}`);
 
-	const sitesConfigs = getConfigFromAppCfg();
+	const {sitesConfigs} = getConfigFromAppCfg();
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 	const sites = site === '_all' ? Object.keys(sitesConfigs) : [site];
+	//log.debug(`sites:${toStr(sites)}`);
 
 	sites.forEach((site) => {
 		const {
-			blacklistedCollections,
 			clientId,
 			clientSecret,
-			path,
-			project,
-			query,
-			//remoteAddresses,
-			rendition,
 			url,
-			whitelistedCollections
+			imports = {}
 		} = sitesConfigs[site];
-		run({
-			repository: `com.enonic.cms.${project}`,
-			branch: 'draft',
-			user: {
-				login: 'su', // So Livetrace Tasks reports correct user
-				idProvider: 'system'
-			},
-			principals: ['role:system.admin']
-		}, () => submitNamed({
-			name: 'syncSite',
-			config: {
-				blacklistedCollectionsJson: JSON.stringify(blacklistedCollections),
-				boolResume,
-				clientId,
-				clientSecret,
-				path,
-				project,
+		//log.debug(`clientId:${toStr(clientId)}`);
+		//log.debug(`clientSecret:${toStr(clientSecret)}`);
+		//log.debug(`url:${toStr(url)}`);
+		const importNames = site === '_all'
+			? Object.keys(imports)
+			: onlyImportName
+				? [onlyImportName]
+				: Object.keys(imports);
+		//log.debug(`importNames:${toStr(importNames)}`);
+		importNames.forEach((importName) => {
+			const {
 				query,
-				//remoteAddressesJson: JSON.stringify(remoteAddresses),
 				rendition,
-				site,
-				url,
-				whitelistedCollectionsJson: JSON.stringify(whitelistedCollections)
-			}
-		})); // run
-	}); // foreach
+				project,
+				path
+			} = sitesConfigs[site].imports[importName];
+			//log.debug(`query:${toStr(query)}`);
+			//log.debug(`rendition:${toStr(rendition)}`);
+			//log.debug(`project:${toStr(project)}`);
+			//log.debug(`path:${toStr(path)}`);
+			run({
+				repository: `com.enonic.cms.${project}`,
+				branch: 'draft',
+				user: {
+					login: 'su', // So Livetrace Tasks reports correct user
+					idProvider: 'system'
+				},
+				principals: ['role:system.admin']
+			}, () => submitNamed({
+				name: 'syncSite',
+				config: {
+					boolResume,
+					clientId,
+					clientSecret,
+					importName,
+					path,
+					project,
+					query,
+					rendition,
+					site,
+					url
+				}
+			})); // run
+		}); // forEach import
+	}); // forEach site
 
 	return {
 		applyFilters: false,
