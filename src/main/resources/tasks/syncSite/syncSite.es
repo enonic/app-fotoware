@@ -184,7 +184,13 @@ export function run(params) {
 		progress.addItems(assetCountTotal); // Found assets to process
 
 		const journal = {
-			assets: {}
+			currentAsset: '',
+			errors: [],
+			skipped: [],
+			created: [],
+			modified: [],
+			modifiedMetadata: [],
+			unchanged: []
 		};
 
 		try {
@@ -234,13 +240,12 @@ export function run(params) {
 					//state.addToAssetsSize(filesize);
 					//state.incrementIncludedCount().addToIncludedSize(filesize);
 					//state.incrementProcessedCount().addToProcessedSize(filesize);
-					journal.assets[currentAsset] = '';
 					if (filename.startsWith('.')) {
 						log.warning(`Skipping filename:${filename} because it starts with a dot, so probabbly a hidden file.`);
-						journal.assets[currentAsset] = 'Skipped because it starts with a dot, so probabbly a hidden file.';
+						journal.skipped.push(currentAsset);
 					} else if (filename.split('.').length < 2) {
 						log.warning(`Skipping filename:${filename} because it has no extention.`);
-						journal.assets[currentAsset] = 'Skipped because it has no extention.';
+						journal.skipped.push(currentAsset);
 					} else {
 						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
 						const mediaPath = `/${path}/${mediaName}`;
@@ -291,12 +296,12 @@ export function run(params) {
 								});
 								if (!createMediaResult) {
 									const mediaPath = `/${path}/${mediaName}`;
-									journal.assets[currentAsset] = 'Failed to create!';
+									journal.errors.push(currentAsset);
 									const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
 									log.error(errMsg);
 									throw new Error(errMsg);
 								}
-								journal.assets[currentAsset] = 'Created';
+								journal.created.push(currentAsset);
 								const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
 								modifyMediaContent({
 									exisitingMediaContent,
@@ -365,7 +370,7 @@ export function run(params) {
 												data: downloadRenditionResponse.bodyStream
 											});
 										}
-										journal.assets[currentAsset] = 'Replaced binary.'
+										journal.modified.push(currentAsset);
 									} else {
 										log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 									}
@@ -391,10 +396,11 @@ export function run(params) {
 									mediaPath,
 									metadata
 								});
-								journal.assets[currentAsset] += 'Modified metadata.'
-							} /*else {
-								log.debug(`mediaPath:${mediaPath} no differences :)`);
-							}*/
+								journal.modifiedMetadata.push(currentAsset);
+							} else {
+								//log.debug(`mediaPath:${mediaPath} no differences :)`);
+								journal.unchanged.push(currentAsset);
+							}
 							if (isPublished({
 								key: mediaPath,
 								project
@@ -442,6 +448,7 @@ export function run(params) {
 				suConnection.modify({
 					key: taskNodeId,
 					editor: (node) => {
+						//log.debug(`journal:${toStr(journal)}`);
 						node.data.journal = journal;
 						node.data.shouldStop = true;
 						return node;
