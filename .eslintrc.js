@@ -97,10 +97,11 @@ module.exports = {
 		'no-tabs': ['off'],
 		'no-underscore-dangle': ['error', {
 			allow: [
-				'_id', // content-type property
-				'_name', // content-type property
+				'_id', // node property
+				'_name', // node property
 				'_path', // content-type property
-				'_selected' // option-set property
+				'_selected', // option-set property
+				'_ts' // node property
 			],
 			allowAfterThis: false,
 			allowAfterSuper: false,

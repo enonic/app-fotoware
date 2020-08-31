@@ -1,12 +1,19 @@
 import {capitalize} from '/lib/fotoware/xp/capitalize';
+import {
+	CHILD_ORDER,
+	REPO_BRANCH,
+	REPO_ID,
+	TASKS_FOLDER_PATH
+} from '/lib/fotoware/xp/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
-//import {toStr} from '/lib/util';
-import {run} from '/lib/xp/context';
+import {toStr} from '/lib/util';
+import {run as runInContext} from '/lib/xp/context';
 import {
 	getBaseUri,
 	getLauncherPath,
 	getLauncherUrl
 } from '/lib/xp/admin';
+import {connect} from '/lib/xp/node';
 import {assetUrl} from '/lib/xp/portal';
 import {
 	list as listTasks,
@@ -262,58 +269,89 @@ export function post(request) {
 	const sites = site === '_all' ? Object.keys(sitesConfigs) : [site];
 	//log.debug(`sites:${toStr(sites)}`);
 
-	sites.forEach((site) => {
-		const {
-			clientId,
-			clientSecret,
-			url,
-			imports = {}
-		} = sitesConfigs[site];
-		//log.debug(`clientId:${toStr(clientId)}`);
-		//log.debug(`clientSecret:${toStr(clientSecret)}`);
-		//log.debug(`url:${toStr(url)}`);
-		const importNames = site === '_all'
-			? Object.keys(imports)
-			: onlyImportName
-				? [onlyImportName]
-				: Object.keys(imports);
-		//log.debug(`importNames:${toStr(importNames)}`);
-		importNames.forEach((importName) => {
+	runInContext({
+		repository: REPO_ID,
+		branch: REPO_BRANCH,
+		user: {
+			login: 'su',
+			idProvider: 'system'
+		},
+		principals: ['role:system.admin']
+	}, () => {
+		const suConnection = connect({
+			repoId: REPO_ID,
+			branch: REPO_BRANCH
+		});
+		sites.forEach((site) => {
 			const {
-				query,
-				rendition,
-				project,
-				path
-			} = sitesConfigs[site].imports[importName];
-			//log.debug(`query:${toStr(query)}`);
-			//log.debug(`rendition:${toStr(rendition)}`);
-			//log.debug(`project:${toStr(project)}`);
-			//log.debug(`path:${toStr(path)}`);
-			run({
-				repository: `com.enonic.cms.${project}`,
-				branch: 'draft',
-				user: {
-					login: 'su', // So Livetrace Tasks reports correct user
-					idProvider: 'system'
-				},
-				principals: ['role:system.admin']
-			}, () => submitNamed({
-				name: 'syncSite',
-				config: {
-					boolResume,
-					clientId,
-					clientSecret,
-					importName,
-					path,
-					project,
+				clientId,
+				clientSecret,
+				url,
+				imports = {}
+			} = sitesConfigs[site];
+			//log.debug(`clientId:${toStr(clientId)}`);
+			//log.debug(`clientSecret:${toStr(clientSecret)}`);
+			//log.debug(`url:${toStr(url)}`);
+			const importNames = site === '_all'
+				? Object.keys(imports)
+				: onlyImportName
+					? [onlyImportName]
+					: Object.keys(imports);
+			//log.debug(`importNames:${toStr(importNames)}`);
+			importNames.forEach((importName) => {
+				const {
 					query,
 					rendition,
-					site,
-					url
-				}
-			})); // run
-		}); // forEach import
-	}); // forEach site
+					project,
+					path
+				} = sitesConfigs[site].imports[importName];
+				//log.debug(`query:${toStr(query)}`);
+				//log.debug(`rendition:${toStr(rendition)}`);
+				//log.debug(`project:${toStr(project)}`);
+				//log.debug(`path:${toStr(path)}`);
+				const createdTaskNode = suConnection.create({
+					_parentPath: TASKS_FOLDER_PATH,
+					_name: `${site}_${importName}`,
+					_inheritsPermissions: true,
+					_childOrder: CHILD_ORDER,
+					data: {
+						shouldStop: false
+					}
+				});
+				//log.debug(`createdTaskNode:${toStr(createdTaskNode)}`);
+				//const renameTaskNodeRes =
+				suConnection.move({
+					source: createdTaskNode._id,
+					target: `${createdTaskNode._ts}_${createdTaskNode._name}`
+				});
+				//log.debug(`renameTaskNodeRes:${toStr(renameTaskNodeRes)}`);
+				runInContext({
+					repository: `com.enonic.cms.${project}`,
+					branch: 'draft',
+					user: {
+						login: 'su', // So Livetrace Tasks reports correct user
+						idProvider: 'system'
+					},
+					principals: ['role:system.admin']
+				}, () => submitNamed({
+					name: 'syncSite',
+					config: {
+						boolResume,
+						clientId,
+						clientSecret,
+						importName,
+						path,
+						project,
+						query,
+						rendition,
+						site,
+						taskNodeId: createdTaskNode._id,
+						url
+					}
+				})); // run
+			}); // forEach import
+		}); // forEach site
+	}); // run in FotoWareRepoContext
 
 	return {
 		applyFilters: false,

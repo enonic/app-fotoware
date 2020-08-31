@@ -1,6 +1,15 @@
 //import {toStr} from '/lib/util';
-import {REPO_ID} from '/lib/fotoware/xp/constants';
+import {
+	CHILD_ORDER,
+	PERMISSIONS,
+	REPO_BRANCH,
+	REPO_ID,
+	TASKS_FOLDER_PARENT_PATH,
+	TASKS_FOLDER_NAME,
+	TASKS_FOLDER_PATH
+} from '/lib/fotoware/xp/constants';
 import {run as runInContext} from '/lib/xp/context';
+import {connect} from '/lib/xp/node';
 import {
 	create as createRepo,
 	list as listRepos
@@ -9,14 +18,14 @@ import {submit} from '/lib/xp/task';
 
 runInContext({
 	repository: 'system-repo',
-	branch: 'master',
+	branch: REPO_BRANCH,
 	user: {
-		login: 'su', // So Livetrace Tasks reports correct user
+		login: 'su',
 		idProvider: 'system'
 	},
 	principals: ['role:system.admin']
 }, () => submit({
-	description: `Creating repoId:${REPO_ID} branch:master (if needed)`,
+	description: `Creating repoId:${REPO_ID} branch:${REPO_BRANCH} (if needed)`,
 	task: () => {
 		const repoList = listRepos();
 		//log.debug(`repoList:${toStr(repoList)}`);
@@ -31,21 +40,30 @@ runInContext({
 			//const createRes =
 			createRepo({
 				id: REPO_ID,
-				rootPermissions: [{
-					principal: 'role:system.admin',
-					allow: [
-						'READ',
-						'CREATE',
-						'MODIFY',
-						'DELETE',
-						'PUBLISH',
-						'READ_PERMISSIONS',
-						'WRITE_PERMISSIONS'
-					],
-					deny: []
-				}]
+				rootPermissions: PERMISSIONS,
+				rootChildOrder: CHILD_ORDER
 			});
 			//log.debug(`createRes:${toStr(createRes)}`);
 		} // if !repo
+
+		const suConnection = connect({
+			repoId: REPO_ID,
+			branch: REPO_BRANCH
+		});
+
+		const boolTaskFolderExists = suConnection.exists(TASKS_FOLDER_PATH);
+		//log.debug(`boolTaskFolderExists:${toStr(boolTaskFolderExists)}`);
+
+		if (!boolTaskFolderExists) {
+			//const nodeCreateRes =
+			suConnection.create({
+				_parentPath: TASKS_FOLDER_PARENT_PATH,
+				_name: TASKS_FOLDER_NAME,
+				_inheritsPermissions: true,
+				_childOrder: CHILD_ORDER,
+				displayName: 'Tasks'
+			});
+			//log.debug(`nodeCreateRes:${toStr(nodeCreateRes)}`);
+		}
 	} // task
 }));

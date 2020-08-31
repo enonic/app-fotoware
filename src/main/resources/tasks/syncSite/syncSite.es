@@ -1,5 +1,16 @@
 import {diff} from 'deep-object-diff';
 import deepEqual from 'fast-deep-equal';
+import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
+import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
+import {query as doQuery} from '/lib/fotoware/api/query';
+import {requestRendition} from '/lib/fotoware/api/requestRendition';
+import {
+	REPO_BRANCH,
+	REPO_ID
+} from '/lib/fotoware/xp/constants';
+import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
+import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
+import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
@@ -14,14 +25,8 @@ import {
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
 import {readText} from '/lib/xp/io';
+import {connect} from '/lib/xp/node';
 
-import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
-import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
-import {query as doQuery} from '/lib/fotoware/api/query';
-import {requestRendition} from '/lib/fotoware/api/requestRendition';
-import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
-import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
-import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
@@ -83,6 +88,7 @@ export function run(params) {
 		query,
 		rendition,
 		site,
+		taskNodeId,
 		url
 	} = params;
 
@@ -102,6 +108,7 @@ export function run(params) {
 	if(!project) { throw new Error(`Required param project missing! params:${toStr(params)}`); }
 	if(!rendition) { throw new Error(`Required param rendition missing! params:${toStr(params)}`); }
 	if(!site) { throw new Error(`Required param site missing! params:${toStr(params)}`); }
+	if(!taskNodeId) { throw new Error(`Required param taskNodeId missing! params:${toStr(params)}`); }
 	//if(!remoteAddressesJson) { throw new Error(`Required param remoteAddressesJson missing! params:${toStr(params)}`); }
 	if(!url) { throw new Error(`Required param url missing! params:${toStr(params)}`); }
 
@@ -129,16 +136,7 @@ export function run(params) {
 				name: path,
 				displayName: path,
 				contentType: CT_COLLECTION,
-				data: {},
-				requireValid: false,
-				x: {
-					[X_APP_NAME]: {
-						'fotoWare': {
-							'shouldStop': false//,
-							//storedState: {}
-						}
-					}
-				}
+				data: {}
 			});
 		} // !folderContent
 
@@ -189,20 +187,31 @@ export function run(params) {
 			collections.forEach(({assets}) => {
 				//assets = [assets[0]]; // DEBUG
 				assets.forEach((asset) => {
-					const innerFolderContent = getContentByKey({key: `/${path}`});
-					const {
-						x: {
-							[X_APP_NAME]: {
-								'fotoWare': {
-									shouldStop = false
-								} = {}
-							} = {}
-						} = {}
-					} = innerFolderContent;
-					//log.debug(`shouldStop:${toStr(shouldStop)}`);
-					if (shouldStop) {
-						throw new Error(`shouldStop:true`);
-					}
+					runInContext({
+						repository: REPO_ID,
+						branch: REPO_BRANCH,
+						user: {
+							login: 'su',
+							idProvider: 'system'
+						},
+						principals: ['role:system.admin']
+					}, () => {
+						const suConnection = connect({
+							repoId: REPO_ID,
+							branch: REPO_BRANCH
+						});
+						const taskNode = suConnection.get(taskNodeId);
+						//log.debug(`taskNode:${toStr(taskNode)}`);
+						const {
+							data: {
+								shouldStop
+							}
+						} = taskNode;
+						//log.debug(`shouldStop:${toStr(shouldStop)}`);
+						if (shouldStop) {
+							throw new Error(`shouldStop:true`);
+						}
+					}); // runInFotoWareRepoContext
 					//log.debug(`asset:${toStr(asset)}`);
 					const {
 						filename,
