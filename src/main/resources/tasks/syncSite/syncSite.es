@@ -183,6 +183,10 @@ export function run(params) {
 
 		progress.addItems(assetCountTotal); // Found assets to process
 
+		const journal = {
+			assets: {}
+		};
+
 		try {
 			collections.forEach(({assets}) => {
 				//assets = [assets[0]]; // DEBUG
@@ -223,14 +227,20 @@ export function run(params) {
 						//renditionHref
 					} = asset;
 
-					progress.setInfo(`Processing asset ${url}${assetHref}`).report();
+					const currentAsset = `${url}${assetHref}`;
+					journal.currentAsset = currentAsset;
+
+					progress.setInfo(`Processing asset ${currentAsset}`).report();
 					//state.addToAssetsSize(filesize);
 					//state.incrementIncludedCount().addToIncludedSize(filesize);
 					//state.incrementProcessedCount().addToProcessedSize(filesize);
+					journal.assets[currentAsset] = '';
 					if (filename.startsWith('.')) {
 						log.warning(`Skipping filename:${filename} because it starts with a dot, so probabbly a hidden file.`);
+						journal.assets[currentAsset] = 'Skipped because it starts with a dot, so probabbly a hidden file.';
 					} else if (filename.split('.').length < 2) {
 						log.warning(`Skipping filename:${filename} because it has no extention.`);
+						journal.assets[currentAsset] = 'Skipped because it has no extention.';
 					} else {
 						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
 						const mediaPath = `/${path}/${mediaName}`;
@@ -281,10 +291,12 @@ export function run(params) {
 								});
 								if (!createMediaResult) {
 									const mediaPath = `/${path}/${mediaName}`;
+									journal.assets[currentAsset] = 'Failed to create!';
 									const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
 									log.error(errMsg);
 									throw new Error(errMsg);
 								}
+								journal.assets[currentAsset] = 'Created';
 								const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
 								modifyMediaContent({
 									exisitingMediaContent,
@@ -353,6 +365,7 @@ export function run(params) {
 												data: downloadRenditionResponse.bodyStream
 											});
 										}
+										journal.assets[currentAsset] = 'Replaced binary.'
 									} else {
 										log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 									}
@@ -378,6 +391,7 @@ export function run(params) {
 									mediaPath,
 									metadata
 								});
+								journal.assets[currentAsset] += 'Modified metadata.'
 							} /*else {
 								log.debug(`mediaPath:${mediaPath} no differences :)`);
 							}*/
@@ -402,9 +416,39 @@ export function run(params) {
 			}); // collections.forEach
 			//progress.finishItem(`Finished processing collections`);//.report();
 			progress.setInfo(`Finished syncing site ${site} ${importName}`).report();
+			journal.currentAsset = '';
 		} catch (e) {
 			log.error(`Something went wrong during sync e:${toStr(e)}`);
+			journal.error = {
+				className: e.class.name,
+				message: e.message
+			};
 			throw e; // Finally should run before this re-throw ends the task.
-		}
+		} finally {
+			runInContext({
+				repository: REPO_ID,
+				branch: REPO_BRANCH,
+				user: {
+					login: 'su',
+					idProvider: 'system'
+				},
+				principals: ['role:system.admin']
+			}, () => {
+				const suConnection = connect({
+					repoId: REPO_ID,
+					branch: REPO_BRANCH
+				});
+				//const modifyTaskNodeRes =
+				suConnection.modify({
+					key: taskNodeId,
+					editor: (node) => {
+						node.data.journal = journal;
+						node.data.shouldStop = true;
+						return node;
+					}
+				});
+				//log.debug(`modifyTaskNodeRes:${modifyTaskNodeRes}`);
+			}); // runInFotoWareRepoContext
+		} // finally
 	}); // runInContext
 } // export function run
