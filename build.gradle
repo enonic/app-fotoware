@@ -117,8 +117,15 @@ task watch(type:NodeTask) {
 	]
 }
 
+task asciidoc(type: NodeTask) {
+  dependsOn yarn_install
+  script file('asciidoc2html.mjs')
+}
 
 processResources {
+	dependsOn asciidoc
+	mustRunAfter asciidoc
+
 	dependsOn webpack
 	mustRunAfter webpack
 

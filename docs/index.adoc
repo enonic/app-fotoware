@@ -1,0 +1,57 @@
+= FotoWare Integration Application Documentation
+:toc: right
+
+== Introduction
+
+The Enonic XP integration with FotoWare is made in such a way you may import from multiple FotoWare sites and/or even multiple times from the same FotoWare site.
+
+For example you might want to import Images, Videos and Documents separately.
+
+== Configuration
+
+Notice "mysite" in the example configuration below.
+It's used as a unique key for a FotoWare site.
+When defining imports you have to use the same key.
+
+.com.enonic.app.fotoware.cfg
+[source,cfg]
+----
+sites.mysite.clientId = abcd <--1-->
+sites.mysite.clientSecret = abcd <--2-->
+#sites.mysite.url = https://mysite.fotoware.cloud <--3-->
+
+#imports.mysite.images.project = default <--4-->
+imports.mysite.images.path = Images from FotoWare <--5-->
+#imports.mysite.images.query = fn:*.jpg|fn:*.png <--6-->
+#imports.mysite.images.rendition = 4096 max width <--7-->
+----
+
+<1> OAuth 2.0 Client ID
+<2> OAuth 2.0 Client Secret
+<3> Url of your FotoWare site. Defaults to `https://${site}.fotoware.cloud`. So in this instance `https://mysite.fotoware.cloud`.
+<4> Which Enonic XP Project to import to. Default is `default` :)
+<5> Which path within the Enonic XP Project to import to. Defaults to `capitalize(importName)`. So in this instance `Images`.
+<6> Which query to use when finding what to import. Defaults to `fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg`.
+<7> Name of rendition to use when importing. If the rendition is not supported by an asset type `Original File` is used. Default is `Original File`.
+
+=== FotoWare API Documentation
+
+- https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API
+- https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview
+- https://api.fotoware.com/
+
+
+=== Authorization
+
+- https://learn.fotoware.com/Integrations_and_APIs/Authorizing_applications_using_OAuth/03_Authorizing_a_client_using_OAuth_2.0/Non-interactive_application_authorization_with_OAuth_2.0
+
+=== Query
+
+- https://learn.fotoware.com/On-Premises/FotoWeb/Navigating_and_searching_to_find_your_assets/Searching_in_FotoWeb/001_Searching_for_assets/FotoWare_Search_Expressions_Reference
+
+[WARNING]
+====
+Some boolean operator symbols fails.
+- Use `AND` not `&`
+- Use `NOT` not `-`
+====

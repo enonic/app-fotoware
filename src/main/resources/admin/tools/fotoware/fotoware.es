@@ -5,6 +5,7 @@ import {
 	REPO_ID
 } from '/lib/fotoware/xp/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
+import Router from '/lib/router';
 //import {toStr} from '/lib/util';
 import {run as runInContext} from '/lib/xp/context';
 import {
@@ -12,15 +13,22 @@ import {
 	getLauncherPath,
 	getLauncherUrl
 } from '/lib/xp/admin';
+import {getResource} from '/lib/xp/io';
 import {connect} from '/lib/xp/node';
 import {assetUrl} from '/lib/xp/portal';
 import {list as listTasks} from '/lib/xp/task';
 
+import {post} from './post';
+
 const {currentTimeMillis} = Java.type('java.lang.System');
 
-export {post} from './post';
+const router = Router();
 
-export function get(/*request*/) {
+export const all = (r) => router.dispatch(r);
+
+router.post('/', (r) => post(r));
+
+function get(/*request*/) {
 	//log.debug(`request:${toStr(request)}`);
 
 	const taskList = listTasks({
@@ -268,6 +276,8 @@ ${sitesHtml}`;
 				</thead>
 				<tbody>${tasksHtml}</tbody>
 			</table>
+			<h2>Documentation</h2>
+			Read the <a href="fotoware/doc/">documentation</a>.
 		</main>
 		<script type="text/javascript">
 			var CONFIG = {
@@ -284,3 +294,10 @@ ${sitesHtml}`;
 		contentType: 'text/html; charset=utf-8'
 	}; // return
 } // function get
+
+router.get('/', (r) => get(r));
+
+router.get('/doc', () => ({
+	body: getResource(resolve('./doc.html')).getStream(),
+	contentType: 'text/html; charset=utf-8'
+}));
