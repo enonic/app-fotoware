@@ -6,7 +6,6 @@ import deepEqual from 'fast-deep-equal';
 import {URL} from '/lib/galimatias';
 import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-import {sanitize} from '/lib/xp/common';
 import {
 	addAttachment,
 	createMedia,
@@ -25,11 +24,10 @@ import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDe
 import {query as doQuery} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
+import {X_APP_NAME} from '/lib/fotoware/xp/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
-
-const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 
 export const assetModified = (request) => {
 	//log.debug(`request:${toStr(request)}`);
@@ -85,8 +83,6 @@ export const assetModified = (request) => {
 	const {
 		clientId,
 		clientSecret,
-		//path,
-		//project,
 		remoteAddresses,
 		url: hostname,
 		imports
@@ -99,11 +95,29 @@ export const assetModified = (request) => {
 		return {status: 404};
 	}
 
+	const {accessToken} = getAccessToken({
+		hostname,
+		clientId,
+		clientSecret
+	});
+	//log.debug(`accessToken:${toStr(accessToken)}`);
+
+	const {
+		searchURL,
+		renditionRequest
+	} = getPrivateFullAPIDescriptor({
+		accessToken,
+		hostname
+	});
+	//log.debug(`searchURL:${toStr(searchURL)}`);
+	//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
+
 	Object.keys(imports).forEach((importName) => {
 		const {
 			project,
 			path,
-			query
+			query,
+			rendition
 		} = imports[importName];
 		runInContext({
 			repository: `com.enonic.cms.${project}`,
@@ -122,28 +136,11 @@ export const assetModified = (request) => {
 					log.error(`mediaPath:${mediaPath} not found! Perhaps missed assetIngested, or assetDeleted arrived before assetModified.`);
 				}
 
-				const {accessToken} = getAccessToken({
-					hostname,
-					clientId,
-					clientSecret
-				});
-				//log.debug(`accessToken:${toStr(accessToken)}`);
-
-				const {
-					searchURL,
-					renditionRequest
-				} = getPrivateFullAPIDescriptor({
-					accessToken,
-					hostname
-				});
-				//log.debug(`searchURL:${toStr(searchURL)}`);
-				//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
-
 				const queryResult = doQuery({
 					accessToken,
 					blacklistedCollections: {}, // NOTE Intentional hardcode
 					hostname,
-					q: `(${query})&(${filename})`,
+					q: `(${query})AND(fn:${filename})`,
 					searchURL,
 					whitelistedCollections: { // NOTE Intentional hardcode
 						'5000-Archive': true
@@ -167,19 +164,39 @@ export const assetModified = (request) => {
 						//href,
 						metadata,
 						//metadataObj,
-						renditionHref
+						//renditionHref
+						renditions
 					} = collections[0].assets[0];
 					if (filename !== filenameFromQuery) {
 						throw new Error(`filename:${filename} from assetModified does not match filename:${filenameFromQuery} from query result`);
 					}
+					const renditionsObj = {};
+					renditions.forEach(({
+						//default,
+						//description,
+						display_name,
+						//height,
+						href//,
+						//original,
+						//profile,
+						//sizeFixed,
+						//width
+					}) => {
+						//log.debug(`display_name:${display_name} href:${href} height:${height} width:${width}`);
+						renditionsObj[display_name] = href;
+					});
+					//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
+
+					const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'];
+
 					const downloadRenditionResponse = requestRendition({
 						accessToken,
 						hostname: url,
 						renditionServiceShortAbsolutePath: renditionRequest,
-						renditionUrl: renditionHref
+						renditionUrl
 					});
 					if (!downloadRenditionResponse) {
-						throw new Error(`Something went wrong when downloading rendition for renditionHref:${renditionHref}!`);
+						throw new Error(`Something went wrong when downloading rendition for renditionUrl:${renditionUrl}!`);
 					}
 					const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
 

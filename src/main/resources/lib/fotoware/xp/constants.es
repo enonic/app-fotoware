@@ -1,3 +1,5 @@
+import {sanitize} from '/lib/xp/common';
+
 export const REPO_ID = app.name;
 export const REPO_BRANCH = 'master';
 
@@ -32,3 +34,5 @@ export const CHILD_ORDER = '_ts DESC';
 export const TASKS_FOLDER_PARENT_PATH = '/';
 export const TASKS_FOLDER_NAME = 'tasks';
 export const TASKS_FOLDER_PATH = `${TASKS_FOLDER_PARENT_PATH}${TASKS_FOLDER_NAME}`;
+
+export const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
