@@ -1,11 +1,14 @@
 // Node modules
 //import {diff} from 'deep-object-diff';
 //import deepEqual from 'fast-deep-equal';
+import setIn from 'set-value';
+import traverse from 'traverse';
 
 // Enonic modules
 import {URL} from '/lib/galimatias';
 //import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
+import {isString} from '/lib/util/value';
 import {
 	//addAttachment,
 	//createMedia,
@@ -155,15 +158,41 @@ export const assetDeleted = (request) => {
 
 						if (assetCountTotal === 0) {
 							log.info(`filename:${filename} not found when querying :) Maybe delete.`);
-							log.debug(`exisitingMedia._id:${toStr(exisitingMedia._id)}`);
+							//log.debug(`exisitingMedia._id:${toStr(exisitingMedia._id)}`);
 
 							const queryContentParams = {
-								count: 0,
+								//count: 1, // DEBUG
+								count: -1,
 								query: `_references = '${exisitingMedia._id}'`
 							};
-							log.debug(`queryContentParams:${toStr(queryContentParams)}`);
+							//log.debug(`queryContentParams:${toStr(queryContentParams)}`);
 
 							const queryContentRes = queryContent(queryContentParams);
+							//log.debug(`queryContentRes:${toStr(queryContentRes)}`);
+
+							queryContentRes.hits = queryContentRes.hits.map(({
+								_id,
+								_path,
+								type,
+								...rest
+							}) => {
+								const obj = {
+									_id,
+									_path,
+									type
+								};
+								traverse(rest).forEach(function(value) { // Fat arrow destroys this
+									//const key = this.key;
+									const path = this.path;//.join('.');
+									//log.debug(`path:${toStr(path)} value:${toStr(value)}`);
+									if (Array.isArray(value) || isString(value)) {
+										if (value.includes(exisitingMedia._id)) {
+											setIn(obj, path, value);
+										}
+									}
+								});
+								return obj;
+							});
 							log.debug(`queryContentRes:${toStr(queryContentRes)}`);
 
 							if (queryContentRes.total === 0) {
