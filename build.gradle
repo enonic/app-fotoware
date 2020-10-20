@@ -53,7 +53,7 @@ dependencies {
 	include 'com.enonic.lib:lib-galimatias:1.0.0-B1'
 	//include 'com.enonic.lib:lib-guillotine:1.0.1'
 	include 'com.enonic.lib:lib-http-client:2.1.2'
-	//include 'com.enonic.lib:lib-license:2.0.0'
+	include 'com.enonic.lib:lib-license:3.0.0'
 	include 'com.enonic.lib:lib-router:2.1.0'
 	//include 'com.enonic.lib:menu:1.3.3'
 	include 'com.enonic.lib:lib-text-encoding:2.0.0'

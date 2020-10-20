@@ -5,6 +5,7 @@ import {
 	REPO_ID
 } from '/lib/fotoware/xp/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
+import {validateLicense} from '/lib/license';
 import Router from '/lib/router';
 //import {toStr} from '/lib/util';
 import {run as runInContext} from '/lib/xp/context';
@@ -19,6 +20,8 @@ import {assetUrl} from '/lib/xp/portal';
 import {list as listTasks} from '/lib/xp/task';
 
 import {post} from './post';
+import {getUploadLicenseForm} from './getUploadLicenseForm';
+import {postUploadLicense} from './postUploadLicense';
 
 const {currentTimeMillis} = Java.type('java.lang.System');
 
@@ -27,9 +30,24 @@ const router = Router();
 export const all = (r) => router.dispatch(r);
 
 router.post('/', (r) => post(r));
+router.get('/uploadLicense', (r) => getUploadLicenseForm(r));
+router.post('/uploadLicense', (r) => postUploadLicense(r));
 
 function get(/*request*/) {
 	//log.debug(`request:${toStr(request)}`);
+
+	const licenseDetails = validateLicense({appKey: app.name});
+	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
+	//const licenseValid = !!(licenseDetails && !licenseDetails.expired);
+	//log.info(`licenseValid:${toStr(licenseValid)}`);
+
+	const licensedTo = licenseDetails
+		? (
+			licenseDetails.expired
+				? 'License expired!'
+				: `Licensed to ${licenseDetails.issuedTo}`
+		)
+		: 'Unlicensed!';
 
 	const taskList = listTasks({
 		name: `${app.name}:syncSite`/*,
@@ -250,6 +268,13 @@ ${sitesHtml}`;
 			.ta-c {
 				text-align: center;
 			}
+			a.app-name {
+				color:#eee;
+				text-decoration: none;
+			}
+			a.app-name:hover {
+				text-decoration: underline;
+			}
 		</style>
 	</head>
 	<body>
@@ -257,6 +282,9 @@ ${sitesHtml}`;
 			<div class="home-button app-icon system-info-button">
 				<img class="app-icon" src="${assetsUrl}/images/svg/fotoware-white.svg" style="height: 15px;margin-top: 15px;width: auto;"/>
 				<span class="app-name">FotoWare Admin</span>
+			</div>
+			<div class="home-button system-info-button">
+				<a class="app-name" href="fotoware/uploadLicense">${licensedTo}</a>
 			</div>
 		</div>
 		<main style="padding: 59px 15px 0px 15px">${mainHtml}
