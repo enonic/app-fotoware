@@ -50,6 +50,7 @@ export function postUploadLicense(request) {
 	<body>
 		<h1>License ${boolLicenseInstalled ? 'Installed.' : 'Invalid!'} Redirecting in 5 seconds...</h1>
 	</body>
-</html`
+</html>`,
+		contentType: 'text/html; charset=utf-8'
 	};
 }

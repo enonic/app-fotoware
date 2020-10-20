@@ -38,7 +38,7 @@ function get(/*request*/) {
 
 	const licenseDetails = validateLicense({appKey: app.name});
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
-	//const licenseValid = !!(licenseDetails && !licenseDetails.expired);
+	const licenseValid = !!(licenseDetails && !licenseDetails.expired);
 	//log.info(`licenseValid:${toStr(licenseValid)}`);
 
 	const licensedTo = licenseDetails
@@ -193,13 +193,13 @@ function get(/*request*/) {
 		<input name="resume" type="hidden" value="true"/>
 		<input name="site" type="hidden" value="${site}"/>
 		<input name="importName" type="hidden" value="${importName}"/>
-		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Refresh ${capitalize(site)} ${capitalize(importName)}"/>
+		<input ${licenseValid ? '' : 'disabled'} type="submit" style="margin-bottom: 15px;padding: 5px" value="Refresh ${capitalize(site)} ${capitalize(importName)}"/>
 	</form>
 	<form method="post">
 		<input name="resume" type="hidden" value="false"/>
 		<input name="site" type="hidden" value="${site}"/>
 		<input name="importName" type="hidden" value="${importName}"/>
-		<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync ${capitalize(site)} ${capitalize(importName)}"/>
+		<input ${licenseValid ? '' : 'disabled'} type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync ${capitalize(site)} ${capitalize(importName)}"/>
 	</form>
 </div>`).join('\n')
 	).join('\n');
@@ -216,12 +216,12 @@ function get(/*request*/) {
 <form method="post">
 	<input name="resume" type="hidden" value="true"/>
 	<input name="site" type="hidden" value="_all"/>
-	<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Refresh all configured FotoWare sites"/>
+	<input ${licenseValid ? '' : 'disabled'} type="submit" style="margin-bottom: 15px;padding: 5px" value="Refresh all configured FotoWare sites"/>
 </form>
 <form method="post">
 	<input name="resume" type="hidden" value="false"/>
 	<input name="site" type="hidden" value="_all"/>
-	<input type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync all configured FotoWare sites"/>
+	<input ${licenseValid ? '' : 'disabled'} type="submit" style="margin-bottom: 15px;padding: 5px" value="Full sync all configured FotoWare sites"/>
 </form>
 </div>`: '';
 	}
