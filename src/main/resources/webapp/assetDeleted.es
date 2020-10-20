@@ -6,6 +6,7 @@ import traverse from 'traverse';
 
 // Enonic modules
 import {URL} from '/lib/galimatias';
+import {validateLicense} from '/lib/license';
 //import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
 import {isString} from '/lib/util/value';
@@ -36,6 +37,22 @@ import {isPublished} from '/lib/fotoware/xp/isPublished';
 
 export const assetDeleted = (request) => {
 	//log.info(`request:${toStr(request)}`);
+
+	const licenseDetails = validateLicense({appKey: app.name});
+	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
+	const licenseValid = !!(licenseDetails && !licenseDetails.expired);
+	const licensedTo = licenseDetails
+		? (
+			licenseDetails.expired
+				? 'License expired!'
+				: `Licensed to ${licenseDetails.issuedTo}`
+		)
+		: 'Unlicensed!';
+
+	if (!licenseValid) {
+		log.error(licensedTo);
+		return {status: 404};
+	}
 
 	const {
 		headers: {
