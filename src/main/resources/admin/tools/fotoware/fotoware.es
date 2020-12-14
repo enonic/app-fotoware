@@ -14,16 +14,19 @@ import {
 	getLauncherPath,
 	getLauncherUrl
 } from '/lib/xp/admin';
-import {getResource} from '/lib/xp/io';
+import {
+	getResource,
+	readText
+} from '/lib/xp/io';
 import {connect} from '/lib/xp/node';
-import {assetUrl} from '/lib/xp/portal';
-import {list as listTasks} from '/lib/xp/task';
+import {
+	assetUrl,
+	serviceUrl as getServiceUrl
+} from '/lib/xp/portal';
 
 import {post} from './post';
 import {getUploadLicenseForm} from './getUploadLicenseForm';
 import {postUploadLicense} from './postUploadLicense';
-
-const {currentTimeMillis} = Java.type('java.lang.System');
 
 const router = Router();
 
@@ -48,81 +51,6 @@ function get(/*request*/) {
 				: `Licensed to ${licenseDetails.issuedTo}`
 		)
 		: 'Unlicensed!';
-
-	const taskList = listTasks({
-		name: `${app.name}:syncSite`/*,
-		state: 'RUNNING'*/
-	});
-	//log.debug(`taskList:${toStr(taskList)}`);
-
-	const currentTime = currentTimeMillis();
-	const tasksHtml = taskList.map(({
-		progress: {
-			current,
-			info,
-			total
-		},
-		startTime,
-		state
-	}) => {
-		// WARNING Date objects does not work serverside!
-		//if (!startTime) { startTime = currentTime;}
-		const remainingCount = total - current;
-		//const durationMs = currentTime - startTime;
-		//const averageMs = current ? durationMs / current : durationMs;
-		//const remainingMs = (remainingCount * averageMs);
-		//const etaMs = currentTime + remainingMs;
-		return `<tr>
-	<td class="min">${state}</td>
-	<td class="min">${info}</td>
-	<!--
-		<td class="min ta-r">${current}</td>
-		<td class="min ta-r">${total}</td>
-	-->
-	<td class="min"><script type="text/javascript">
-	(function() {
-		var scripts= document.getElementsByTagName('script');
-		var script= scripts[scripts.length-1];
-		var div= document.createElement('div');
-		const startTime = (new Date('${startTime}')).getTime();
-		const FORMAT = 'YYYY-MM-DD HH:mm:ss';
-		div.innerHTML= moment(new Date(startTime)).format(FORMAT);
-		script.parentNode.insertBefore(div, script);
-	})();</script></td>
-	<td class="min"><script type="text/javascript">
-	(function() {
-		var scripts= document.getElementsByTagName('script');
-		var script= scripts[scripts.length-1];
-		var div= document.createElement('div');
-		const current = ${current};
-		const remainingCount = ${remainingCount};
-		const currentTime = ${currentTime};
-		const startTime = (new Date('${startTime}')).getTime();
-		const durationMs = currentTime - startTime;
-		const averageMs = current ? durationMs / current : durationMs;
-		const remainingMs = (remainingCount * averageMs);
-		const etaMs = currentTime + remainingMs;
-		const FORMAT = 'YYYY-MM-DD HH:mm:ss';
-		div.innerHTML= moment(new Date(etaMs)).format(FORMAT);
-		script.parentNode.insertBefore(div, script);
-	})();</script></td>
-	<td class="min"><script type="text/javascript">
-	(function() {
-		var scripts= document.getElementsByTagName('script');
-		var script= scripts[scripts.length-1];
-		var div= document.createElement('div');
-		const current = ${current};
-		const remainingCount = ${remainingCount};
-		const currentTime = ${currentTime};
-		const startTime = (new Date('${startTime}')).getTime();
-		const durationMs = currentTime - startTime;
-		const averageMs = current ? durationMs / current : durationMs;
-		const remainingMs = (remainingCount * averageMs);
-		div.innerHTML = moment.utc(moment.duration(remainingMs).asMilliseconds()).format("HH:mm:ss");
-		script.parentNode.insertBefore(div, script);
-	})();</script></td>
-	<td><div class="ta-c" style="background-color:lightgray;width:${current/total*100}%">[${current}/${remainingCount}/${total}]</div></td>
-</tr>`}).join('\n');
 
 	const stoppableTasks = {};
 	runInContext({
@@ -234,13 +162,19 @@ ${sitesHtml}`;
 		body: `<!DOCTYPE html>
 <html>
 	<head>
+		<title>FotoWare Admin</title>
+
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<meta name="theme-color" content="#ffffff">
-		<meta http-equiv="refresh" content="5"/>
 
-		<title>FotoWare Admin</title>
+		<script src="https://unpkg.com/react@latest/umd/react.development.js" crossorigin="anonymous"></script>
+		<script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js"></script>
+		<script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js" crossorigin="anonymous"></script>
+		<script src="https://unpkg.com/babel-standalone@latest/babel.min.js" crossorigin="anonymous"></script>
+
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
 
 		<link rel="shortcut icon" href="${assetsUrl}/images/ico/fotoware.ico">
 
@@ -251,22 +185,8 @@ ${sitesHtml}`;
 			form {
 				display: inline-block;
 			}
-			td, th {
-				border: 1px solid gray;
-				padding: 2px;
-			}
-			th {
-				font-weight: bold;
-			}
-			td.min {
-    			width: 1%;
-    			white-space: nowrap;
-			}
-			.ta-r {
-				text-align: right;
-			}
-			.ta-c {
-				text-align: center;
+			h2 {
+				margin-top: 15px;
 			}
 			a.app-name {
 				color:#eee;
@@ -289,24 +209,16 @@ ${sitesHtml}`;
 		</div>
 		<main style="padding: 59px 15px 0px 15px">${mainHtml}
 			<h2>Tasks</h2>
-			<table style="width:100%">
-				<thead>
-					<tr>
-						<th>State</th>
-						<th>Info</th>
-						<!--th>Current</th>
-						<th>Total</th-->
-						<th>StartTime</th>
-						<th>Eta</th>
-						<th>Remaining</th>
-						<th>Progress</th>
-					</tr>
-				</thead>
-				<tbody>${tasksHtml}</tbody>
-			</table>
+			<div id="root"></div>
 			<h2>Documentation</h2>
 			Read the <a href="fotoware/doc/">documentation</a>.
 		</main>
+
+		<script type="text/babel">
+			const baseServicesUrl = "${getServiceUrl({service: '/'})}";
+			${readText(getResource(resolve('./app.babel')).getStream())}
+		</script>
+
 		<script type="text/javascript">
 			var CONFIG = {
 				//adminUrl: '${getBaseUri()}',

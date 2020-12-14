@@ -1,0 +1,168 @@
+/* global baseServicesUrl clearInterval MaterialUI moment React ReactDOM setInterval */
+
+function useInterval(callback, delay) {
+	const savedCallback = React.useRef();
+
+	// Remember the latest callback.
+	React.useEffect(() => {
+		savedCallback.current = callback;
+	}, [callback]);
+
+	// Set up the interval.
+	React.useEffect(() => {
+		function tick() {
+			savedCallback.current();
+		}
+		if (delay !== null) {
+			let id = setInterval(tick, delay);
+			return () => clearInterval(id);
+		}
+	}, [delay]);
+} // useInterval
+
+
+/* eslint-disable no-unused-vars */
+const {
+	Box,
+	colors,
+	CircularProgress,
+	createMuiTheme,
+	CssBaseline,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	ThemeProvider,
+	Typography
+} = MaterialUI;
+/* eslint-enable no-unused-vars */
+
+
+const theme = createMuiTheme({
+	palette: {
+		primary: {
+			main: '#556cd6'
+		},
+		secondary: {
+			main: '#19857b'
+		},
+		error: {
+			main: colors.red.A400
+		},
+		background: {
+			default: '#fff'
+		}
+	}
+});
+
+
+// eslint-disable-next-line no-unused-vars
+const CircularProgressWithLabel = (props) => <Box position="relative" display="inline-flex">
+	<CircularProgress variant="determinate" {...props} />
+	<Box
+		top={0}
+		left={0}
+		bottom={0}
+		right={0}
+		position="absolute"
+		display="flex"
+		alignItems="center"
+		justifyContent="center"
+	>
+		<Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
+			props.value,
+		)}%`}</Typography>
+	</Box>
+</Box>;
+
+
+function App() { // eslint-disable-line no-unused-vars
+
+	const [taskList, setTaskList] = React.useState([]);
+
+	useInterval(() => {
+		fetch(`${baseServicesUrl}/listTasks`)
+			.then(response => response.json())
+			.then(data => {
+				//console.log(data);
+				setTaskList(data);
+			});
+		//console.log(baseServicesUrl);
+	}, 1000);
+
+	/*React.useEffect(() => {
+		console.log(taskList);
+	}, [taskList]);*/
+
+	return (
+		<TableContainer>
+			<Table>
+				<TableHead>
+					<TableRow>
+						<TableCell>State</TableCell>
+						<TableCell>Info</TableCell>
+						<TableCell>StartTime</TableCell>
+						<TableCell>Eta</TableCell>
+						<TableCell>Remaining</TableCell>
+						<TableCell>Progress</TableCell>
+					</TableRow>
+				</TableHead>
+				<TableBody>
+					{taskList.map(({
+						progress: {
+							current,
+							info,
+							total
+						},
+						startTime: startTimeEnonic,
+						state
+					}, i) => {
+						//console.log('total', total);
+						//console.log('current', current);
+						const remainingCount = total - current;
+						//console.log('remainingCount', remainingCount);
+
+						//console.log('startTimeEnonic', startTimeEnonic);
+						const startDateObj = new Date(startTimeEnonic);
+						//console.log('startDateObj', startDateObj);
+
+						const now = Date.now(); // The number of milliseconds elapsed since January 1, 1970 00:00:00 UTC
+						//console.log('now',now);
+
+						const durationMs = now - startDateObj.getTime(); // in milliseconds
+						//console.log('durationMs', durationMs); // ERROR
+
+						const averageMs = current ? durationMs / current : durationMs;
+						//console.log('averageMs', averageMs);
+
+						const remainingMs = (remainingCount * averageMs);
+						//console.log('remainingMs', remainingMs);
+
+						const etaMs = now + remainingMs;
+						//console.log('etaMs', etaMs);
+
+						return <TableRow key={i}>
+							<TableCell>{state}</TableCell>
+							<TableCell>{info}</TableCell>
+							<TableCell>{moment(startDateObj).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
+							<TableCell>{moment(new Date(etaMs)).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
+							<TableCell>{moment.utc(moment.duration(remainingMs).asMilliseconds()).format("HH:mm:ss")}</TableCell>
+							<TableCell><CircularProgressWithLabel value={current/total*100} /></TableCell>
+						</TableRow>;
+					})}
+				</TableBody>
+			</Table>
+		</TableContainer>
+	);
+}; // eslint-disable-line no-extra-semi
+
+
+ReactDOM.render(
+	<ThemeProvider theme={theme}>
+		<CssBaseline />
+		<App />
+	</ThemeProvider>,
+	document.querySelector('#root')
+);
