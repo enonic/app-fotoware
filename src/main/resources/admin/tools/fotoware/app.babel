@@ -1,5 +1,11 @@
 /* global baseServicesUrl clearInterval MaterialUI moment React ReactDOM setInterval */
 
+const capitalize = (s) => {
+	if (typeof s !== 'string') return ''
+	return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+
 function useInterval(callback, delay) {
 	const savedCallback = React.useRef();
 
@@ -24,6 +30,7 @@ function useInterval(callback, delay) {
 /* eslint-disable no-unused-vars */
 const {
 	Box,
+	Button,
 	colors,
 	CircularProgress,
 	createMuiTheme,
@@ -78,11 +85,32 @@ const CircularProgressWithLabel = (props) => <Box position="relative" display="i
 </Box>;
 
 
-function App() { // eslint-disable-line no-unused-vars
+function App({theme}) { // eslint-disable-line no-unused-vars
 
+	const [licenseValid, setLicenseValid] = React.useState(false);
+	const [sitesConfigs, setSitesConfigs] = React.useState({});
+	const [stoppableTasks, setStoppableTasks] = React.useState({});
 	const [taskList, setTaskList] = React.useState([]);
 
 	useInterval(() => {
+		fetch(`${baseServicesUrl}/licenseValid`)
+			.then(response => response.json())
+			.then(data => {
+				//console.log(data);
+				setLicenseValid(data.licenseValid);
+			});
+		fetch(`${baseServicesUrl}/sitesConfigs`)
+			.then(response => response.json())
+			.then(data => {
+				//console.log(data);
+				setSitesConfigs(data);
+			});
+		fetch(`${baseServicesUrl}/stoppableTasks`)
+			.then(response => response.json())
+			.then(data => {
+				//console.log(data);
+				setStoppableTasks(data);
+			});
 		fetch(`${baseServicesUrl}/listTasks`)
 			.then(response => response.json())
 			.then(data => {
@@ -92,11 +120,79 @@ function App() { // eslint-disable-line no-unused-vars
 		//console.log(baseServicesUrl);
 	}, 1000);
 
-	/*React.useEffect(() => {
-		console.log(taskList);
-	}, [taskList]);*/
+	const boolMoreThanOne = Object.keys(sitesConfigs).length > 1 ||
+	(
+		Object.keys(sitesConfigs).length === 1 &&
+		Object.keys(sitesConfigs[Object.keys(sitesConfigs)[0]].imports).length > 1
+	);
 
-	return (
+	return (<React.Fragment>
+		{boolMoreThanOne
+			? (
+				<div>
+					{
+						Object.keys(stoppableTasks).length
+							? null
+							: <React.Fragment>
+								<Button disabled={!licenseValid} onClick={() => {
+									fetch('?resume=true&site=_all', {
+										method: 'POST',
+										headers: {
+											'Content-Type':	'application/json'
+										}
+									})
+								}}
+								style={{marginRight:theme.spacing(1)}}
+								variant="contained">Refresh all configured FotoWare sites</Button>
+								<Button disabled={!licenseValid} onClick={() => {
+									fetch('?resume=false&site=_all', {
+										method: 'POST',
+										headers: {
+											'Content-Type':	'application/json'
+										}
+									})
+								}} variant="contained">Full sync all configured FotoWare sites</Button>
+							</React.Fragment>
+					}
+				</div>
+			)
+			: null
+		}
+		{Object.keys(sitesConfigs).map((site, i) =>
+			Object.keys(sitesConfigs[site].imports).map((importName, j) => <div key={`${i}_${j}`}>
+				{(stoppableTasks[site] && stoppableTasks[site][importName])
+					? <Button disabled={!licenseValid} onClick={() => {
+						fetch(`?importName=${importName}&stop=true&site=${site}&taskNodeId=${stoppableTasks[site][importName]}`, {
+							method: 'POST',
+							headers: {
+								'Content-Type':	'application/json'
+							}
+						})
+					}} variant="contained">{`Stop ${capitalize(site)} ${capitalize(importName)}`}</Button>
+					: <React.Fragment>
+						<Button disabled={!licenseValid} onClick={() => {
+							fetch(`?importName=${importName}&resume=true&site=${site}`, {
+								method: 'POST',
+								headers: {
+									'Content-Type':	'application/json'
+								}
+							})
+						}}
+						style={{marginRight:theme.spacing(1)}}
+						variant="contained">{`Refresh ${capitalize(site)} ${capitalize(importName)}`}</Button>
+						<Button disabled={!licenseValid} onClick={() => {
+							fetch(`?importName=${importName}&resume=false&site=${site}`, {
+								method: 'POST',
+								headers: {
+									'Content-Type':	'application/json'
+								}
+							})
+						}} variant="contained">{`Full sync ${capitalize(site)} ${capitalize(importName)}`}</Button>
+					</React.Fragment>}
+			</div>)
+		)
+		}
+		<Typography variant="h2" gutterBottom>Tasks</Typography>
 		<TableContainer>
 			<Table>
 				<TableHead>
@@ -155,14 +251,14 @@ function App() { // eslint-disable-line no-unused-vars
 				</TableBody>
 			</Table>
 		</TableContainer>
-	);
+	</React.Fragment>);
 }; // eslint-disable-line no-extra-semi
 
 
 ReactDOM.render(
 	<ThemeProvider theme={theme}>
 		<CssBaseline />
-		<App />
+		<App theme={theme}/>
 	</ThemeProvider>,
 	document.querySelector('#root')
 );
