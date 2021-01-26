@@ -58,3 +58,4 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 * Node 12.20.1
 * Upgrade node modules (patch and minor)
 * Various build changes in attempt to upgrade to webpack 5
+* Success refresh works with webpack 5
