@@ -43,3 +43,17 @@ fotoware.sites.sitenameVideos.url = https://sitename.fotoware.cloud
 fotoware.sites.sitenameVideos.path = FotoWare Videos
 fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 ```
+
+## Compatibility
+
+| App version | XP version |
+| ----------- | ---------- |
+| 1.0.0-SNAPSHOT | 7.4.1 |
+
+## Changelog
+
+### 1.0.0-SNAPSHOT
+
+* Require Enonic 7.4.1
+* Node 12.20.1
+* Upgrade node modules (patch)
