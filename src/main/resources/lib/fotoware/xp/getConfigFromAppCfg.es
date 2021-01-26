@@ -1,5 +1,6 @@
 //import {toStr} from '/lib/util';
 import {deepen} from '/lib/fotoware/xp/deepen';
+//import {deepen} from './deepen';
 import {capitalize} from '/lib/fotoware/xp/capitalize';
 
 export function getConfigFromAppCfg() {

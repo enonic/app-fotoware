@@ -1,8 +1,8 @@
 // Node modules
 //import {diff} from 'deep-object-diff';
 //import deepEqual from 'fast-deep-equal';
-import setIn from 'set-value';
-import traverse from 'traverse';
+import * as setIn from 'set-value';
+import * as traverse from 'traverse';
 
 // Enonic modules
 import {URL} from '/lib/galimatias';

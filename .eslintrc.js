@@ -4,15 +4,19 @@ module.exports = {
 	extends: [
 		'eslint:recommended',
 		//'airbnb-base',
-		//'plugin:react/recommended',
-		//'plugin:jsx-a11y/recommended',
-		//'plugin:react-hooks/recommended'
+		'plugin:react/recommended',
+		'plugin:jsx-a11y/recommended',
+		'plugin:react-hooks/recommended'
 	],
 
 	globals: {
 		// Node
-		module: false,
 		__dirname: false,
+		require: false,
+
+		// CommonJS (CJS) format
+		exports: false,
+		module: false,
 
 		// Nashorn
 		Java: false,
@@ -36,10 +40,10 @@ module.exports = {
 
 		// Jquery
 		$: false,
-		jQuery: false//,
+		jQuery: false,
 
 		// React
-		//React: false
+		React: false
 
 	}, //globals
 
@@ -66,9 +70,9 @@ module.exports = {
 	},
 
 	plugins: [
-		'import' //,
-		//'react',
-		//'jsx-a11y'
+		'import',
+		'react',
+		'jsx-a11y'
 	],
 
 	rules: { // https://eslint.org/docs/rules

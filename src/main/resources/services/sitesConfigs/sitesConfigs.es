@@ -1,4 +1,5 @@
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
+//import {getConfigFromAppCfg} from '../../lib/fotoware/xp/getConfigFromAppCfg';
 
 export function get() {
 	const {sitesConfigs} = getConfigFromAppCfg();

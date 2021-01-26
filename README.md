@@ -57,3 +57,4 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 * Require Enonic 7.4.1
 * Node 12.20.1
 * Upgrade node modules (patch and minor)
+* Various build changes in attempt to upgrade to webpack 5

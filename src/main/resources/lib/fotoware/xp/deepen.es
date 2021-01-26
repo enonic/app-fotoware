@@ -44,3 +44,24 @@ export function deepen(o) {
 	//log.debug(`oo:${toStr(oo)}`);
 	return oo;
 }
+
+// https://stackoverflow.com/questions/19098797/fastest-way-to-flatten-un-flatten-nested-json-objects
+// http://jsfiddle.net/WSzec/14/
+/*export const deepen = function(data) {
+	//"use strict";
+	if (Object(data) !== data || Array.isArray(data))
+		return data;
+	var result = {}, cur, prop, idx, last, temp;
+	for(var p in data) {
+		cur = result, prop = "", last = 0;
+		do {
+			idx = p.indexOf(".", last);
+			temp = p.substring(last, idx !== -1 ? idx : undefined);
+			cur = cur[prop] || (cur[prop] = (!isNaN(parseInt(temp)) ? [] : {}));
+			prop = temp;
+			last = idx + 1;
+		} while(idx >= 0);
+		cur[prop] = data[p];
+	}
+	return result[""];
+}*/

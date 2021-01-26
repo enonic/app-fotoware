@@ -1,4 +1,4 @@
-import deepEqual from 'fast-deep-equal';
+import * as deepEqual from 'fast-deep-equal';
 
 import {request} from '/lib/http-client';
 import {toStr} from '/lib/util';

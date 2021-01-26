@@ -4,9 +4,10 @@
 //──────────────────────────────────────────────────────────────────────────────
 import glob from 'glob';
 import path from 'path';
+import webpack from 'webpack';
 
 // Currently requires webpack 4
-import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
+//import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
 
 //import TerserPlugin from 'terser-webpack-plugin';
 
@@ -29,7 +30,7 @@ const stats = {
 	colors: true,
 	entrypoints: false,
 	hash: false,
-	maxModules: 0, // Removed in Webpack 5
+	//maxModules: 0, // Removed in Webpack 5
 	modules: false,
 	moduleTrace: false,
 	timings: false,
@@ -78,6 +79,12 @@ if (SERVER_JS_FILES.length) {
 		module: {
 			rules: [{
 				test: SERVER_JS_TEST,
+				//exclude: /node_modules/,
+				exclude: [
+					/\bcore-js\b/,
+					/\bwebpack\b/,
+					/\bregenerator-runtime\b/,
+				],
 				use: [{
 					loader: 'babel-loader',
 					options: {
@@ -86,28 +93,45 @@ if (SERVER_JS_FILES.length) {
 						compact: false,
 						minified: false,
 						plugins: [
-							'array-includes',
-							//'import-css-to-jss', // NOTE This will hide the css from MiniCssExtractPlugin!
-							//'optimize-starts-with', https://github.com/xtuc/babel-plugin-optimize-starts-with/issues/1
-							//'transform-prejss',
+							'@babel/plugin-proposal-class-properties',
+							'@babel/plugin-proposal-export-default-from',
 							'@babel/plugin-proposal-object-rest-spread',
-							'@babel/plugin-transform-object-assign'
+							'@babel/plugin-syntax-dynamic-import',
+							'@babel/plugin-syntax-throw-expressions',
+							'@babel/plugin-transform-classes',
+							'@babel/plugin-transform-modules-commonjs',
+							'@babel/plugin-transform-object-assign',
+							'array-includes'
 						],
 						presets: [
 							[
 								'@babel/preset-env',
 								{
-									useBuiltIns: false // false means polyfill not required runtime
+									corejs: 3,
+
+									// Enables all transformation plugins and as a result,
+									// your code is fully compiled to ES5
+									forceAllTransforms: true,
+
+									targets: {
+										esmodules: false, // Enonic XP doesn't support ECMAScript Modules
+										node: '0.10.48'
+									},
+									useBuiltIns: false // no polyfills are added automatically
+									//useBuiltIns: 'entry' // replaces direct imports of core-js to imports of only the specific modules required for a target environment
+									//useBuiltIns: 'usage' // polyfills will be added automatically when the usage of some feature is unsupported in target environment
+
 								}
-							]
+							]//,
+							//'@babel/preset-react'
 						]
 					} // options
 				}]
 			}]
 		}, // module
 		optimization: {
-			//minimize: false
-			minimize: true,
+			minimize: false
+			/*minimize: true,
 			minimizer: [
 				/*new TerserPlugin({ // Internal Server Error (java.lang.UnsupportedOperationException)
 					extractComments: false, // Default is true
@@ -131,20 +155,28 @@ if (SERVER_JS_FILES.length) {
 					},
 					//test: /\.m?js(\?.*)?$/i
 					test: SERVER_JS_TEST
-				})*/
+				})
 				// Currently requires Webpack 4
-				new UglifyJsPlugin({
+				/*new UglifyJsPlugin({
 					parallel: true, // highly recommended
 					sourceMap: false
 				})
-			]
+			]*/
 		},
 		output: {
 			path: outputPath,
 			filename: '[name].js',
 			libraryTarget: 'commonjs'
 		}, // output
+		plugins: [
+			new webpack.ProvidePlugin({
+				global: 'myGlobal'
+			})
+		],
 		resolve: {
+			alias: {
+				myGlobal: path.resolve(__dirname, 'src/main/resources/global')
+			},
 			extensions
 		}, // resolve
 		stats
