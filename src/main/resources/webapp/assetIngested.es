@@ -1,6 +1,9 @@
 // Node modules
 import {diff} from 'deep-object-diff';
-import * as deepEqual from 'fast-deep-equal';
+
+//import * as deepEqual from 'fast-deep-equal';
+import deepEqual from 'fast-deep-equal';
+
 
 // Enonic modules
 import {URL} from '/lib/galimatias';

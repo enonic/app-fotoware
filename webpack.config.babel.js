@@ -72,7 +72,24 @@ if (SERVER_JS_FILES.length) {
 		context,
 		entry: SERVER_JS_ENTRY,
 		externals: [
-			/^\//
+			// /^\//
+			'/lib/galimatias',
+			'/lib/http-client',
+			'/lib/license',
+			'/lib/router',
+			'/lib/text-encoding',
+			'/lib/util',
+			'/lib/util/data',
+			'/lib/util/value',
+			'/lib/xp/admin',
+			'/lib/xp/common',
+			'/lib/xp/context',
+			'/lib/xp/content',
+			'/lib/xp/io',
+			'/lib/xp/node',
+			'/lib/xp/portal',
+			'/lib/xp/repo',
+			'/lib/xp/task'
 		],
 		devtool: false, // Don't waste time generating sourceMaps
 		mode: MODE,
@@ -80,10 +97,12 @@ if (SERVER_JS_FILES.length) {
 			rules: [{
 				test: SERVER_JS_TEST,
 				//exclude: /node_modules/,
-				exclude: [
-					/\bcore-js\b/,
-					/\bwebpack\b/,
-					/\bregenerator-runtime\b/,
+				exclude: [ // It takes time to transpile, if you know they don't need transpilation to run in Enonic you may list them here:
+					/node_modules[\\/]core-js/, // will cause errors if they are transpiled by Babel
+					/node_modules[\\/]webpack[\\/]buildin/ // will cause errors if they are transpiled by Babel
+					// /\bcore-js\b/,
+					// /\bwebpack\b/,
+					// /\bregenerator-runtime\b/,
 				],
 				use: [{
 					loader: 'babel-loader',
@@ -93,14 +112,39 @@ if (SERVER_JS_FILES.length) {
 						compact: false,
 						minified: false,
 						plugins: [
+							'@babel/plugin-transform-arrow-functions',
 							'@babel/plugin-proposal-class-properties',
-							'@babel/plugin-proposal-export-default-from',
+							'@babel/plugin-proposal-export-default-from', // export v from 'mod'; // I think it adds a default export
+							'@babel/plugin-proposal-export-namespace-from', // export * as ns from 'mod';
 							'@babel/plugin-proposal-object-rest-spread',
-							'@babel/plugin-syntax-dynamic-import',
+							'@babel/plugin-syntax-dynamic-import', // Allow parsing of import()
 							'@babel/plugin-syntax-throw-expressions',
-							'@babel/plugin-transform-classes',
-							'@babel/plugin-transform-modules-commonjs',
-							'@babel/plugin-transform-object-assign',
+							'@babel/plugin-transform-block-scoped-functions',
+							'@babel/plugin-transform-block-scoping',
+							'@babel/plugin-transform-classes', // tasks/syncSite/Progress.es
+							'@babel/plugin-transform-computed-properties',
+							'@babel/plugin-transform-destructuring',
+							'@babel/plugin-transform-duplicate-keys',
+							'@babel/plugin-transform-for-of',
+							'@babel/plugin-transform-function-name',
+							'@babel/plugin-transform-instanceof',
+							'@babel/plugin-transform-literals',
+							'@babel/plugin-transform-new-target',
+							'@babel/plugin-transform-member-expression-literals',
+							'@babel/plugin-transform-modules-commonjs', // transforms ECMAScript modules to CommonJS
+							'@babel/plugin-transform-object-assign', // Not used locally, perhaps in node_modules?
+							'@babel/plugin-transform-object-super',
+							'@babel/plugin-transform-parameters',
+							'@babel/plugin-transform-property-literals',
+							'@babel/plugin-transform-property-mutators',
+							'@babel/plugin-transform-reserved-words',
+							'@babel/plugin-transform-shorthand-properties',
+							'@babel/plugin-transform-spread',
+							'@babel/plugin-transform-sticky-regex',
+							'@babel/plugin-transform-template-literals',
+							'@babel/plugin-transform-typeof-symbol',
+							'@babel/plugin-transform-unicode-escapes', // This plugin is included in @babel/preset-env
+							'@babel/plugin-transform-unicode-regex',
 							'array-includes'
 						],
 						presets: [
@@ -117,10 +161,14 @@ if (SERVER_JS_FILES.length) {
 										esmodules: false, // Enonic XP doesn't support ECMAScript Modules
 										node: '0.10.48'
 									},
-									useBuiltIns: false // no polyfills are added automatically
-									//useBuiltIns: 'entry' // replaces direct imports of core-js to imports of only the specific modules required for a target environment
-									//useBuiltIns: 'usage' // polyfills will be added automatically when the usage of some feature is unsupported in target environment
 
+									// These first two doesn't include node_modules??? TypeError: deepEqual is not a function
+									//useBuiltIns: false // no polyfills are added automatically
+									useBuiltIns: 'entry' // replaces direct imports of core-js to imports of only the specific modules required for a target environment
+
+									// This one has Runtime errors
+									// java.lang.AssertionError: unknown call type GET:METHOD|PROPERTY|ELEMENT:call(Object)Object@jdk.nashorn.internal.scripts.Script$Recompilation$10565$137806A$fotoware
+									//useBuiltIns: 'usage' // polyfills will be added automatically when the usage of some feature is unsupported in target environment
 								}
 							]//,
 							//'@babel/preset-react'

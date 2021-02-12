@@ -1,4 +1,6 @@
+//import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
+
 //import {getMetadataView} from '/lib/fotoware/api/metadata/get';
 import {paginate} from '/lib/fotoware/api/paginate';
 import {request} from '/lib/http-client';

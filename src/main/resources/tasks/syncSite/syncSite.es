@@ -1,5 +1,8 @@
 import {diff} from 'deep-object-diff';
-import * as deepEqual from 'fast-deep-equal';
+
+//import * as deepEqual from 'fast-deep-equal';
+import deepEqual from 'fast-deep-equal';
+
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';

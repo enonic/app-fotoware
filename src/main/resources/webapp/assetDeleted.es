@@ -1,6 +1,9 @@
 // Node modules
 //import {diff} from 'deep-object-diff';
+
+//import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
+
 import * as setIn from 'set-value';
 import * as traverse from 'traverse';
 
