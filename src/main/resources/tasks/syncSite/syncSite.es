@@ -426,9 +426,12 @@ export function run(params) {
 			progress.setInfo(`Finished syncing site ${site} ${importName}`).report();
 			journal.currentAsset = '';
 		} catch (e) {
-			log.error(`Something went wrong during sync e:${toStr(e)}`);
+			//log.error('e', e);
+			//log.error('e.message', e.message);
+			//log.error('e.class.name', e.class.name);
+			log.error(`Something went wrong during sync`, e);
 			journal.error = {
-				className: e.class.name,
+				//className: e.class.name,
 				message: e.message
 			};
 			throw e; // Finally should run before this re-throw ends the task.
