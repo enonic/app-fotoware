@@ -98,6 +98,7 @@ export const assetModified = (request) => {
 
 	//log.debug(`sites:${toStr(sites)}`);
 	const {
+		archiveName,
 		clientId,
 		clientSecret,
 		remoteAddresses,
@@ -160,7 +161,7 @@ export const assetModified = (request) => {
 					q: `(${query})AND(fn:${filename})`,
 					searchURL,
 					whitelistedCollections: { // NOTE Intentional hardcode
-						'5000-Archive': true
+						[archiveName]: true
 					}
 				});
 				//log.debug(`queryResult:${toStr(queryResult)}`);

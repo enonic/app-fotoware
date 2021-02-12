@@ -21,6 +21,8 @@ export function getConfigFromAppCfg() {
 	Object.keys(sites).forEach((site) => {
 		//log.debug(`site:${toStr(site)}`);
 		const {
+			//archiveName = '5000-Archive',
+			archiveName = '5000-All-files',
 			url = `https://${site}.fotoware.cloud`,
 			remoteAddresses = {},
 			clientSecret,
@@ -38,6 +40,7 @@ export function getConfigFromAppCfg() {
 			log.error(`Site ${site} is missing clientSecret!`);
 		} else {
 			sitesConfigs[site] = {
+				archiveName,
 				url,
 				remoteAddresses,
 				clientSecret,

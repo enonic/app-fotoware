@@ -101,6 +101,7 @@ export function post(request) {
 		} else {
 			sites.forEach((site) => {
 				const {
+					archiveName,
 					clientId,
 					clientSecret,
 					url,
@@ -155,6 +156,7 @@ export function post(request) {
 					}, () => submitNamed({
 						name: 'syncSite',
 						config: {
+							archiveName,
 							boolResume,
 							clientId,
 							clientSecret,

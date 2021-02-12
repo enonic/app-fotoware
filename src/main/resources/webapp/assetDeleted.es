@@ -102,6 +102,7 @@ export const assetDeleted = (request) => {
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 	const {
+		archiveName,
 		clientId,
 		clientSecret,
 		remoteAddresses,
@@ -164,7 +165,7 @@ export const assetDeleted = (request) => {
 							q: `(${query})AND(fn:${filename})`,
 							searchURL,
 							whitelistedCollections: { // NOTE Intentional hardcode
-								'5000-Archive': true
+								[archiveName]: true
 							}
 						});
 						//log.debug(`queryResult:${toStr(queryResult)}`);

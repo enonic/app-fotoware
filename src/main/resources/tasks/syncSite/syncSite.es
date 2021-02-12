@@ -79,6 +79,7 @@ export function run(params) {
 	//log.debug(`params:${toStr(params)}`);
 
 	const {
+		archiveName,
 		boolResume = true,
 		clientId,
 		clientSecret,
@@ -102,6 +103,7 @@ export function run(params) {
 
 	//const state = new StateClass();
 
+	if(!archiveName) { throw new Error(`Required param archiveName missing! params:${toStr(params)}`); }
 	if(!clientId) { throw new Error(`Required param clientId missing! params:${toStr(params)}`); }
 	if(!clientSecret) { throw new Error(`Required param clientSecret missing! params:${toStr(params)}`); }
 	if(!path) { throw new Error(`Required param path missing! params:${toStr(params)}`); }
@@ -170,7 +172,7 @@ export function run(params) {
 			q: query,
 			searchURL,
 			whitelistedCollections: { // NOTE Intentional hardcode
-				'5000-Archive': true
+				[archiveName]: true
 			}
 		});
 

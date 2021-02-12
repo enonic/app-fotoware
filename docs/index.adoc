@@ -18,24 +18,26 @@ When defining imports you have to use the same key.
 ----
 sites.mysite.clientId = abcd <--1-->
 sites.mysite.clientSecret = abcd <--2-->
-#sites.mysite.remoteAddresses.'127.0.0.1' <--3-->
-#sites.mysite.remoteAddresses.'127.0.0.2' <--3-->
-#sites.mysite.url = https://mysite.fotoware.cloud <--4-->
+#sites.mysite.archiveName = 5000-All-files <--3-->
+#sites.mysite.remoteAddresses.'127.0.0.1' <--4-->
+#sites.mysite.remoteAddresses.'127.0.0.2' <--4-->
+#sites.mysite.url = https://mysite.fotoware.cloud <--5-->
 
-#imports.mysite.images.project = default <--5-->
-imports.mysite.images.path = Images from FotoWare <--6-->
-#imports.mysite.images.query = fn:*.jpg|fn:*.png <--7-->
-#imports.mysite.images.rendition = 4096 max width <--8-->
+#imports.mysite.images.project = default <--6-->
+imports.mysite.images.path = Images from FotoWare <--7-->
+#imports.mysite.images.query = fn:*.jpg|fn:*.png <--8-->
+#imports.mysite.images.rendition = 4096 max width <--9-->
 ----
 
 <1> OAuth 2.0 Client ID
 <2> OAuth 2.0 Client Secret
-<3> Allow receiving webhooks from these IP addresses
-<4> Url of your FotoWare site. Defaults to `https://${site}.fotoware.cloud`. So in this instance `https://mysite.fotoware.cloud`.
-<5> Which Enonic XP Project to import to. Default is `default` :)
-<6> Which path within the Enonic XP Project to import to. Defaults to `capitalize(importName)`. So in this instance `Images`.
-<7> Which query to use when finding what to import. Defaults to `fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg`.
-<8> Name of rendition to use when importing. If the rendition is not supported by an asset type `Original File` is used. Default is `Original File`.
+<3> What is the name of the magic archive that contains all the files. Default is `5000-All-files`. Used to be `5000-Archive`.
+<4> Allow receiving webhooks from these IP addresses
+<5> Url of your FotoWare site. Defaults to `https://${site}.fotoware.cloud`. So in this instance `https://mysite.fotoware.cloud`.
+<6> Which Enonic XP Project to import to. Default is `default` :)
+<7> Which path within the Enonic XP Project to import to. Defaults to `capitalize(importName)`. So in this instance `Images`.
+<8> Which query to use when finding what to import. Defaults to `fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg`.
+<9> Name of rendition to use when importing. If the rendition is not supported by an asset type `Original File` is used. Default is `Original File`.
 
 == Webhooks
 

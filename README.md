@@ -12,6 +12,7 @@ fotoware.sites.sitename.clientSecret = ...
 #fotoware.sites.sitename.url = https://sitename.fotoware.cloud
 
 # These are the defaults, but they can be overridden:
+fotoware.sites.sitename.archiveName = 5000-All-files
 #fotoware.sites.sitename.project = default
 #fotoware.sites.sitename.path = FotoWare
 #fotoware.sites.sitename.rendition = Original File
@@ -54,6 +55,7 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 
 ### 1.0.0-SNAPSHOT
 
+* Set default archiveName to 5000-All-files
 * Explicitly set followRedirects: true (did not help)
 * Require Enonic 7.4.1
 * Node 12.20.1
