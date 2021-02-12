@@ -36,6 +36,7 @@ export const getAccessToken = ({
 	const tokenRequestParams = {
 		body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
 		contentType: 'application/x-www-form-urlencoded',
+		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 		method: 'POST',
 		headers: {
 			Accept: 'application/json'

@@ -7,6 +7,7 @@ export const getAssetList = ({
 }) => {
 	const assetListRequestParams = {
 		contentType: 'application/json',
+		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 		method: 'GET',
 		headers: {
 			Accept: 'application/vnd.fotoware.assetlist+json'

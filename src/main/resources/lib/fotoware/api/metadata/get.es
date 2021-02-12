@@ -12,6 +12,7 @@ export const getMetadataView = ({
 }) => {
 	const metadataViewRequestParams = {
 		contentType: 'application/json',
+		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 		/*headers: {
 			'Accept-Language': 'nb, no, en-US, en pt-BR' // Localization
 		},*/

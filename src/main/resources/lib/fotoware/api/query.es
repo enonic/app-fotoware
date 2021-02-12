@@ -15,6 +15,7 @@ export function query(params) {
 	} = params;
 	const queryRequest = {
 		contentType: 'application/json',
+		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 		method: 'GET',
 		//method: 'POST', // Method Not Allowed
 		headers: {
@@ -171,6 +172,7 @@ export function query(params) {
 			hostname,
 			request: {
 				contentType: 'application/json',
+				followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 				method: 'GET',
 				headers: {
 					Accept: 'application/vnd.fotoware.assetlist+json',

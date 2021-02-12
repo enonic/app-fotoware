@@ -54,6 +54,7 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 
 ### 1.0.0-SNAPSHOT
 
+* Explicitly set followRedirects: true (did not help)
 * Require Enonic 7.4.1
 * Node 12.20.1
 * Upgrade node modules (patch and minor)

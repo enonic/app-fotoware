@@ -29,7 +29,7 @@ export const requestRendition = ({
 		//contentType: 'multipart/mixed',
 
 		//followRedirects: false, // default is ?
-		followRedirects: true,
+		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 
 		//method: 'GET', // 404 Not Found
 		method: 'POST',
@@ -97,6 +97,7 @@ export const requestRendition = ({
 	//log.debug(`rendtitionRequestUrl:${toStr(rendtitionRequestUrl)}`);
 
 	const pollAndDownloadRenditionRequestParams = {
+		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 		method: 'GET',
 		url: rendtitionRequestUrl
 	};
