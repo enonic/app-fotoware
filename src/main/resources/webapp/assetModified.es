@@ -18,7 +18,7 @@ import {
 	removeAttachment
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
-import {readText} from '/lib/xp/io';
+import {getMimeType, readText} from '/lib/xp/io';
 import {submit} from '/lib/xp/task';
 
 // FotoWare modules
@@ -264,6 +264,7 @@ export const assetModified = (request) => {
 								addAttachment({
 									key: mediaPath,
 									//mimeType: doctype, // 'image' is a invalid mimetype
+									mimeType: getMimeType(filename),
 									name: filename,
 									data: downloadRenditionResponse.bodyStream
 								});
@@ -280,6 +281,7 @@ export const assetModified = (request) => {
 								addAttachment({
 									key: mediaPath,
 									//mimeType: doctype, // 'image' is a invalid mimetype
+									mimeType: getMimeType(filename),
 									name: filename,
 									data: downloadRenditionResponse.bodyStream
 								});
