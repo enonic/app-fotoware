@@ -1,11 +1,11 @@
 // Node modules
 import {diff} from 'deep-object-diff';
 
-//import * as deepEqual from 'fast-deep-equal';
 import deepEqual from 'fast-deep-equal';
 
 
 // Enonic modules
+//import {schedule, unschedule} from '/lib/cron';
 import {URL} from '/lib/galimatias';
 import {validateLicense} from '/lib/license';
 import {md5} from '/lib/text-encoding';
@@ -20,7 +20,10 @@ import {
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
 import {readText} from '/lib/xp/io';
-import {submit} from '/lib/xp/task';
+import {
+	submit//,
+	//submitNamed
+} from '/lib/xp/task';
 
 // FotoWare modules
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
@@ -32,6 +35,10 @@ import {X_APP_NAME} from '/lib/fotoware/xp/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
+
+
+//const CRON_DELAY = 1000 * 60; // A minute in milliseconds
+
 
 export const assetIngested = (request) => {
 	log.info(`request:${toStr(request)}`);
@@ -76,12 +83,12 @@ export const assetIngested = (request) => {
 	}
 
 	const {
-		href, // FQDN
+		href: hrefFromHook, // FQDN
 		data: {
 			filename
 		}
 	} = body;
-	//log.debug(`href:${toStr(href)}`);
+	//log.debug(`hrefFromHook:${toStr(hrefFromHook)}`);
 	//log.debug(`filename:${toStr(filename)}`);
 
 	if (filename.startsWith('.')) {
@@ -92,7 +99,7 @@ export const assetIngested = (request) => {
 		};
 	}
 
-	const url = new URL(href);
+	const url = new URL(hrefFromHook);
 	const site = url.getHost().replace('.fotoware.cloud', '');
 	//log.debug(`site:${toStr(site)}`);
 
@@ -114,6 +121,34 @@ export const assetIngested = (request) => {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}
+
+	/*submitNamed({
+		name: 'assetIngested',
+		config: {
+			archiveName,
+			clientId,
+			clientSecret,
+			filename,
+			hostname,
+			imports,
+			url
+		} // config
+	}); // submitNamed*/
+
+	/*
+	// This probably need to be totally unique, so that only once can run at a time.
+	const CRON_TASK_NAME = `assetIngested_${filename}`;
+
+	schedule({
+		name: CRON_TASK_NAME,
+		delay: CRON_DELAY,
+
+		// Even though we only run once this parameter is required, or you get
+		// ERROR c.e.x.p.i.e.ExceptionRendererImpl - Job cron or fixedDelay bigger then `0` must be set, but not both.
+		fixedDelay: 1000 * 60, // A minute in milliseconds.
+
+		times: 1, // Run once
+		callback: () => {*/
 
 	const {accessToken} = getAccessToken({
 		hostname,
@@ -195,14 +230,14 @@ export const assetIngested = (request) => {
 							//description,
 							display_name,
 							//height,
-							href//,
+							href: aRenditionHref//,
 							//original,
 							//profile,
 							//sizeFixed,
 							//width
 						}) => {
-							//log.debug(`display_name:${display_name} href:${href} height:${height} width:${width}`);
-							renditionsObj[display_name] = href;
+							//log.debug(`display_name:${display_name} aRenditionHref:${aRenditionHref} height:${height} width:${width}`);
+							renditionsObj[display_name] = aRenditionHref;
 						});
 						//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
 
@@ -316,6 +351,10 @@ export const assetIngested = (request) => {
 			}) // submit
 		); // runInContext
 	}); // forEach
+	//unschedule({name: CRON_TASK_NAME});
+	//} // callback
+	//context: // I set this inside the callback
+	//}); // schedule
 
 	return {
 		body: {},

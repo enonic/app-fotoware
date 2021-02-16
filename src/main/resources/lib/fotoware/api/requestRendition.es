@@ -8,6 +8,7 @@ export const requestRendition = ({
 	renditionServiceShortAbsolutePath,
 	renditionUrl
 }) => {
+	//log.info(`renditionUrl:${renditionUrl}`);
 	const renditionServiceRequestParams = {
 		/*body: {
 			href: renditionUrl
@@ -70,7 +71,7 @@ export const requestRendition = ({
 		//log.debug(`cookies:${toStr(cookies)}`);
 		renditionServiceRequestParams.headers.Cookie = cookies.map(({name, value}) => `${name}=${value}`).join('; ');
 	}
-	//log.debug(`renditionServiceRequestParams:${toStr(renditionServiceRequestParams)}`);
+	//log.info(`renditionServiceRequestParams:${toStr(renditionServiceRequestParams)}`);
 	const rendtitionServiceResponse = request(renditionServiceRequestParams);
 	//log.debug(`rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
 

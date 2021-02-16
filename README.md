@@ -55,6 +55,7 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 
 ### 1.0.0-SNAPSHOT
 
+
 * Webpack 5 doesn't like import * as
 * Set default archiveName to 5000-All-files
 * Explicitly set followRedirects: true (did not help)

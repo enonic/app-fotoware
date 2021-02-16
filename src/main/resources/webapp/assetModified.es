@@ -78,12 +78,12 @@ export const assetModified = (request) => {
 	}
 
 	const {
-		href, // FQDN
+		href: hrefFromHook, // FQDN
 		data: {
 			filename
 		}
 	} = body;
-	//log.debug(`href:${toStr(href)}`);
+	//log.debug(`hrefFromHook:${toStr(hrefFromHook)}`);
 	//log.debug(`filename:${toStr(filename)}`);
 
 	if (filename.startsWith('.')) {
@@ -94,7 +94,7 @@ export const assetModified = (request) => {
 		};
 	}
 
-	const url = new URL(href);
+	const url = new URL(hrefFromHook);
 	const site = url.getHost().replace('.fotoware.cloud', '');
 	//log.debug(`site:${toStr(site)}`);
 
@@ -166,7 +166,7 @@ export const assetModified = (request) => {
 						[archiveName]: true
 					}
 				});
-				//log.debug(`queryResult:${toStr(queryResult)}`);
+				//log.info(`queryResult:${toStr(queryResult)}`);
 
 				const {
 					assetCountTotal,
@@ -179,6 +179,7 @@ export const assetModified = (request) => {
 					log.error(`Querying for filename:${filename} returned more than one asset!`);
 				} else {
 					const {
+						//doctype,
 						filename: filenameFromQuery, // Should match or query is weird
 						//filesize,
 						//href,
@@ -187,6 +188,8 @@ export const assetModified = (request) => {
 						//renditionHref
 						renditions
 					} = collections[0].assets[0];
+					//log.info(`filenameFromQuery:${toStr(filenameFromQuery)}`);
+					//log.info(`metadata:${toStr(metadata)}`);
 					if (filename !== filenameFromQuery) {
 						throw new Error(`filename:${filename} from assetModified does not match filename:${filenameFromQuery} from query result`);
 					}
@@ -196,14 +199,14 @@ export const assetModified = (request) => {
 						//description,
 						display_name,
 						//height,
-						href//,
+						href: aRenditionHref//,
 						//original,
 						//profile,
 						//sizeFixed,
 						//width
 					}) => {
 						//log.debug(`display_name:${display_name} href:${href} height:${height} width:${width}`);
-						renditionsObj[display_name] = href;
+						renditionsObj[display_name] = aRenditionHref;
 					});
 					//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
 
@@ -219,6 +222,7 @@ export const assetModified = (request) => {
 						throw new Error(`Something went wrong when downloading rendition for renditionUrl:${renditionUrl}!`);
 					}
 					const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
+					//log.info(`md5sumOfDownload:${toStr(md5sumOfDownload)}`);
 
 					if (!exisitingMedia) {
 						const createMediaResult = createMedia({
@@ -252,12 +256,14 @@ export const assetModified = (request) => {
 							key: mediaPath,
 							name: filename
 						})));
+						//log.info(`md5sumOfExisitingMediaContent:${toStr(md5sumOfExisitingMediaContent)}`);
 						if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
 							log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
 							// TODO Modify attachment
 							try {
 								addAttachment({
 									key: mediaPath,
+									//mimeType: doctype, // 'image' is a invalid mimetype
 									name: filename,
 									data: downloadRenditionResponse.bodyStream
 								});
@@ -273,6 +279,7 @@ export const assetModified = (request) => {
 								// NOTE re-add old attachment with old name? nah, that information is in versions
 								addAttachment({
 									key: mediaPath,
+									//mimeType: doctype, // 'image' is a invalid mimetype
 									name: filename,
 									data: downloadRenditionResponse.bodyStream
 								});
@@ -280,11 +287,14 @@ export const assetModified = (request) => {
 						} else {
 							log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 						}
+
 						const maybeModifiedMediaContent = addMetadataToContent({
 							md5sum: md5sumOfDownload,
 							metadata,
 							content: JSON.parse(JSON.stringify(exisitingMedia))
 						});
+						//log.info(`maybeModifiedMediaContent:${toStr(maybeModifiedMediaContent)}`);
+
 						if (!deepEqual(exisitingMedia, maybeModifiedMediaContent)) {
 							const differences = diff(exisitingMedia, maybeModifiedMediaContent);
 							log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);

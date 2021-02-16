@@ -73,6 +73,7 @@ if (SERVER_JS_FILES.length) {
 		entry: SERVER_JS_ENTRY,
 		externals: [
 			// /^\//
+			'/lib/cron',
 			'/lib/galimatias',
 			'/lib/http-client',
 			'/lib/license',
@@ -216,6 +217,9 @@ if (SERVER_JS_FILES.length) {
 			filename: '[name].js',
 			libraryTarget: 'commonjs'
 		}, // output
+		performance: {
+			hints: false
+		},
 		plugins: [
 			new webpack.ProvidePlugin({
 				global: 'myGlobal'
