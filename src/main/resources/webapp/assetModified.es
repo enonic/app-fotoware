@@ -214,7 +214,7 @@ export const assetModified = (request) => {
 
 					const downloadRenditionResponse = requestRendition({
 						accessToken,
-						hostname: url,
+						hostname,
 						renditionServiceShortAbsolutePath: renditionRequest,
 						renditionUrl
 					});
