@@ -17,6 +17,7 @@ repositories {
 
 app {
 	name = project.appName
+	group = 'com.enonic.app'
 	displayName = 'FotoWare'
 	vendorName = 'Enonic AS'
 	vendorUrl = 'http://enonic.com'
