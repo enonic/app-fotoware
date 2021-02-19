@@ -55,18 +55,11 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.0.0-SNAPSHOT | 7.4.1 |
+| 1.0.0 | 7.5.0 |
 
 ## Changelog
 
-### 1.0.0-SNAPSHOT
+### 1.0.0
 
-
-* Webpack 5 doesn't like import * as
 * Set default archiveName to 5000-All-files
-* Explicitly set followRedirects: true (did not help)
-* Require Enonic 7.4.1
-* Node 12.20.1
-* Upgrade node modules (patch and minor)
-* Various build changes in attempt to upgrade to webpack 5
-* Success refresh works with webpack 5
+* Require Enonic 7.5.0
