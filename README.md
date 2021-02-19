@@ -64,3 +64,4 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 * Set default archiveName to 5000-All-files
 * Require Enonic 7.5.0
 * Node 14.15.5
+* Webpack 5

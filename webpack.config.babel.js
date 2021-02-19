@@ -221,14 +221,11 @@ if (SERVER_JS_FILES.length) {
 			hints: false
 		},
 		plugins: [
-			new webpack.ProvidePlugin({
-				global: 'myGlobal'
-			})
+			/*new webpack.ProvidePlugin({
+				global: '@enonic/global-polyfill'
+			})*/
 		],
 		resolve: {
-			alias: {
-				myGlobal: path.resolve(__dirname, 'src/main/resources/global')
-			},
 			extensions
 		}, // resolve
 		stats
