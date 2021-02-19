@@ -45,6 +45,12 @@ fotoware.sites.sitenameVideos.path = FotoWare Videos
 fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 ```
 
+## Known Issues
+
+* When renaming a file on the FotoWare server, the received asset modified doesn't contain information about the new filename. So we are unable to perform the rename on the Enonic XP side.
+* When duplicating a file on the FotoWare server no asset ingested is sent.
+* When moving a file on the FotoWare server, it actually make a copy, but no asset ingested nor asset modified is sent.
+
 ## Compatibility
 
 | App version | XP version |
