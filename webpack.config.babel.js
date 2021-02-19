@@ -14,8 +14,8 @@ import webpack from 'webpack';
 //──────────────────────────────────────────────────────────────────────────────
 // Common
 //──────────────────────────────────────────────────────────────────────────────
-const MODE = 'development';
-//const MODE = 'production';
+//const MODE = 'development';
+const MODE = 'production';
 const JS_EXTENSION_GLOB_BRACE = '*.{es,es6,mjs,jsx,flow,js}';
 const ASSETS_PATH_GLOB_BRACE = '{site/assets,assets}';
 
