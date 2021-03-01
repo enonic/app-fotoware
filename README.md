@@ -59,6 +59,9 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 
 ## Changelog
 
+### 1.0.1-SNAPSHOT
+
+* Node 14.16.0
 ### 1.0.0
 
 * Set default archiveName to 5000-All-files
