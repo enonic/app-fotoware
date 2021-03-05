@@ -19,6 +19,17 @@ import {post} from './post';
 import {getUploadLicenseForm} from './getUploadLicenseForm';
 import {postUploadLicense} from './postUploadLicense';
 
+/*
+react-dom/react-dom.production.min.js
+react-dom/react-dom.profiling.min.js
+react-dom/react-dom.development.js
+react/react.production.min.js
+react/react.development.js
+react/react.profiling.min.js
+*/
+//const REACT_MODE = 'production.min';
+const REACT_MODE = 'development';
+
 const router = Router();
 
 export const all = (r) => router.dispatch(r);
@@ -53,18 +64,18 @@ function get(/*request*/) {
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<meta name="theme-color" content="#ffffff">
 
-		<script src="https://unpkg.com/react@latest/umd/react.development.js" crossorigin="anonymous"></script>
-		<script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js"></script>
-		<script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js" crossorigin="anonymous"></script>
-		<script src="https://unpkg.com/babel-standalone@latest/babel.min.js" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="${assetUrl({path: `js/react/react.${REACT_MODE}.js`})}"></script>
+		<script type="text/javascript" src="${assetUrl({path: `js/react-dom/react-dom.${REACT_MODE}.js`})}"></script>
+		<script type="text/javascript" src="${assetUrl({path: `js/@material-ui/material-ui.${REACT_MODE}.js`})}"></script>
+		<script type="text/javascript" src="${assetUrl({path: 'js/@babel/standalone/babel.min.js'})}"></script>
 
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+		<link rel="stylesheet" href="${assetUrl({path: 'fonts/fonts.css'})}" />
 
 		<link rel="shortcut icon" href="${assetsUrl}/images/ico/fotoware.ico">
 
 		<link rel="stylesheet" type="text/css" href="${assetsUrl}/admin/common/styles/lib.css">
 		<script defer src="${assetsUrl}/admin/common/js/lib.js" type="text/javascript"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment-with-locales.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="${assetUrl({path: 'js/moment/moment-with-locales.min.js'})}"></script>
 		<style>
 			form {
 				display: inline-block;

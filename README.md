@@ -59,16 +59,18 @@ fotoware.sites.sitenameVideos.path = fn:*.mov|fn:*.mp4
 
 ## Changelog
 
-### 1.0.1-SNAPSHOT
-
-* Node 14.16.0
-* Babel modules 7.13.8
-* core-js 3.9.1
-* webpack 5.24.2
-
 ### 1.0.0
 
 * Set default archiveName to 5000-All-files
 * Require Enonic 7.5.0
-* Node 14.15.5
-* Webpack 5
+* Make assets local:
+  * Babel standalone
+  * Google fonts
+  * Material-UI
+  * Moment
+  * React and React DOM
+* Build system upgrades:
+  * Node 14.16.0
+  * Babel modules 7.13.9
+  * Core-js 3.9.1
+  * Webpack 5.24.3

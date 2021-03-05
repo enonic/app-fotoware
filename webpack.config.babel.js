@@ -2,9 +2,14 @@
 //──────────────────────────────────────────────────────────────────────────────
 // Imports
 //──────────────────────────────────────────────────────────────────────────────
+import CopyPlugin from 'copy-webpack-plugin';
+//import GetGoogleFonts from 'get-google-fonts';
 import glob from 'glob';
+//import GoogleFontsPlugin from 'google-fonts-webpack-plugin';
 import path from 'path';
-import webpack from 'webpack';
+//import webpack from 'webpack';
+
+//new GetGoogleFonts().download('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap');
 
 // Currently requires webpack 4
 //import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
@@ -67,6 +72,8 @@ if (SERVER_JS_FILES.length) {
 		`.${k.replace(`${SRC_DIR}`, '')}` // source relative to context
 	]));
 	//console.log(`SERVER_JS_ENTRY:${toStr(SERVER_JS_ENTRY)}`);
+
+	const NODE_MODULES_CONTEXT = path.resolve(__dirname, 'node_modules');
 
 	const SERVER_JS_CONFIG = {
 		context,
@@ -221,6 +228,32 @@ if (SERVER_JS_FILES.length) {
 			hints: false
 		},
 		plugins: [
+			new CopyPlugin({
+				patterns: [
+					{ context: NODE_MODULES_CONTEXT, from: '@babel/standalone/babel.*.js', to: 'assets/js/@babel/standalone/[name][ext]' },
+					{ context: NODE_MODULES_CONTEXT, from: '@material-ui/core/umd/material-ui.*.js', to: 'assets/js/@material-ui/[name][ext]' },
+					{ context: NODE_MODULES_CONTEXT, from: 'moment/min/*.js', to: 'assets/js/moment/[name][ext]' },
+					{ context: NODE_MODULES_CONTEXT, from: 'react/umd/react.*.js', to: 'assets/js/react/[name][ext]' },
+					{ context: NODE_MODULES_CONTEXT, from: 'react-dom/umd/react-dom.*.js', to: 'assets/js/react-dom/[name][ext]' },
+				]
+			}),
+			/*
+			Not Webpack 5 compatible?
+			[webpack-cli] TypeError: compiler.plugin is not a function
+			new GoogleFontsPlugin({
+				fonts: [
+					//{ family: "Source Sans Pro" },
+					{
+						family: 'Roboto',
+						variants: [
+							'300',
+							'400',
+							'500',
+							'700'
+						]
+					}
+				]
+			})*/
 			/*new webpack.ProvidePlugin({
 				global: '@enonic/global-polyfill'
 			})*/

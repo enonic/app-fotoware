@@ -139,7 +139,7 @@ processResources {
 	//include '**/*.xml'
 
 	// Let webpack handle these (rather than gradle)
-	exclude '**/*.css'
+	//exclude '**/*.css' // We need google fonts
 	exclude '**/*.es'
 	exclude '**/*.js'
 	exclude '**/*.jsx'
