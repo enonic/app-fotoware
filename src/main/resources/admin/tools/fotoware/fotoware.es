@@ -104,8 +104,6 @@ function get(/*request*/) {
 		</div>
 		<main style="padding: 59px 15px 0px 15px">
 			<div id="root"></div>
-			<h2>Documentation</h2>
-			Read the <a href="fotoware/doc/">documentation</a>.
 		</main>
 
 		<script type="text/babel">
