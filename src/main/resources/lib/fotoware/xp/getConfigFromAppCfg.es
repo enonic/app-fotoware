@@ -1,7 +1,7 @@
 //import {toStr} from '/lib/util';
 import {deepen} from '/lib/fotoware/xp/deepen';
 //import {deepen} from './deepen';
-import {capitalize} from '/lib/fotoware/xp/capitalize';
+//import {capitalize} from '/lib/fotoware/xp/capitalize';
 
 export function getConfigFromAppCfg() {
 	//log.debug(`app.config:${toStr(app.config)}`);
@@ -57,37 +57,41 @@ export function getConfigFromAppCfg() {
 		}
 
 	}); // foreach
-	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
+	//log.info(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 	const projectPaths = {};
-	Object.keys(imports).forEach((site) => {
-		//log.debug(`site:${toStr(site)}`);
-		if (!sitesConfigs[site]) {
+	Object.keys(imports).forEach((importName) => {
+		const {
+			project,
+			path = 'fotoware',
+			query = 'fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg',
+			rendition = 'Original File',
+			site
+		} = imports[importName];
+		//log.info(`project:${toStr(project)}`);
+		//log.info(`path:${toStr(path)}`);
+		//log.info(`query:${toStr(query)}`);
+		//log.info(`rendition:${toStr(rendition)}`);
+		//log.info(`site:${toStr(site)}`);
+		if (!site) {
+			log.error(`Import ${importName} is missing site!`);
+		} else if (!project) {
+			log.error(`Import ${importName} is missing project!`);
+		} else if (!sitesConfigs[site]) {
 			log.error(`Unconfigured site ${site}!`);
+		} else if (projectPaths[project] && projectPaths[project] === path) {
+			log.error(`Two imports cannot have the same project:${project} and path:${path}!`);
 		} else {
-			Object.keys(imports[site]).forEach((importName) => {
-				//log.debug(`importName:${toStr(importName)}`);
-				const {
-					rendition = 'Original File',
-					query = 'fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg',
-					project = 'default',
-					path = capitalize(importName)
-				} = imports[site][importName];
-				if (projectPaths[project] && projectPaths[project] === path) {
-					log.error(`Two imports cannot have the same project:${project} and path:${path}!`);
-				} else {
-					projectPaths[project] = path;
-					sitesConfigs[site].imports.[importName] = {
-						rendition,
-						query,
-						project,
-						path
-					}
-				}
-			});
+			projectPaths[project] = path;
+			sitesConfigs[site].imports[importName] = {
+				path,
+				project,
+				query,
+				rendition
+			};
 		}
 	});
-	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
+	//log.info(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 	return {
 		sitesConfigs
