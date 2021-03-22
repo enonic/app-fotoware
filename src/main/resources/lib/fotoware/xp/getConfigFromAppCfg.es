@@ -23,7 +23,7 @@ export function getConfigFromAppCfg() {
 		const {
 			//archiveName = '5000-Archive',
 			archiveName = '5000-All-files',
-			url = `https://${site}.fotoware.cloud`,
+			url = '', // `https://${site}.fotoware.cloud`,
 			remoteAddresses = {},
 			clientSecret,
 			clientId
@@ -38,6 +38,8 @@ export function getConfigFromAppCfg() {
 			log.error(`Site ${site} is missing clientId!`);
 		} else if(!clientSecret) {
 			log.error(`Site ${site} is missing clientSecret!`);
+		} else if(!url) {
+			log.error(`Site ${site} is missing url!`);
 		} else {
 			sitesConfigs[site] = {
 				archiveName,
