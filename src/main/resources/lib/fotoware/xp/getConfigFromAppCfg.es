@@ -24,15 +24,15 @@ export function getConfigFromAppCfg() {
 			//archiveName = '5000-Archive',
 			archiveName = '5000-All-files',
 			url = '', // `https://${site}.fotoware.cloud`,
-			remoteAddresses = {},
+			allowWebhookFromIp = 'localhost',
 			clientSecret,
 			clientId
 		} = sites[site];
+		//log.info(`allowWebhookFromIp:${toStr(allowWebhookFromIp)}`);
 		/*log.debug(`${toStr({
 			clientId,
 			clientSecret,
-			url,
-			remoteAddresses
+			url
 		})}`);*/
 		if (!clientId) {
 			log.error(`Site ${site} is missing clientId!`);
@@ -41,6 +41,11 @@ export function getConfigFromAppCfg() {
 		} else if(!url) {
 			log.error(`Site ${site} is missing url!`);
 		} else {
+			const remoteAddresses = {};
+			allowWebhookFromIp.split(/\s*,\s*/).forEach((ip) => {
+				remoteAddresses[ip] = true;
+			});
+			//log.info(`remoteAddresses:${toStr(remoteAddresses)}`);
 			sitesConfigs[site] = {
 				archiveName,
 				url,
