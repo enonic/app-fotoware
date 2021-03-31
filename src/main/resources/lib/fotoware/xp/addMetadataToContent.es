@@ -41,6 +41,8 @@ export const addMetadataToContent = ({
 		delete dereffedMetadata[120];
 	}
 
+	// TODO remove the field containing the Enonic node._id
+
 	const metadataObj = {};
 	Object.keys(dereffedMetadata).forEach((k) => {
 		metadataObj[k] = unforceArray(dereffedMetadata[k].value);

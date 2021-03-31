@@ -1,10 +1,12 @@
 //import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
 
-//import {getMetadataView} from '/lib/fotoware/api/metadata/get';
+import {getMetadataView} from '/lib/fotoware/api/metadata/get';
 import {paginate} from '/lib/fotoware/api/paginate';
+import {camelize} from '/lib/fotoware/xp/camelize';
 import {request} from '/lib/http-client';
 import {toStr} from '/lib/util';
+
 
 export function query(params) {
 	const {
@@ -55,26 +57,30 @@ export function query(params) {
 	}
 
 	let assetCountTotal = 0;
-	//const fields = {};
-	//const unknownFields = {};
-	//const metadataHrefs = {};
+	const fields = {};
+	const unknownFields = {};
+	const metadataHrefs = {};
 
 	const collections = collectionList.data.map(({
 		assetCount,
 		href,
-		/*metadataEditor: {
+		metadataEditor: {
 			href: collectionMetadataHref
-		},*/
-		originalURL
+		},
+		originalURL//,
+		//...rest
 	}) => ({
 		assetCount,
 		collectionId: originalURL.replace(/\/$/, '').replace(/^.*\//, ''),
-		//collectionMetadataHref,
-		href
+		collectionMetadataHref,
+		href//,
+		//rest
 	})).filter(({
 		assetCount,
-		collectionId
+		collectionId//,
+		//rest
 	}) => { // False gets removed
+		//log.debug(`rest:${toStr(rest)}`);
 		if (!assetCount) {
 			//log.debug(`No hits collectionId:${toStr(collectionId)}`);
 			return false;
@@ -92,12 +98,12 @@ export function query(params) {
 	}).map(({
 		assetCount,
 		collectionId,
-		//collectionMetadataHref,
+		collectionMetadataHref,
 		href
 	}) => {
 		//log.debug(`href:${toStr(href)}`); // /fotoweb/archives/5000-Archive/?q=
 		assetCountTotal += assetCount;
-		/*if (!metadataHrefs[collectionMetadataHref]) {
+		if (!metadataHrefs[collectionMetadataHref]) {
 			//log.debug(`New metadataEditor in collection ${collectionId} href:${collectionMetadataHref}`);
 			metadataHrefs[collectionMetadataHref] = true;
 			getMetadataView({
@@ -106,7 +112,7 @@ export function query(params) {
 				hostname,
 				shortAbsolutePath: collectionMetadataHref
 			});
-		}*/
+		}
 		// NOTE 17.7 seconds when processing metadata, 1.6 seconds when not
 		// Skipping the deepEqual wasn't good enough, still 17.6 seconds
 		// Skipping filter 17.3
@@ -131,12 +137,14 @@ export function query(params) {
 					filesize,
 					href,
 					metadata,
-					/*metadataEditor: {
+					metadataEditor: {
 						href: assetMetadataHref
-					},*/
-					renditions
+					},
+					renditions//,
+					//...pageRest
 				}) => {
-					/*if (!metadataHrefs[assetMetadataHref]) {
+					//log.debug(`pageRest:${toStr(pageRest)}`);
+					if (!metadataHrefs[assetMetadataHref]) {
 						log.debug(`New metadataEditor in asset ${href} href:${assetMetadataHref}`); // Haven's seen this happen yet.
 						metadataHrefs[assetMetadataHref] = true;
 						getMetadataView({
@@ -153,10 +161,10 @@ export function query(params) {
 						} else {
 							if (!unknownFields[k]) {
 								unknownFields[k] = true;
-								//log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])} assetHref:${href} editorHref:${assetMetadataHref}`);
+								log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])} assetHref:${href} editorHref:${assetMetadataHref}`);
 							}
 						}
-					});*/
+					});
 					//log.debug(`metadataArray:${toStr(metadataArray)}`);
 					collectionObj.assets.push({
 						doctype,

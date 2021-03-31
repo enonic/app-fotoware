@@ -1,39 +1,43 @@
-import {diff} from 'deep-object-diff';
+//import {diff} from 'deep-object-diff';
 
-//import * as deepEqual from 'fast-deep-equal';
-import deepEqual from 'fast-deep-equal';
+//import deepEqual from 'fast-deep-equal';
 
+//import {assetUpdate} from '/lib/fotoware/api/asset/update';
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
-import {requestRendition} from '/lib/fotoware/api/requestRendition';
+//import {getTaxonomies} from '/lib/fotoware/api/taxonomies/get';
+//import {getTaxonomyField} from '/lib/fotoware/api/taxonomies/getField';
+//import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {
 	REPO_BRANCH,
 	REPO_ID
 } from '/lib/fotoware/xp/constants';
-import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
-import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
-import {isPublished} from '/lib/fotoware/xp/isPublished';
-import {md5} from '/lib/text-encoding';
+//import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
+//import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
+//import {isPublished} from '/lib/fotoware/xp/isPublished';
+//import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-import {sanitize} from '/lib/xp/common';
+//import {sanitize} from '/lib/xp/common';
 import {
-	addAttachment,
+	//addAttachment,
 	create as createContent,
-	createMedia,
-	get as getContentByKey,
-	getAttachmentStream,
-	publish,
-	removeAttachment
+	//createMedia,
+	get as getContentByKey//,
+	//getAttachmentStream,
+	//publish,
+	//removeAttachment
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
-import {readText} from '/lib/xp/io';
+//import {readText} from '/lib/xp/io';
 import {connect} from '/lib/xp/node';
 
+import {handleExistingMedia} from './handleExistingMedia';
+import {handleNewMedia} from './handleNewMedia';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
-const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
+//const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 
 /*class StateClass {
 	constructor() {
@@ -154,6 +158,27 @@ export function run(params) {
 			clientSecret
 		});
 
+
+		//──────────────────────────────────────────────────────────────────────
+		// Testing taxonomies
+		//──────────────────────────────────────────────────────────────────────
+		/*const taxonomies = getTaxonomies({
+			accessToken,
+			hostname: url
+		});
+		log.debug(`taxonomies:${toStr(taxonomies)}`);
+
+		taxonomies.forEach(({field: fieldId}) => {
+			const taxonomyField = getTaxonomyField({
+				accessToken,
+				fieldId,
+				hostname: url
+			});
+			log.debug(`taxonomyField:${toStr(taxonomyField)}`);
+		});*/
+		//──────────────────────────────────────────────────────────────────────
+
+
 		progress.finishItem(/*'Getting accessToken'*/).setInfo('Getting API Descriptor').report();
 		// Progress should be [3/5] Getting API Descriptor
 
@@ -168,7 +193,7 @@ export function run(params) {
 
 		progress.finishItem(/*'apiDescriptor'*/).setInfo(`Querying for assets`).report();
 
-		const res = doQuery({
+		const queryRes = doQuery({
 			accessToken,
 			blacklistedCollections: {}, // NOTE Intentional hardcode
 			hostname: url,
@@ -178,13 +203,15 @@ export function run(params) {
 				[archiveName]: true
 			}
 		});
+		//log.debug(`queryRes:${toStr(queryRes)}`);
 
 		progress.finishItem(/*'Finished querying for assets'*/)//.report();
 
 		const {
 			assetCountTotal,
 			collections
-		} = res;
+		} = queryRes;
+		//log.debug(`collections:${toStr(collections)}`);
 
 		progress.addItems(assetCountTotal); // Found assets to process
 
@@ -199,7 +226,13 @@ export function run(params) {
 		};
 
 		try {
-			collections.forEach(({assets}) => {
+			collections.forEach(({
+				//assetCount,
+				assets//,
+				//collectionId,
+				//...rest
+			}) => {
+				//log.debug(`rest:${toStr(rest)}`);
 				//assets = [assets[0]]; // DEBUG
 				assets.forEach((asset) => {
 					runInContext({
@@ -237,6 +270,8 @@ export function run(params) {
 						renditions
 						//renditionHref
 					} = asset;
+					//log.debug(`metadata:${toStr(metadata)}`);
+					//log.debug(`metadataObj:${toStr(metadataObj)}`); // Undefined on Enonic Test Server
 
 					const currentAsset = `${url}${assetHref}`;
 					journal.currentAsset = currentAsset;
@@ -280,146 +315,33 @@ export function run(params) {
 						// 3. exist !resume check binary size and md5, modify attachment if changed, same with metadata
 
 						if (!exisitingMediaContent) {
-							//log.debug(`renditions:${toStr(renditions)}`);
-							let downloadRenditionResponse;
-							try {
-								downloadRenditionResponse = requestRendition({
-									accessToken,
-									hostname: url,
-									renditionServiceShortAbsolutePath: renditionRequest,
-									renditionUrl
-								});
-							} catch (e) {
-								// Errors are already logged, simply skip and continue
-							}
-
-							if (downloadRenditionResponse) {
-								const createMediaResult = createMedia({
-									parentPath: `/${path}`,
-									name: mediaName,
-									data: downloadRenditionResponse.bodyStream
-								});
-								if (!createMediaResult) {
-									const mediaPath = `/${path}/${mediaName}`;
-									journal.errors.push(currentAsset);
-									const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
-									log.error(errMsg);
-									throw new Error(errMsg);
-								}
-								journal.created.push(currentAsset);
-								const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
-								modifyMediaContent({
-									exisitingMediaContent,
-									key: createMediaResult._id,
-									md5sum,
-									mediaPath,
-									metadata
-								});
-							} // if downloadRenditionResponse
-						} else { // Media exist
-							const {
-								x: {
-									[X_APP_NAME]: {
-										'fotoWare': {
-											'md5sum': md5sumFromXdata
-										} = {}
-									} = {}
-								} = {}
-							} = exisitingMediaContent;
-							//log.debug(`mediaPath:${mediaPath} md5sumFromXdata:${md5sumFromXdata}`);
-
-							const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(getAttachmentStream({
-								key: mediaPath,
-								name: mediaName
-							})));
-							//log.debug(`mediaPath:${mediaPath} md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent}`);
-							let md5sumToStore = md5sumOfExisitingMediaContent;
-							//log.debug(`mediaPath:${mediaPath} md5sumToStore:${md5sumToStore}`);
-
-							if (!boolResume) {
-								let downloadRenditionResponse;
-								try {
-									downloadRenditionResponse = requestRendition({
-										accessToken,
-										hostname: url,
-										renditionServiceShortAbsolutePath: renditionRequest,
-										renditionUrl
-									});
-								} catch (e) {
-									// Errors are already logged, simply skip and continue
-								}
-								if (downloadRenditionResponse) {
-									const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
-									if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
-										log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
-										// TODO Modify attachment
-										try {
-											addAttachment({
-												key: mediaPath,
-												name: mediaName,
-												data: downloadRenditionResponse.bodyStream
-											});
-										} catch (e) {
-											// Just to see what happens if you try to add an attachment that already exists
-											log.error(e);
-											log.error(e.class.name);
-											log.error(e.message);
-											removeAttachment({
-												key: mediaPath,
-												name: mediaName
-											});
-											// NOTE re-add old attachment with old name? nah, that information is in versions
-											addAttachment({
-												key: mediaPath,
-												name: mediaName,
-												data: downloadRenditionResponse.bodyStream
-											});
-										}
-										journal.modified.push(currentAsset);
-									} else {
-										log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
-									}
-									md5sumToStore = md5sumOfDownload;
-								}
-							} // if !boolResume
-
-							// NOTE Could generate md5sum from possibly modified attachment here.
-
-							const maybeModifiedMediaContent = addMetadataToContent({
-								md5sum: md5sumToStore,
+							handleNewMedia({
+								accessToken,
+								currentAsset,
+								journal,
+								hostname: url,
+								mediaName,
+								mediaPath,
 								metadata,
-								content: JSON.parse(JSON.stringify(exisitingMediaContent))
+								path,
+								renditionRequest,
+								renditionUrl
 							});
-
-							if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
-								const differences = diff(exisitingMediaContent, maybeModifiedMediaContent);
-								log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
-								modifyMediaContent({
-									exisitingMediaContent,
-									key: mediaPath,
-									md5sum: md5sumToStore,
-									mediaPath,
-									metadata
-								});
-								journal.modifiedMetadata.push(currentAsset);
-							} else {
-								//log.debug(`mediaPath:${mediaPath} no differences :)`);
-								journal.unchanged.push(currentAsset);
-							}
-							if (isPublished({
-								key: mediaPath,
-								project
-							})) {
-								const publishParams = {
-									includeDependencies: false,
-									keys:[mediaPath],
-									sourceBranch: 'draft',
-									targetBranch: 'master'
-								};
-								//log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
-								const publishRes = publish(publishParams);
-								log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
-							}
+						} else { // Media exist
+							handleExistingMedia({
+								accessToken,
+								boolResume,
+								currentAsset,
+								exisitingMediaContent,
+								hostname: url,
+								journal,
+								mediaName,
+								mediaPath,
+								metadata,
+								project,
+								renditionRequest,
+								renditionUrl
+							});
 						} // else exisitingMediaContent
 					} // valid filename
 					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
