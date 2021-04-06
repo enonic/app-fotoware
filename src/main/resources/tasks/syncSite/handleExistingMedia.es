@@ -107,6 +107,7 @@ export function handleExistingMedia({
 	const maybeModifiedMediaContent = addMetadataToContent({
 		md5sum: md5sumToStore,
 		metadata,
+		mediaName,
 		content: JSON.parse(JSON.stringify(exisitingMediaContent))
 	});
 
@@ -117,6 +118,7 @@ export function handleExistingMedia({
 			exisitingMediaContent,
 			key: mediaPath,
 			md5sum: md5sumToStore,
+			mediaName,
 			mediaPath,
 			metadata
 		});

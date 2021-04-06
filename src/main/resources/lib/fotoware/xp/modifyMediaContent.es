@@ -9,6 +9,7 @@ export const modifyMediaContent = ({
 	exisitingMediaContent, // can be undefined
 	key,
 	md5sum,
+	mediaName,
 	mediaPath,
 	metadata
 }) => {
@@ -18,6 +19,7 @@ export const modifyMediaContent = ({
 			editor: (content) => addMetadataToContent({
 				md5sum,
 				metadata,
+				mediaName,
 				content
 			}),
 			requireValid: false // May contain extra undefined x-data

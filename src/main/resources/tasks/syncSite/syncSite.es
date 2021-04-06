@@ -18,14 +18,15 @@ import {
 //import {isPublished} from '/lib/fotoware/xp/isPublished';
 //import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-//import {sanitize} from '/lib/xp/common';
+import {sanitize} from '/lib/xp/common';
 import {
 	//addAttachment,
 	create as createContent,
 	//createMedia,
-	get as getContentByKey//,
+	get as getContentByKey,
 	//getAttachmentStream,
 	//publish,
+	query as queryForContent
 	//removeAttachment
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
@@ -37,7 +38,7 @@ import {handleNewMedia} from './handleNewMedia';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
-//const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
+const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 
 /*class StateClass {
 	constructor() {
@@ -289,7 +290,44 @@ export function run(params) {
 					} else {
 						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
 						const mediaPath = `/${path}/${mediaName}`;
-						const exisitingMediaContent = getContentByKey({key: mediaPath});
+
+						const contentQueryParams = {
+							count: -1,
+							filters: {
+								boolean: {
+									must: [
+										/*{
+											exists: {
+												field: `x.${X_APP_NAME}.fotoWare.filename`
+											}
+										},*/
+										{
+											hasValue: {
+												field: `x.${X_APP_NAME}.fotoWare.filename`,
+												values: [
+													mediaName
+												]
+											}
+										}
+									]
+								}
+							}
+							//query: `x.${X_APP_NAME}.fotoWare.filename = ${mediaName}`
+						};
+						//log.debug(`contentQueryParams:${toStr(contentQueryParams)}`);
+						const contentQueryResult = queryForContent(contentQueryParams);
+						//log.debug(`contentQueryResult:${toStr(contentQueryResult)}`);
+
+						let exisitingMediaContent;
+						if (contentQueryResult.total === 0) {
+							// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
+							exisitingMediaContent = getContentByKey({key: mediaPath});
+						} else if (contentQueryResult.total === 1) {
+							exisitingMediaContent = contentQueryResult.hits[0];
+						} else if (contentQueryResult.total > 1) {
+							log.error(`Found more than one content with FotoWare filename:${mediaName} ids:${contentQueryResult.hits.map(({_id}) => _id).join(', ')}`);
+							exisitingMediaContent = -1;
+						}
 
 						const renditionsObj = {};
 						renditions.forEach(({
@@ -313,8 +351,9 @@ export function run(params) {
 						// 1. !exist (resume or not doesn't matter) download and create
 						// 2. exist resume check metadata modify if changes
 						// 3. exist !resume check binary size and md5, modify attachment if changed, same with metadata
-
-						if (!exisitingMediaContent) {
+						if (exisitingMediaContent === -1) {
+							// no-op
+						} else if (!exisitingMediaContent) {
 							handleNewMedia({
 								accessToken,
 								currentAsset,

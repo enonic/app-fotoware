@@ -1,4 +1,4 @@
-import {assetUpdate} from '/lib/fotoware/api/asset/update';
+//import {assetUpdate} from '/lib/fotoware/api/asset/update';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 
@@ -41,13 +41,13 @@ export function handleNewMedia({
 		});
 		log.debug(`createMediaResult:${toStr(createMediaResult)}`);
 
-		assetUpdate({
+		/*assetUpdate({
 			accessToken,
 			fullAssetUrl: currentAsset,
 			metadata: {
 				255: createMediaResult._id
 			}
-		}); // TODO This data won't be in Enonic before second sync?
+		});*/ // TODO This data won't be in Enonic before second sync?
 
 		if (!createMediaResult) {
 			journal.errors.push(currentAsset);
@@ -60,6 +60,7 @@ export function handleNewMedia({
 		modifyMediaContent({
 			key: createMediaResult._id,
 			md5sum,
+			mediaName,
 			mediaPath,
 			metadata
 		});

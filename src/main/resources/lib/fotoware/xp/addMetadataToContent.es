@@ -8,6 +8,7 @@ const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 export const addMetadataToContent = ({
 	md5sum,
 	metadata,
+	mediaName,
 	content
 }) => {
 	const dereffedMetadata = JSON.parse(JSON.stringify(metadata));
@@ -48,12 +49,28 @@ export const addMetadataToContent = ({
 		metadataObj[k] = unforceArray(dereffedMetadata[k].value);
 	});
 
-	content.x[X_APP_NAME] = {
-		'fotoWare': {
-			'md5sum': md5sum, // https://github.com/enonic/xp/issues/8281#issuecomment-678994176
-			'metadata': metadataObj
-		}
-	}; // eslint-disable-line no-param-reassign
+	if (!content.x) { content.x = {}; }
+	if (!content.x[X_APP_NAME]) { content.x[X_APP_NAME] = {}; }
+	if (!content.x[X_APP_NAME].fotoWare) { content.x[X_APP_NAME].fotoWare = {}; }
+
+	// Only add name if missing aka never change it
+	if (!content.x[X_APP_NAME].fotoWare.filename) {
+		content.x[X_APP_NAME].fotoWare.filename = mediaName;
+	} else if (content.x[X_APP_NAME].fotoWare.filename !== mediaName) {
+		log.error(`not changing filename from:${content.x[X_APP_NAME].fotoWare.filename} to ${mediaName}!`);
+	}
+
+	// Always update md5sum
+	if (!content.x[X_APP_NAME].fotoWare.md5sum) {
+		content.x[X_APP_NAME].fotoWare.md5sum = md5sum;
+	} else if (content.x[X_APP_NAME].fotoWare.md5sum !== md5sum) {
+		log.warning(`md5sum changed from:${content.x[X_APP_NAME].fotoWare.md5sum} to ${md5sum} on mediaName:${mediaName}`);
+		content.x[X_APP_NAME].fotoWare.md5sum = md5sum;
+	}
+
+	// TODO Deepdiff?
+	content.x[X_APP_NAME].fotoWare.metadata = metadataObj;
+
 	//log.debug(`modified content:${toStr(content)}`);
 	return content;
 }

@@ -11,6 +11,7 @@ Integration with Fotoware
 
 ### 1.0.0
 
+* Keep original FotoWare filename in x-data, to allow rename in Enonic XP
 * Set default archiveName to 5000-All-files
 * Require Enonic 7.5.0
 * Make assets local:
@@ -21,6 +22,6 @@ Integration with Fotoware
   * React and React DOM
 * Build system upgrades:
   * Node 14.16.0
-  * Babel modules 7.13.9
-  * Core-js 3.9.1
-  * Webpack 5.24.3
+  * Babel modules 7.13.14
+  * Core-js 3.10.0
+  * Webpack 5.30.0
