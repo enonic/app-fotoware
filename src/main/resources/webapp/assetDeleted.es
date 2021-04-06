@@ -37,6 +37,8 @@ import {query as doQuery} from '/lib/fotoware/api/query';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 //import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
+import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
+
 
 export const assetDeleted = (request) => {
 	//log.info(`request:${toStr(request)}`);
@@ -157,8 +159,23 @@ export const assetDeleted = (request) => {
 				description: '',
 				task: () => {
 					const mediaPath = `/${path}/${filename}`;
-					const exisitingMedia = getContentByKey({key: mediaPath});
-					if (!exisitingMedia) {
+
+					const contentQueryResult = queryForFilename({filename});
+					let exisitingMediaContent;
+					if (contentQueryResult.total === 0) {
+						// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
+						exisitingMediaContent = getContentByKey({key: mediaPath});
+					} else if (contentQueryResult.total === 1) {
+						exisitingMediaContent = contentQueryResult.hits[0];
+					} else if (contentQueryResult.total > 1) {
+						log.error(`Found more than one content with FotoWare filename:${filename} ids:${contentQueryResult.hits.map(({_id}) => _id).join(', ')}`);
+						exisitingMediaContent = -1;
+					}
+
+
+					if (exisitingMediaContent === -1) {
+						// no-op
+					} else if (!exisitingMediaContent) {
 						log.error(`mediaPath:${mediaPath} not found! Perhaps deleted manually.`);
 					} else {
 						const queryResult = doQuery({
@@ -184,7 +201,7 @@ export const assetDeleted = (request) => {
 							const queryContentParams = {
 								//count: 1, // DEBUG
 								count: -1,
-								query: `_references = '${exisitingMedia._id}'`
+								query: `_references = '${exisitingMediaContent._id}'`
 							};
 							//log.debug(`queryContentParams:${toStr(queryContentParams)}`);
 
@@ -207,7 +224,7 @@ export const assetDeleted = (request) => {
 									const path = this.path;//.join('.');
 									//log.debug(`path:${toStr(path)} value:${toStr(value)}`);
 									if (Array.isArray(value) || isString(value)) {
-										if (value.includes(exisitingMedia._id)) {
+										if (value.includes(exisitingMediaContent._id)) {
 											setIn(obj, path, value);
 										}
 									}
@@ -217,8 +234,8 @@ export const assetDeleted = (request) => {
 							log.debug(`queryContentRes:${toStr(queryContentRes)}`);
 
 							if (queryContentRes.total === 0) {
-								log.info(`No reference to exisitingMedia._id:${exisitingMedia._id} found. Going ahead with delete :)`);
-								const deleteContentRes = deleteContent({key: exisitingMedia._id});
+								log.info(`No reference to exisitingMedia._id:${exisitingMediaContent._id} found. Going ahead with delete :)`);
+								const deleteContentRes = deleteContent({key: exisitingMediaContent._id});
 								if (deleteContentRes) {
 									if (isPublished({
 										key: mediaPath,
@@ -235,10 +252,10 @@ export const assetDeleted = (request) => {
 										log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
 									}
 								} else {
-									log.error(`Something went wrong while trying to delete ${exisitingMedia._id}`);
+									log.error(`Something went wrong while trying to delete ${exisitingMediaContent._id}`);
 								}
 							} else {
-								log.warning(`${queryContentRes.total} reference(s) to exisitingMedia._id:${exisitingMedia._id} found! Skipping delete.`);
+								log.warning(`${queryContentRes.total} reference(s) to exisitingMedia._id:${exisitingMediaContent._id} found! Skipping delete.`);
 							}
 
 						} else if (assetCountTotal > 1) {

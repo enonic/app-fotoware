@@ -16,17 +16,17 @@ import {
 //import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 //import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
 //import {isPublished} from '/lib/fotoware/xp/isPublished';
+import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 //import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-import {sanitize} from '/lib/xp/common';
+//import {sanitize} from '/lib/xp/common';
 import {
 	//addAttachment,
 	create as createContent,
 	//createMedia,
-	get as getContentByKey,
+	get as getContentByKey//,
 	//getAttachmentStream,
-	//publish,
-	query as queryForContent
+	//publish
 	//removeAttachment
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
@@ -38,7 +38,7 @@ import {handleNewMedia} from './handleNewMedia';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
-const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
+//const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 
 /*class StateClass {
 	constructor() {
@@ -291,31 +291,7 @@ export function run(params) {
 						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
 						const mediaPath = `/${path}/${mediaName}`;
 
-						const contentQueryParams = {
-							count: -1,
-							filters: {
-								boolean: {
-									must: [
-										/*{
-											exists: {
-												field: `x.${X_APP_NAME}.fotoWare.filename`
-											}
-										},*/
-										{
-											hasValue: {
-												field: `x.${X_APP_NAME}.fotoWare.filename`,
-												values: [
-													mediaName
-												]
-											}
-										}
-									]
-								}
-							}
-							//query: `x.${X_APP_NAME}.fotoWare.filename = ${mediaName}`
-						};
-						//log.debug(`contentQueryParams:${toStr(contentQueryParams)}`);
-						const contentQueryResult = queryForContent(contentQueryParams);
+						const contentQueryResult = queryForFilename({filename});
 						//log.debug(`contentQueryResult:${toStr(contentQueryResult)}`);
 
 						let exisitingMediaContent;

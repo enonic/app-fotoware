@@ -31,6 +31,8 @@ import {X_APP_NAME} from '/lib/fotoware/xp/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
+import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
+
 
 export const assetModified = (request) => {
 	//log.debug(`request:${toStr(request)}`);
@@ -151,8 +153,20 @@ export const assetModified = (request) => {
 			description: '',
 			task: () => {
 				const mediaPath = `/${path}/${filename}`;
-				const exisitingMedia = getContentByKey({key: mediaPath});
-				if (!exisitingMedia) {
+
+				const contentQueryResult = queryForFilename({filename});
+				let exisitingMediaContent;
+				if (contentQueryResult.total === 0) {
+					// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
+					exisitingMediaContent = getContentByKey({key: mediaPath});
+				} else if (contentQueryResult.total === 1) {
+					exisitingMediaContent = contentQueryResult.hits[0];
+				} else if (contentQueryResult.total > 1) {
+					log.error(`Found more than one content with FotoWare filename:${filename} ids:${contentQueryResult.hits.map(({_id}) => _id).join(', ')}`);
+					exisitingMediaContent = -1;
+				}
+
+				if (!exisitingMediaContent) {
 					log.error(`mediaPath:${mediaPath} not found! Perhaps missed assetIngested, or assetDeleted arrived before assetModified.`);
 				}
 
@@ -224,7 +238,9 @@ export const assetModified = (request) => {
 					const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
 					//log.info(`md5sumOfDownload:${toStr(md5sumOfDownload)}`);
 
-					if (!exisitingMedia) {
+					if (exisitingMediaContent === -1) {
+						// no-op
+					} else if (!exisitingMediaContent) {
 						const createMediaResult = createMedia({
 							parentPath: `/${path}`,
 							name: filename,
@@ -240,6 +256,7 @@ export const assetModified = (request) => {
 							key: mediaPath,
 							md5sum: md5sumOfDownload,
 							mediaPath,
+							mediaName: filename,
 							metadata
 						});
 					} else { // Media already exist
@@ -251,7 +268,7 @@ export const assetModified = (request) => {
 									} = {}
 								} = {}
 							} = {}
-						} = exisitingMedia;
+						} = exisitingMediaContent;
 						const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(getAttachmentStream({
 							key: mediaPath,
 							name: filename
@@ -293,17 +310,19 @@ export const assetModified = (request) => {
 						const maybeModifiedMediaContent = addMetadataToContent({
 							md5sum: md5sumOfDownload,
 							metadata,
-							content: JSON.parse(JSON.stringify(exisitingMedia))
+							mediaName: filename,
+							content: JSON.parse(JSON.stringify(exisitingMediaContent))
 						});
 						//log.info(`maybeModifiedMediaContent:${toStr(maybeModifiedMediaContent)}`);
 
-						if (!deepEqual(exisitingMedia, maybeModifiedMediaContent)) {
-							const differences = diff(exisitingMedia, maybeModifiedMediaContent);
+						if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
+							const differences = diff(exisitingMediaContent, maybeModifiedMediaContent);
 							log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
 							modifyMediaContent({
-								exisitingMediaContent: exisitingMedia,
+								exisitingMediaContent,
 								key: mediaPath,
 								md5sum: md5sumOfDownload,
+								mediaName: filename,
 								mediaPath,
 								metadata
 							});
