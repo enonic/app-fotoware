@@ -246,7 +246,7 @@ if (SERVER_JS_FILES.length) {
 				patterns: [
 					{ context: NODE_MODULES_CONTEXT, from: '@babel/standalone/babel.*.js', to: 'assets/js/@babel/standalone/[name][ext]' },
 					{ context: NODE_MODULES_CONTEXT, from: '@material-ui/core/umd/material-ui.*.js', to: 'assets/js/@material-ui/[name][ext]' },
-					{ context: NODE_MODULES_CONTEXT, from: 'moment/min/*.js', to: 'assets/js/moment/[name][ext]' },
+					{ context: NODE_MODULES_CONTEXT, from: 'moment/min/*', to: 'assets/js/moment/[name][ext]' },
 					{ context: NODE_MODULES_CONTEXT, from: 'react/umd/react.*.js', to: 'assets/js/react/[name][ext]' },
 					{ context: NODE_MODULES_CONTEXT, from: 'react-dom/umd/react-dom.*.js', to: 'assets/js/react-dom/[name][ext]' },
 				]
