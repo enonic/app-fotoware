@@ -19,8 +19,8 @@ import path from 'path';
 //──────────────────────────────────────────────────────────────────────────────
 // Common
 //──────────────────────────────────────────────────────────────────────────────
-const MODE = 'development';
-//const MODE = 'production';
+//const MODE = 'development';
+const MODE = 'production';
 const JS_EXTENSION_GLOB_BRACE = '*.{es,es6,mjs,jsx,flow,js}';
 const ASSETS_PATH_GLOB_BRACE = '{site/assets,assets}';
 
@@ -72,8 +72,32 @@ const SERVER_JS_FILES = glob.sync(`${SRC_DIR}/**/${JS_EXTENSION_GLOB_BRACE}`, {
 const SERVER_JS_TEST = /\.(es6?|js)$/i; // Will need js for node module depenencies
 
 const SS_ALIAS = {};
+const SS_EXTERNALS = [
+	// /^\//
+	'/lib/cron',
+	'/lib/galimatias',
+	'/lib/http-client',
+	'/lib/license',
+	'/lib/router',
+	'/lib/text-encoding',
+	'/lib/util',
+	'/lib/util/data',
+	'/lib/util/value',
+	'/lib/xp/admin',
+	'/lib/xp/common',
+	'/lib/xp/context',
+	'/lib/xp/content',
+	'/lib/xp/io',
+	'/lib/xp/node',
+	'/lib/xp/portal',
+	'/lib/xp/repo',
+	'/lib/xp/task'
+];
+
 if (MODE === 'development') {
 	SS_ALIAS['/lib/enonic/static'] = path.resolve(__dirname, '../lib-static/src/main/resources/lib/enonic/static');
+} else {
+	SS_EXTERNALS.push('/lib/enonic/static');
 }
 
 if (SERVER_JS_FILES.length) {
@@ -88,27 +112,7 @@ if (SERVER_JS_FILES.length) {
 	const SERVER_JS_CONFIG = {
 		context,
 		entry: SERVER_JS_ENTRY,
-		externals: [
-			// /^\//
-			'/lib/cron',
-			'/lib/galimatias',
-			'/lib/http-client',
-			'/lib/license',
-			'/lib/router',
-			'/lib/text-encoding',
-			'/lib/util',
-			'/lib/util/data',
-			'/lib/util/value',
-			'/lib/xp/admin',
-			'/lib/xp/common',
-			'/lib/xp/context',
-			'/lib/xp/content',
-			'/lib/xp/io',
-			'/lib/xp/node',
-			'/lib/xp/portal',
-			'/lib/xp/repo',
-			'/lib/xp/task'
-		],
+		externals: SS_EXTERNALS,
 		devtool: false, // Don't waste time generating sourceMaps
 		mode: MODE,
 		module: {
