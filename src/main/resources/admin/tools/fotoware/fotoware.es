@@ -39,7 +39,36 @@ router.post('/', (r) => post(r));
 router.get('/uploadLicense', (r) => getUploadLicenseForm(r));
 router.post('/uploadLicense', (r) => postUploadLicense(r));
 
-const getAsset = buildGetter('assets');
+const getAsset = buildGetter('assets', {
+	//cacheControl: 'public, max-age=31536000, immutable', // This is the default
+	//cacheControl: 'public, no-transform, max-age=31536000',
+	//cacheControl: false,
+	//cacheControl: 'must-revalidate', // 304
+	contentType: {
+		css: 'text/css',
+		ico: 'image/x-icon',
+		js: 'application/javascript',
+		svg: 'image/svg+xml',
+
+		woff: 'font/woff',
+		//woff: 'application/font-woff',
+		//woff: 'application/octet-stream',
+
+		woff2: 'font/woff2'
+		//woff2: 'application/octet-stream'
+	},
+	//etag: false,
+	etag: true//,
+	/*getCleanPath: (request) => {
+		//log.debug(`request:${toStr(request)}`);
+		if (!request.rawPath.startsWith('/admin/tool/com.enonic.app.fotoware/fotoware/')) {
+			log.error(`request.rawPath:${toStr(request.rawPath)}`);
+			throw Error('Ooops');
+		}
+		return request.rawPath.substring('/admin/tool/com.enonic.app.fotoware/fotoware/'.length);
+	},*/
+	//throwErrors: true
+});
 router.get('/admin/{path:.+}', (r) => getAsset(r));
 router.get('/fonts/{path:.+}', (r) => getAsset(r));
 router.get('/images/{path:.+}', (r) => getAsset(r));
