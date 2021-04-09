@@ -18,11 +18,19 @@ import {toStr} from '/lib/util';
 export function assetUpdate({
 	accessToken,
 	fullAssetUrl,
-	metadata // { 5: { value: 'The Beatles' }, 90: { value: 'London' } }
+	metadata
 }) {
+	// Enonic:   { 5:          'The Beatles'  , 90:          'London' }
+	// FotoWare: { 5: { value: 'The Beatles' }, 90: { value: 'London' } }
+	const metadataWithValue = {}
+	Object.keys(metadata).forEach((k) => {
+		const value = metadata[k];
+		metadataWithValue[k] = { value };
+	});
+
 	const assetUpdateRequestParams = {
 		body: {
-			metadata
+			metadata: metadataWithValue
 		},
 		contentType: 'application/vnd.fotoware.assetupdate+json',
 		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
