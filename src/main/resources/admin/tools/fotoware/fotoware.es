@@ -1,4 +1,4 @@
-import {static as buildGetter} from '/lib/enonic/static';
+import {buildGetter} from '/lib/enonic/static';
 import {validateLicense} from '/lib/license';
 import Router from '/lib/router';
 //import {toStr} from '/lib/util';
