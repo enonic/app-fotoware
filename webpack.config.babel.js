@@ -19,8 +19,8 @@ import path from 'path';
 //──────────────────────────────────────────────────────────────────────────────
 // Common
 //──────────────────────────────────────────────────────────────────────────────
-//const MODE = 'development';
-const MODE = 'production';
+const MODE = 'development';
+//const MODE = 'production';
 const JS_EXTENSION_GLOB_BRACE = '*.{es,es6,mjs,jsx,flow,js}';
 const ASSETS_PATH_GLOB_BRACE = '{site/assets,assets}';
 
@@ -28,7 +28,12 @@ const SRC_DIR = 'src/main/resources';
 const DST_DIR = 'build/resources/main';
 
 const context = path.resolve(__dirname, SRC_DIR);
-const extensions = ['.es', '.js', '.json']; // used in resolve
+const extensions = [
+	'.es',
+	'.es6', // lib-static
+	'.js',
+	'.json'
+]; // used in resolve
 const outputPath = path.join(__dirname, DST_DIR);
 
 const stats = {
@@ -65,6 +70,11 @@ const SERVER_JS_FILES = glob.sync(`${SRC_DIR}/**/${JS_EXTENSION_GLOB_BRACE}`, {
 //console.log(`SERVER_JS_FILES:${toStr(SERVER_JS_FILES)}`);
 
 const SERVER_JS_TEST = /\.(es6?|js)$/i; // Will need js for node module depenencies
+
+const SS_ALIAS = {};
+if (MODE === 'development') {
+	SS_ALIAS['/lib/enonic/static'] = path.resolve(__dirname, '../lib-static/src/main/resources/lib/enonic/static');
+}
 
 if (SERVER_JS_FILES.length) {
 	const SERVER_JS_ENTRY = dict(SERVER_JS_FILES.map(k => [
@@ -259,6 +269,7 @@ if (SERVER_JS_FILES.length) {
 			})*/
 		],
 		resolve: {
+			alias: SS_ALIAS,
 			extensions
 		}, // resolve
 		stats

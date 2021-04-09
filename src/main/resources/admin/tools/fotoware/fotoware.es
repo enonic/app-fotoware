@@ -1,3 +1,4 @@
+import {static as buildGetter} from '/lib/enonic/static';
 import {validateLicense} from '/lib/license';
 import Router from '/lib/router';
 //import {toStr} from '/lib/util';
@@ -38,6 +39,12 @@ router.post('/', (r) => post(r));
 router.get('/uploadLicense', (r) => getUploadLicenseForm(r));
 router.post('/uploadLicense', (r) => postUploadLicense(r));
 
+const getAsset = buildGetter('assets');
+router.get('/admin/{path:.+}', (r) => getAsset(r));
+router.get('/fonts/{path:.+}', (r) => getAsset(r));
+router.get('/images/{path:.+}', (r) => getAsset(r));
+router.get('/js/{path:.+}', (r) => getAsset(r));
+
 function get(/*request*/) {
 	//log.debug(`request:${toStr(request)}`);
 
@@ -52,6 +59,8 @@ function get(/*request*/) {
 		)
 		: 'Unlicensed!';
 
+
+
 	const assetsUrl = assetUrl({path: ''});
 	return {
 		body: `<!DOCTYPE html>
@@ -64,18 +73,33 @@ function get(/*request*/) {
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<meta name="theme-color" content="#ffffff">
 
-		<script type="text/javascript" src="${assetUrl({path: `js/react/react.${REACT_MODE}.js`})}"></script>
-		<script type="text/javascript" src="${assetUrl({path: `js/react-dom/react-dom.${REACT_MODE}.js`})}"></script>
-		<script type="text/javascript" src="${assetUrl({path: `js/@material-ui/material-ui.${REACT_MODE}.js`})}"></script>
-		<script type="text/javascript" src="${assetUrl({path: 'js/@babel/standalone/babel.min.js'})}"></script>
+		<!--script type="text/javascript" src="${assetUrl({path: `js/react/react.${REACT_MODE}.js`})}"></script-->
+		<script type="text/javascript" src="fotoware/js/react/react.${REACT_MODE}.js"></script>
 
-		<link rel="stylesheet" href="${assetUrl({path: 'fonts/fonts.css'})}" />
+		<!--script type="text/javascript" src="${assetUrl({path: `js/react-dom/react-dom.${REACT_MODE}.js`})}"></script-->
+		<script type="text/javascript" src="fotoware/js/react-dom/react-dom.${REACT_MODE}.js"></script>
 
-		<link rel="shortcut icon" href="${assetsUrl}/images/ico/fotoware.ico">
+		<!--script type="text/javascript" src="${assetUrl({path: `js/@material-ui/material-ui.${REACT_MODE}.js`})}"></script-->
+		<script type="text/javascript" src="fotoware/js/@material-ui/material-ui.${REACT_MODE}.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="${assetsUrl}/admin/common/styles/lib.css">
-		<script defer src="${assetsUrl}/admin/common/js/lib.js" type="text/javascript"></script>
-		<script type="text/javascript" src="${assetUrl({path: 'js/moment/moment-with-locales.min.js'})}"></script>
+		<!--script type="text/javascript" src="${assetUrl({path: 'js/@babel/standalone/babel.min.js'})}"></script-->
+		<script type="text/javascript" src="fotoware/js/@babel/standalone/babel.min.js"></script>
+
+		<!--link rel="stylesheet" href="${assetUrl({path: 'fonts/fonts.css'})}" /-->
+		<link rel="stylesheet" href="fotoware/fonts/fonts.css" />
+
+		<!--link rel="shortcut icon" href="${assetsUrl}/images/ico/fotoware.ico"-->
+		<link rel="shortcut icon" href="fotoware/images/ico/fotoware.ico">
+
+		<!--link rel="stylesheet" type="text/css" href="${assetsUrl}/admin/common/styles/lib.css"-->
+		<link rel="stylesheet" type="text/css" href="fotoware/admin/common/styles/lib.css">
+
+		<!--script defer src="${assetsUrl}/admin/common/js/lib.js" type="text/javascript"></script-->
+		<script defer src="fotoware/admin/common/js/lib.js" type="text/javascript"></script>
+
+		<!--script type="text/javascript" src="${assetUrl({path: 'js/moment/moment-with-locales.min.js'})}"></script-->
+		<script type="text/javascript" src="fotoware/js/moment/moment-with-locales.min.js"></script>
+
 		<style>
 			form {
 				display: inline-block;
@@ -95,7 +119,8 @@ function get(/*request*/) {
 	<body>
 		<div class="appbar">
 			<div class="home-button app-icon system-info-button">
-				<img class="app-icon" src="${assetsUrl}/images/svg/fotoware-white.svg" style="height: 15px;margin-top: 15px;width: auto;"/>
+				<!--img class="app-icon" src="${assetsUrl}/images/svg/fotoware-white.svg" style="height: 15px;margin-top: 15px;width: auto;"/-->
+				<img class="app-icon" src="fotoware/images/svg/fotoware-white.svg" style="height: 15px;margin-top: 15px;width: auto;"/>
 				<span class="app-name">FotoWare Admin</span>
 			</div>
 			<div class="home-button system-info-button">
