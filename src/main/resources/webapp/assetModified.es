@@ -27,7 +27,6 @@ import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDe
 import {query as doQuery} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
-import {X_APP_NAME} from '/lib/fotoware/xp/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
@@ -152,13 +151,14 @@ export const assetModified = (request) => {
 		}, () => submit({
 			description: '',
 			task: () => {
-				const mediaPath = `/${path}/${filename}`;
-
-				const contentQueryResult = queryForFilename({filename});
+				const contentQueryResult = queryForFilename({
+					filename,
+					path
+				});
 				let exisitingMediaContent;
 				if (contentQueryResult.total === 0) {
 					// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
-					exisitingMediaContent = getContentByKey({key: mediaPath});
+					exisitingMediaContent = getContentByKey({key: `/${path}/${filename}`});
 				} else if (contentQueryResult.total === 1) {
 					exisitingMediaContent = contentQueryResult.hits[0];
 				} else if (contentQueryResult.total > 1) {
@@ -167,7 +167,7 @@ export const assetModified = (request) => {
 				}
 
 				if (!exisitingMediaContent) {
-					log.error(`mediaPath:${mediaPath} not found! Perhaps missed assetIngested, or assetDeleted arrived before assetModified.`);
+					log.error(`path:${path} name:${filename} not found! Perhaps missed assetIngested, or assetDeleted arrived before assetModified.`);
 				}
 
 				const queryResult = doQuery({
@@ -241,45 +241,42 @@ export const assetModified = (request) => {
 					if (exisitingMediaContent === -1) {
 						// no-op
 					} else if (!exisitingMediaContent) {
+						const parentPath = `/${path}`;
 						const createMediaResult = createMedia({
-							parentPath: `/${path}`,
+							parentPath,
 							name: filename,
 							data: downloadRenditionResponse.bodyStream
 						});
 						if (!createMediaResult) {
-							const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
+							const errMsg = `Something went wrong when creating parentPath:${parentPath} name:${filename}!`;
 							log.error(errMsg);
 							throw new Error(errMsg);
 						}
 						modifyMediaContent({
 							exisitingMediaContent: createMediaResult,
-							key: mediaPath,
+							key: createMediaResult._path,
 							md5sum: md5sumOfDownload,
-							mediaPath,
-							mediaName: filename,
 							metadata
 						});
 					} else { // Media already exist
 						const {
-							x: {
-								[X_APP_NAME]: {
-									'fotoWare': {
-										'md5sum': md5sumFromXdata
-									} = {}
+							data: {
+								'fotoWare': {
+									'md5sum': md5sumFromContent
 								} = {}
 							} = {}
 						} = exisitingMediaContent;
-						const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(getAttachmentStream({
-							key: mediaPath,
+						const md5sumOfExisitingMediaContent = md5sumFromContent || md5(readText(getAttachmentStream({
+							key: exisitingMediaContent._path,
 							name: filename
 						})));
 						//log.info(`md5sumOfExisitingMediaContent:${toStr(md5sumOfExisitingMediaContent)}`);
 						if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
-							log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
+							log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
 							// TODO Modify attachment
 							try {
 								addAttachment({
-									key: mediaPath,
+									key: exisitingMediaContent._path,
 									//mimeType: doctype, // 'image' is a invalid mimetype
 									mimeType: getMimeType(filename),
 									name: filename,
@@ -291,12 +288,12 @@ export const assetModified = (request) => {
 								log.error(e.class.name);
 								log.error(e.message);
 								removeAttachment({
-									key: mediaPath,
+									key: exisitingMediaContent._path,
 									name: filename
 								});
 								// NOTE re-add old attachment with old name? nah, that information is in versions
 								addAttachment({
-									key: mediaPath,
+									key: exisitingMediaContent._path,
 									//mimeType: doctype, // 'image' is a invalid mimetype
 									mimeType: getMimeType(filename),
 									name: filename,
@@ -304,44 +301,41 @@ export const assetModified = (request) => {
 								});
 							}
 						} else {
-							log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
+							log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 						}
 
 						const maybeModifiedMediaContent = addMetadataToContent({
 							md5sum: md5sumOfDownload,
 							metadata,
-							mediaName: filename,
 							content: JSON.parse(JSON.stringify(exisitingMediaContent))
 						});
 						//log.info(`maybeModifiedMediaContent:${toStr(maybeModifiedMediaContent)}`);
 
 						if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
 							const differences = diff(exisitingMediaContent, maybeModifiedMediaContent);
-							log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
+							log.debug(`_path:${exisitingMediaContent._path} differences:${toStr(differences)}`);
 							modifyMediaContent({
 								exisitingMediaContent,
-								key: mediaPath,
+								key: exisitingMediaContent._path,
 								md5sum: md5sumOfDownload,
-								mediaName: filename,
-								mediaPath,
 								metadata
 							});
 						} /*else {
-							log.debug(`mediaPath:${mediaPath} no differences :)`);
+							log.debug(`_path:${exisitingMediaContent._path} no differences :)`);
 						}*/
 						if (isPublished({
-							key: mediaPath,
+							key: exisitingMediaContent._path,
 							project
 						})) {
 							const publishParams = {
 								includeDependencies: false,
-								keys:[mediaPath],
+								keys:[exisitingMediaContent._path],
 								sourceBranch: 'draft',
 								targetBranch: 'master'
 							};
-							//log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
+							//log.debug(`_path:${exisitingMediaContent._path} publishParams:${toStr(publishParams)}`);
 							const publishRes = publish(publishParams);
-							log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
+							log.debug(`_path:${exisitingMediaContent._path} publishRes:${toStr(publishRes)}`);
 						}
 					}
 				} // if assetCountTotal

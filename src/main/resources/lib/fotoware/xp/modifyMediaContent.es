@@ -9,8 +9,6 @@ export const modifyMediaContent = ({
 	exisitingMediaContent, // can be undefined
 	key,
 	md5sum,
-	mediaName,
-	mediaPath,
 	metadata
 }) => {
 	try {
@@ -19,7 +17,6 @@ export const modifyMediaContent = ({
 			editor: (content) => addMetadataToContent({
 				md5sum,
 				metadata,
-				mediaName,
 				content
 			}),
 			requireValid: false // May contain extra undefined x-data
@@ -27,7 +24,7 @@ export const modifyMediaContent = ({
 	} catch (e) {
 		if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
 			// Known problem on psd, svg, ai, jpf, pdf
-			log.error(`Unable to modify ${mediaPath}`);
+			log.error(`Unable to modify ${key}`);
 			/*deleteContent({ // So it will be retried on next sync
 				key: createMediaResult._id
 			});*/
@@ -35,7 +32,7 @@ export const modifyMediaContent = ({
 		} else if (e.class.name === 'java.lang.RuntimeException' && e.message === 'Failed to read BufferedImage from InputStream') {
 			// c.e.x.e.impl.BinaryExtractorImpl - Error extracting binary: TIKA-198: Illegal IOException from org.apache.tika.parser.jpeg.JpegParser@44c1fc82
 			//java.lang.RuntimeException: Failed to read BufferedImage from InputStream
-			log.warning(`Deleting corrupt image ${mediaPath}`);
+			log.warning(`Deleting corrupt image ${key}`);
 			deleteContent({ // We don't want corrupt files
 				key
 			});

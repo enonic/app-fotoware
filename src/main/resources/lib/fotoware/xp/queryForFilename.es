@@ -1,24 +1,20 @@
-import {X_APP_NAME} from '/lib/fotoware/xp/constants';
-
+//import {toStr} from '/lib/util';
 import {query as queryForContent} from '/lib/xp/content';
 
 
 export function queryForFilename({
-	filename
+	filename,
+	path,
+	query = `_path LIKE '/content/${path}/*'` // NOTE: File can be moved to sub folders, but not outside.
 }) {
 	const contentQueryParams = {
 		count: -1,
 		filters: {
 			boolean: {
 				must: [
-					/*{
-						exists: {
-							field: `x.${X_APP_NAME}.fotoWare.filename`
-						}
-					},*/
 					{
 						hasValue: {
-							field: `x.${X_APP_NAME}.fotoWare.filename`,
+							field: 'data.media.attachment',
 							values: [
 								filename
 							]
@@ -26,8 +22,8 @@ export function queryForFilename({
 					}
 				]
 			}
-		}
-		//query: `x.${X_APP_NAME}.fotoWare.filename = ${mediaName}`
+		},
+		query
 	};
 	//log.debug(`contentQueryParams:${toStr(contentQueryParams)}`);
 	//const contentQueryResult =

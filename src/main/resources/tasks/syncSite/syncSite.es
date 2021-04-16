@@ -38,7 +38,6 @@ import {handleNewMedia} from './handleNewMedia';
 import {Progress} from './Progress';
 
 const CT_COLLECTION = `${app.name}:collection`;
-//const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
 
 /*class StateClass {
 	constructor() {
@@ -277,7 +276,7 @@ export function run(params) {
 					const currentAsset = `${url}${assetHref}`;
 					journal.currentAsset = currentAsset;
 
-					progress.setInfo(`Processing asset ${currentAsset}`).report();
+					progress.setInfo(`Processing path:${path} asset:${currentAsset} `).report();
 					//state.addToAssetsSize(filesize);
 					//state.incrementIncludedCount().addToIncludedSize(filesize);
 					//state.incrementProcessedCount().addToProcessedSize(filesize);
@@ -288,20 +287,20 @@ export function run(params) {
 						log.warning(`Skipping filename:${filename} because it has no extention.`);
 						journal.skipped.push(currentAsset);
 					} else {
-						const mediaName = filename; // Can't use sanitize "1 (2).jpg" collision "1-2.jpg"
-						const mediaPath = `/${path}/${mediaName}`;
-
-						const contentQueryResult = queryForFilename({filename});
+						const contentQueryResult = queryForFilename({
+							filename,
+							path
+						});
 						//log.debug(`contentQueryResult:${toStr(contentQueryResult)}`);
 
 						let exisitingMediaContent;
 						if (contentQueryResult.total === 0) {
 							// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
-							exisitingMediaContent = getContentByKey({key: mediaPath});
+							exisitingMediaContent = getContentByKey({key: `/${path}/${filename}`});
 						} else if (contentQueryResult.total === 1) {
 							exisitingMediaContent = contentQueryResult.hits[0];
 						} else if (contentQueryResult.total > 1) {
-							log.error(`Found more than one content with FotoWare filename:${mediaName} ids:${contentQueryResult.hits.map(({_id}) => _id).join(', ')}`);
+							log.error(`Found more than one content with FotoWare filename:${filename} ids:${contentQueryResult.hits.map(({_id}) => _id).join(', ')}`);
 							exisitingMediaContent = -1;
 						}
 
@@ -333,10 +332,9 @@ export function run(params) {
 							handleNewMedia({
 								accessToken,
 								currentAsset,
-								journal,
+								filename,
 								hostname: url,
-								mediaName,
-								mediaPath,
+								journal,
 								metadata,
 								path,
 								renditionRequest,
@@ -348,10 +346,9 @@ export function run(params) {
 								boolResume,
 								currentAsset,
 								exisitingMediaContent,
+								filename,
 								hostname: url,
 								journal,
-								mediaName,
-								mediaPath,
 								metadata,
 								project,
 								renditionRequest,
@@ -359,7 +356,7 @@ export function run(params) {
 							});
 						} // else exisitingMediaContent
 					} // valid filename
-					progress.finishItem(`Finished processing asset ${assetHref}`);//.report();
+					progress.finishItem(`Finished processing path:${path} asset:${assetHref}`);//.report();
 				}); // forEach asset
 			}); // collections.forEach
 			//progress.finishItem(`Finished processing collections`);//.report();

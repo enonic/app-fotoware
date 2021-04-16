@@ -33,7 +33,6 @@ import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDe
 import {query as doQuery} from '/lib/fotoware/api/query';
 //import {requestRendition} from '/lib/fotoware/api/requestRendition';
 //import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
-//import {X_APP_NAME} from '/lib/fotoware/xp/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 //import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
@@ -158,13 +157,14 @@ export const assetDeleted = (request) => {
 			}, () => submit({
 				description: '',
 				task: () => {
-					const mediaPath = `/${path}/${filename}`;
-
-					const contentQueryResult = queryForFilename({filename});
+					const contentQueryResult = queryForFilename({
+						filename,
+						path
+					});
 					let exisitingMediaContent;
 					if (contentQueryResult.total === 0) {
 						// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
-						exisitingMediaContent = getContentByKey({key: mediaPath});
+						exisitingMediaContent = getContentByKey({key: `/${path}/${filename}`});
 					} else if (contentQueryResult.total === 1) {
 						exisitingMediaContent = contentQueryResult.hits[0];
 					} else if (contentQueryResult.total > 1) {
@@ -176,7 +176,7 @@ export const assetDeleted = (request) => {
 					if (exisitingMediaContent === -1) {
 						// no-op
 					} else if (!exisitingMediaContent) {
-						log.error(`mediaPath:${mediaPath} not found! Perhaps deleted manually.`);
+						log.error(`path:${path} name:${filename} not found! Perhaps deleted manually.`);
 					} else {
 						const queryResult = doQuery({
 							accessToken,
@@ -238,18 +238,18 @@ export const assetDeleted = (request) => {
 								const deleteContentRes = deleteContent({key: exisitingMediaContent._id});
 								if (deleteContentRes) {
 									if (isPublished({
-										key: mediaPath,
+										key: exisitingMediaContent._path,
 										project
 									})) {
 										const publishParams = {
 											includeDependencies: false,
-											keys:[mediaPath],
+											keys:[exisitingMediaContent._path],
 											sourceBranch: 'draft',
 											targetBranch: 'master'
 										};
-										//log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
+										//log.debug(`_path:${exisitingMediaContent._path} publishParams:${toStr(publishParams)}`);
 										const publishRes = publish(publishParams);
-										log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
+										log.debug(`_path:${exisitingMediaContent._path} publishRes:${toStr(publishRes)}`);
 									}
 								} else {
 									log.error(`Something went wrong while trying to delete ${exisitingMediaContent._id}`);

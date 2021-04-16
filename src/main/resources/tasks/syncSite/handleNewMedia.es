@@ -11,10 +11,9 @@ import {readText} from '/lib/xp/io';
 export function handleNewMedia({
 	accessToken,
 	currentAsset,
-	journal,
+	filename,
 	hostname,
-	mediaName,
-	mediaPath, // `/${path}/${mediaName}`
+	journal,
 	metadata,
 	path,
 	renditionRequest,
@@ -36,7 +35,7 @@ export function handleNewMedia({
 	if (downloadRenditionResponse) {
 		const createMediaResult = createMedia({
 			parentPath: `/${path}`,
-			name: mediaName,
+			name: filename,
 			data: downloadRenditionResponse.bodyStream
 		});
 		log.debug(`createMediaResult:${toStr(createMediaResult)}`);
@@ -51,7 +50,7 @@ export function handleNewMedia({
 
 		if (!createMediaResult) {
 			journal.errors.push(currentAsset);
-			const errMsg = `Something went wrong when creating mediaPath:${mediaPath}!`;
+			const errMsg = `Something went wrong when creating path:${path} filename:${filename}!`;
 			log.error(errMsg);
 			throw new Error(errMsg);
 		}
@@ -60,8 +59,6 @@ export function handleNewMedia({
 		modifyMediaContent({
 			key: createMediaResult._id,
 			md5sum,
-			mediaName,
-			mediaPath,
 			metadata
 		});
 	} // if downloadRenditionResponse

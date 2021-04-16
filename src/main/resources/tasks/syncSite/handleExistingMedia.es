@@ -9,17 +9,17 @@ import {isPublished} from '/lib/fotoware/xp/isPublished';
 
 import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-import {sanitize} from '/lib/xp/common';
+//import {sanitize} from '/lib/xp/common';
 import {
 	addAttachment,
 	getAttachmentStream,
 	publish,
 	removeAttachment
 } from '/lib/xp/content';
-import {readText} from '/lib/xp/io';
-
-
-const X_APP_NAME = sanitize(app.name).replace(/\./g, '-');
+import {
+	getMimeType,
+	readText
+} from '/lib/xp/io';
 
 
 export function handleExistingMedia({
@@ -27,33 +27,30 @@ export function handleExistingMedia({
 	boolResume,
 	currentAsset,
 	exisitingMediaContent,
+	filename,
 	hostname,
 	journal,
-	mediaName,
-	mediaPath,
 	metadata,
 	project,
 	renditionRequest,
 	renditionUrl
 }) {
 	const {
-		x: {
-			[X_APP_NAME]: {
-				'fotoWare': {
-					'md5sum': md5sumFromXdata
-				} = {}
+		data: {
+			'fotoWare': {
+				'md5sum': md5sumFromXdata
 			} = {}
 		} = {}
 	} = exisitingMediaContent;
-	//log.debug(`mediaPath:${mediaPath} md5sumFromXdata:${md5sumFromXdata}`);
+	//log.debug(`_path:${exisitingMediaContent._path} md5sumFromXdata:${md5sumFromXdata}`);
 
 	const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(getAttachmentStream({
-		key: mediaPath,
-		name: mediaName
+		key: exisitingMediaContent._path,
+		name: filename
 	})));
-	//log.debug(`mediaPath:${mediaPath} md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent}`);
+	//log.debug(`_path:${exisitingMediaContent._path} md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent}`);
 	let md5sumToStore = md5sumOfExisitingMediaContent;
-	//log.debug(`mediaPath:${mediaPath} md5sumToStore:${md5sumToStore}`);
+	//log.debug(`_path:${exisitingMediaContent._path} md5sumToStore:${md5sumToStore}`);
 
 	if (!boolResume) {
 		let downloadRenditionResponse;
@@ -70,12 +67,13 @@ export function handleExistingMedia({
 		if (downloadRenditionResponse) {
 			const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
 			if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
-				log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
+				log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
 				// TODO Modify attachment
 				try {
 					addAttachment({
-						key: mediaPath,
-						name: mediaName,
+						key: exisitingMediaContent._path,
+						mimeType: getMimeType(filename),
+						name: filename,
 						data: downloadRenditionResponse.bodyStream
 					});
 				} catch (e) {
@@ -84,19 +82,20 @@ export function handleExistingMedia({
 					log.error(e.class.name);
 					log.error(e.message);
 					removeAttachment({
-						key: mediaPath,
-						name: mediaName
+						key: exisitingMediaContent._path,
+						name: filename
 					});
 					// NOTE re-add old attachment with old name? nah, that information is in versions
 					addAttachment({
-						key: mediaPath,
-						name: mediaName,
+						key: exisitingMediaContent._path,
+						mimeType: getMimeType(filename),
+						name: filename,
 						data: downloadRenditionResponse.bodyStream
 					});
 				}
 				journal.modified.push(currentAsset);
 			} else {
-				log.debug(`mediaPath:${mediaPath} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
+				log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 			}
 			md5sumToStore = md5sumOfDownload;
 		}
@@ -107,38 +106,35 @@ export function handleExistingMedia({
 	const maybeModifiedMediaContent = addMetadataToContent({
 		md5sum: md5sumToStore,
 		metadata,
-		mediaName,
 		content: JSON.parse(JSON.stringify(exisitingMediaContent))
 	});
 
 	if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
 		const differences = diff(exisitingMediaContent, maybeModifiedMediaContent);
-		log.debug(`mediaPath:${mediaPath} differences:${toStr(differences)}`);
+		log.debug(`_path:${exisitingMediaContent._path} differences:${toStr(differences)}`);
 		modifyMediaContent({
 			exisitingMediaContent,
-			key: mediaPath,
+			key: exisitingMediaContent._path,
 			md5sum: md5sumToStore,
-			mediaName,
-			mediaPath,
 			metadata
 		});
 		journal.modifiedMetadata.push(currentAsset);
 	} else {
-		//log.debug(`mediaPath:${mediaPath} no differences :)`);
+		//log.debug(`_path:${exisitingMediaContent._path} no differences :)`);
 		journal.unchanged.push(currentAsset);
 	}
 	if (isPublished({
-		key: mediaPath,
+		key: exisitingMediaContent._path,
 		project
 	})) {
 		const publishParams = {
 			includeDependencies: false,
-			keys:[mediaPath],
+			keys:[exisitingMediaContent._path],
 			sourceBranch: 'draft',
 			targetBranch: 'master'
 		};
-		//log.debug(`mediaPath:${mediaPath} publishParams:${toStr(publishParams)}`);
+		//log.debug(`_path:${exisitingMediaContent._path} publishParams:${toStr(publishParams)}`);
 		const publishRes = publish(publishParams);
-		log.debug(`mediaPath:${mediaPath} publishRes:${toStr(publishRes)}`);
+		log.debug(`_path:${exisitingMediaContent._path} publishRes:${toStr(publishRes)}`);
 	}
 }
