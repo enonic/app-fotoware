@@ -2,6 +2,12 @@
 import {deepen} from '/lib/fotoware/xp/deepen';
 //import {deepen} from './deepen';
 //import {capitalize} from '/lib/fotoware/xp/capitalize';
+import {
+	PROPERTY_ON_CREATE,
+	PROPERTY_IF_CHANGED,
+	PROPERTY_OVERWRITE
+} from '/lib/fotoware/xp/constants';
+
 
 export function getConfigFromAppCfg() {
 	//log.debug(`app.config:${toStr(app.config)}`);
@@ -26,7 +32,15 @@ export function getConfigFromAppCfg() {
 			url = '', // `https://${site}.fotoware.cloud`,
 			allowWebhookFromIp = 'localhost',
 			clientSecret,
-			clientId
+			clientId,
+			properties: {
+				artist = PROPERTY_IF_CHANGED,
+				caption = PROPERTY_IF_CHANGED,
+				copyright = PROPERTY_OVERWRITE,
+				description = PROPERTY_IF_CHANGED,
+				displayName = PROPERTY_ON_CREATE,
+				tags = PROPERTY_IF_CHANGED
+			} = {}
 		} = sites[site];
 		//log.info(`allowWebhookFromIp:${toStr(allowWebhookFromIp)}`);
 		/*log.debug(`${toStr({
@@ -52,7 +66,15 @@ export function getConfigFromAppCfg() {
 				remoteAddresses,
 				clientSecret,
 				clientId,
-				imports: {}
+				imports: {},
+				properties: {
+					artist,
+					caption,
+					copyright,
+					description,
+					displayName,
+					tags
+				}
 			};
 		}
 

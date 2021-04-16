@@ -34,6 +34,32 @@
 			<label>project</label>
 			<occurrences minimum="1" maximum="1"/>
 		</input>
+
+		<input name="propertyArtist" type="TextLine">
+			<label>propertyArtist</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="propertyCaption" type="TextLine">
+			<label>propertyCaption</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="propertyCopyright" type="TextLine">
+			<label>propertyCopyright</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="propertyDescription" type="TextLine">
+			<label>propertyDescription</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="propertyDisplayName" type="TextLine">
+			<label>propertyDisplayName</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="propertyTags" type="TextLine">
+			<label>propertyTags</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+
 		<input name="query" type="TextLine">
 			<label>query</label>
 			<occurrences minimum="1" maximum="1"/>

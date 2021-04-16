@@ -31,6 +31,10 @@ export const PERMISSIONS = [{
 
 export const CHILD_ORDER = '_ts DESC';
 
+export const PROPERTY_ON_CREATE = 'onCreate';
+export const PROPERTY_IF_CHANGED = 'ifChanged';
+export const PROPERTY_OVERWRITE = 'overwrite';
+
 export const TASKS_FOLDER_PARENT_PATH = '/';
 export const TASKS_FOLDER_NAME = 'tasks';
 export const TASKS_FOLDER_PATH = `${TASKS_FOLDER_PARENT_PATH}${TASKS_FOLDER_NAME}`;

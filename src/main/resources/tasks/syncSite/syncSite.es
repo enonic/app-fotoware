@@ -1,36 +1,22 @@
-//import {diff} from 'deep-object-diff';
-
-//import deepEqual from 'fast-deep-equal';
-
-//import {assetUpdate} from '/lib/fotoware/api/asset/update';
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
 //import {getTaxonomies} from '/lib/fotoware/api/taxonomies/get';
 //import {getTaxonomyField} from '/lib/fotoware/api/taxonomies/getField';
-//import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {
+	/*PROPERTY_ON_CREATE,
+	PROPERTY_IF_CHANGED,
+	PROPERTY_OVERWRITE,*/
 	REPO_BRANCH,
 	REPO_ID
 } from '/lib/fotoware/xp/constants';
-//import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
-//import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
-//import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
-//import {md5} from '/lib/text-encoding';
 import {toStr} from '/lib/util';
-//import {sanitize} from '/lib/xp/common';
 import {
-	//addAttachment,
 	create as createContent,
-	//createMedia,
-	get as getContentByKey//,
-	//getAttachmentStream,
-	//publish
-	//removeAttachment
+	get as getContentByKey
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
-//import {readText} from '/lib/xp/io';
 import {connect} from '/lib/xp/node';
 
 import {handleExistingMedia} from './handleExistingMedia';
@@ -93,12 +79,33 @@ export function run(params) {
 		importName,
 		path,
 		project,
+		propertyArtist,// = PROPERTY_IF_CHANGED,
+		propertyCaption,// = PROPERTY_IF_CHANGED,
+		propertyCopyright,// = PROPERTY_OVERWRITE,
+		propertyDescription,// = PROPERTY_IF_CHANGED,
+		propertyDisplayName,// = PROPERTY_ON_CREATE,
+		propertyTags,// = PROPERTY_IF_CHANGED,
 		query,
 		rendition,
 		site,
 		taskNodeId,
 		url
 	} = params;
+	//log.debug(`propertyArtist:${propertyArtist}`);
+	//log.debug(`propertyCaption:${propertyCaption}`);
+	//log.debug(`propertyCopyright:${propertyCopyright}`);
+	//log.debug(`propertyDescription:${propertyDescription}`);
+	//log.debug(`propertyDisplayName:${propertyDisplayName}`);
+	//log.debug(`propertyTags:${propertyTags}`);
+	const properties = {
+		artist: propertyArtist,
+		caption: propertyCaption,
+		copyright: propertyCopyright,
+		description: propertyDescription,
+		displayName: propertyDisplayName,
+		tags: propertyTags
+	};
+	//log.debug(`properties:${toStr(properties)}`);
 
 	if(!site) { throw new Error(`Required param site missing! params:${toStr(params)}`); }
 
@@ -337,6 +344,7 @@ export function run(params) {
 								journal,
 								metadata,
 								path,
+								properties,
 								renditionRequest,
 								renditionUrl
 							});
@@ -351,6 +359,7 @@ export function run(params) {
 								journal,
 								metadata,
 								project,
+								properties,
 								renditionRequest,
 								renditionUrl
 							});

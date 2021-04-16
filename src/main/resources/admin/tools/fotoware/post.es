@@ -104,6 +104,7 @@ export function post(request) {
 					archiveName,
 					clientId,
 					clientSecret,
+					properties,
 					url,
 					imports = {}
 				} = sitesConfigs[site];
@@ -163,6 +164,12 @@ export function post(request) {
 							importName,
 							path,
 							project,
+							propertyArtist: properties.artist,
+							propertyCaption: properties.caption,
+							propertyCopyright: properties.copyright,
+							propertyDescription: properties.description,
+							propertyDisplayName: properties.displayname,
+							propertyTags: properties.tags,
 							query,
 							rendition,
 							site,

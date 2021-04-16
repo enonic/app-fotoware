@@ -3,7 +3,7 @@ import deepEqual from 'fast-deep-equal';
 
 //import {assetUpdate} from '/lib/fotoware/api/asset/update';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
-import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
+import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 
@@ -32,9 +32,11 @@ export function handleExistingMedia({
 	journal,
 	metadata,
 	project,
+	properties,
 	renditionRequest,
 	renditionUrl
 }) {
+	//log.debug(`handleExistingMedia properties:${toStr(properties)}`);
 	const {
 		data: {
 			'fotoWare': {
@@ -103,10 +105,12 @@ export function handleExistingMedia({
 
 	// NOTE Could generate md5sum from possibly modified attachment here.
 
-	const maybeModifiedMediaContent = addMetadataToContent({
+	const maybeModifiedMediaContent = updateMetadataOnContent({
+		content: JSON.parse(JSON.stringify(exisitingMediaContent)),
 		md5sum: md5sumToStore,
 		metadata,
-		content: JSON.parse(JSON.stringify(exisitingMediaContent))
+		modify: true,
+		properties
 	});
 
 	if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
@@ -116,7 +120,8 @@ export function handleExistingMedia({
 			exisitingMediaContent,
 			key: exisitingMediaContent._path,
 			md5sum: md5sumToStore,
-			metadata
+			metadata,
+			properties
 		});
 		journal.modifiedMetadata.push(currentAsset);
 	} else {

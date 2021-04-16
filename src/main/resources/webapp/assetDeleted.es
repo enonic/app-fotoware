@@ -31,10 +31,7 @@ import {submit} from '/lib/xp/task';
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
-//import {requestRendition} from '/lib/fotoware/api/requestRendition';
-//import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
-//import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 

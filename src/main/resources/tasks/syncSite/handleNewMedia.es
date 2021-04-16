@@ -16,9 +16,11 @@ export function handleNewMedia({
 	journal,
 	metadata,
 	path,
+	properties,
 	renditionRequest,
 	renditionUrl
 }) {
+	//log.debug(`handleNewMedia properties:${toStr(properties)}`);
 	//log.debug(`renditions:${toStr(renditions)}`);
 	let downloadRenditionResponse;
 	try {
@@ -59,7 +61,8 @@ export function handleNewMedia({
 		modifyMediaContent({
 			key: createMediaResult._id,
 			md5sum,
-			metadata
+			metadata,
+			properties
 		});
 	} // if downloadRenditionResponse
 }

@@ -26,7 +26,7 @@ import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
-import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
+import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
@@ -304,7 +304,7 @@ export const assetModified = (request) => {
 							log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 						}
 
-						const maybeModifiedMediaContent = addMetadataToContent({
+						const maybeModifiedMediaContent = updateMetadataOnContent({
 							md5sum: md5sumOfDownload,
 							metadata,
 							content: JSON.parse(JSON.stringify(exisitingMediaContent))

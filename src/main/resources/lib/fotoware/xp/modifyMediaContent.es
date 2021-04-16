@@ -1,4 +1,4 @@
-import {addMetadataToContent} from '/lib/fotoware/xp/addMetadataToContent';
+import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 import {
 	delete as deleteContent,
 	modify as modifyContent
@@ -6,18 +6,22 @@ import {
 import {toStr} from '/lib/util';
 
 export const modifyMediaContent = ({
-	exisitingMediaContent, // can be undefined
+	exisitingMediaContent, // is undefined when creating
 	key,
 	md5sum,
-	metadata
+	metadata,
+	properties
 }) => {
+	//log.debug(`modifyMediaContent properties:${toStr(properties)}`);
 	try {
 		modifyContent({
 			key,
-			editor: (content) => addMetadataToContent({
+			editor: (content) => updateMetadataOnContent({
+				content,
 				md5sum,
 				metadata,
-				content
+				modify: !!exisitingMediaContent,
+				properties
 			}),
 			requireValid: false // May contain extra undefined x-data
 		}); // modifyContent
