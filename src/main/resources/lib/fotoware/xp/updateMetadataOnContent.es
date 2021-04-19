@@ -87,7 +87,7 @@ export const updateMetadataOnContent = ({
 	if (
 		!deepEqual(content.data.artist, artist) && (
 			properties.artist === PROPERTY_OVERWRITE
-			|| (properties.artist === PROPERTY_IF_CHANGED && artist !== content.data.fotoWare.metadata[80])
+			|| (properties.artist === PROPERTY_IF_CHANGED && !deepEqual(artist, content.data.fotoWare.metadata[80]))
 			|| !modify // ASSUMING PROPERTY_ON_CREATE
 		)
 	) {
@@ -150,7 +150,7 @@ export const updateMetadataOnContent = ({
 	if (
 		!deepEqual(content.data.tags, tags) && (
 			properties.tags === PROPERTY_OVERWRITE
-			|| (properties.tags === PROPERTY_IF_CHANGED && tags !== content.data.fotoWare.metadata[25])
+			|| (properties.tags === PROPERTY_IF_CHANGED && !deepEqual(tags, content.data.fotoWare.metadata[25]))
 			|| !modify // ASSUMING PROPERTY_ON_CREATE
 		)
 	) {
