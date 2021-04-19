@@ -3,7 +3,7 @@ import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 
 import {md5} from '/lib/text-encoding';
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 import {createMedia} from '/lib/xp/content';
 import {readText} from '/lib/xp/io';
 
@@ -40,7 +40,7 @@ export function handleNewMedia({
 			name: filename,
 			data: downloadRenditionResponse.bodyStream
 		});
-		log.debug(`createMediaResult:${toStr(createMediaResult)}`);
+		//log.debug(`createMediaResult:${toStr(createMediaResult)}`);
 
 		/*assetUpdate({
 			accessToken,

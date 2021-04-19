@@ -41,7 +41,7 @@ export const modifyMediaContent = ({
 				key
 			});
 		} else {
-			log.error(`Something unkown went wrong when trying to modifyContent exisitingMediaContent:${toStr(exisitingMediaContent)}`);
+			log.error(`Something unkown went wrong when trying to modifyContent exisitingMediaContent:${toStr(exisitingMediaContent)}`); // exisitingMediaContent can be undefined
 			//log.error(`metadataObj:${toStr(metadataObj)}`);
 			log.error(e); // com.enonic.xp.data.ValueTypeException: Value of type [com.enonic.xp.data.PropertySet] cannot be converted to [Reference]
 			//log.error(e.class.name); // com.enonic.xp.data.ValueTypeException

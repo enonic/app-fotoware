@@ -167,7 +167,7 @@ export function post(request) {
 							propertyArtist: properties.artist,
 							propertyCopyright: properties.copyright,
 							propertyDescription: properties.description,
-							propertyDisplayName: properties.displayname,
+							propertyDisplayName: properties.displayName,
 							propertyTags: properties.tags,
 							query,
 							rendition,

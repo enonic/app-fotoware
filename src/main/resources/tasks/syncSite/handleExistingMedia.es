@@ -1,4 +1,5 @@
-import {diff} from 'deep-object-diff';
+import {detailedDiff} from 'deep-object-diff';
+//import HumanDiff from 'human-object-diff';
 import deepEqual from 'fast-deep-equal';
 
 //import {assetUpdate} from '/lib/fotoware/api/asset/update';
@@ -20,6 +21,10 @@ import {
 	getMimeType,
 	readText
 } from '/lib/xp/io';
+
+/*const { diff } = new HumanDiff({
+	objectName: 'content'
+});*/
 
 
 export function handleExistingMedia({
@@ -105,8 +110,10 @@ export function handleExistingMedia({
 
 	// NOTE Could generate md5sum from possibly modified attachment here.
 
+	// Is used to detect if it is neccesary to modiy the content
+	// and to produce a nice diff of which changes will be written.
 	const maybeModifiedMediaContent = updateMetadataOnContent({
-		content: JSON.parse(JSON.stringify(exisitingMediaContent)),
+		content: JSON.parse(JSON.stringify(exisitingMediaContent)), // deref so exisitingMediaContent can't be modified
 		md5sum: md5sumToStore,
 		metadata,
 		modify: true,
@@ -114,7 +121,9 @@ export function handleExistingMedia({
 	});
 
 	if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
-		const differences = diff(exisitingMediaContent, maybeModifiedMediaContent);
+		//log.debug(`exisitingMediaContent.data.fotoWare.metadata:${toStr(exisitingMediaContent.data.fotoWare.metadata)}`);
+		//log.debug(`maybeModifiedMediaContent.data.fotoWare.metadata:${toStr(maybeModifiedMediaContent.data.fotoWare.metadata)}`);
+		const differences = detailedDiff(exisitingMediaContent, maybeModifiedMediaContent);
 		log.debug(`_path:${exisitingMediaContent._path} differences:${toStr(differences)}`);
 		modifyMediaContent({
 			exisitingMediaContent,
