@@ -1,5 +1,5 @@
 // Node modules
-import {diff} from 'deep-object-diff';
+import {detailedDiff} from 'deep-object-diff';
 
 import deepEqual from 'fast-deep-equal';
 
@@ -110,6 +110,7 @@ export const assetIngested = (request) => {
 		archiveName,
 		clientId,
 		clientSecret,
+		properties,
 		remoteAddresses,
 		url: hostname,
 		imports
@@ -202,7 +203,7 @@ export const assetIngested = (request) => {
 					}
 
 					if (exisitingMediaContent) {
-						log.error(`_path:${exisitingMediaContent._path} found! Perhaps missed assetDeleted.`);
+						log.error(`_path:${exisitingMediaContent._path} found! Perhaps missed assetDeleted?`);
 					}
 
 					const queryResult = doQuery({
@@ -282,12 +283,14 @@ export const assetIngested = (request) => {
 								throw new Error(errMsg);
 							}
 							modifyMediaContent({
-								exisitingMediaContent: createMediaResult,
+								//exisitingMediaContent: createMediaResult, // No, keep in create mode
 								key: createMediaResult._path,
 								md5sum: md5sumOfDownload,
-								metadata
+								metadata,
+								properties
 							});
 						} else { // Media already exist
+							// Perhaps the image was deleted and reuploaded in FotoWare and we missed the assetDeleted hook
 							const {
 								data: {
 									'fotoWare': {
@@ -328,18 +331,21 @@ export const assetIngested = (request) => {
 								log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 							}
 							const maybeModifiedMediaContent = updateMetadataOnContent({
+								content: JSON.parse(JSON.stringify(exisitingMediaContent)), // deref so exisitingMediaContent can't be modified
 								md5sum: md5sumOfDownload,
 								metadata,
-								content: JSON.parse(JSON.stringify(exisitingMediaContent))
+								modify: true,
+								properties
 							});
 							if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
-								const differences = diff(exisitingMediaContent, maybeModifiedMediaContent);
+								const differences = detailedDiff(exisitingMediaContent, maybeModifiedMediaContent);
 								log.debug(`_path:${exisitingMediaContent._path} differences:${toStr(differences)}`);
 								modifyMediaContent({
 									exisitingMediaContent,
 									key: exisitingMediaContent._path,
 									md5sum: md5sumOfDownload,
-									metadata
+									metadata,
+									properties
 								});
 							} /*else {
 								log.debug(`_path:${exisitingMediaContent._path} no differences :)`);

@@ -1,5 +1,5 @@
 // Node modules
-import {diff} from 'deep-object-diff';
+import {detailedDiff} from 'deep-object-diff';
 
 //import * as deepEqual from 'fast-deep-equal';
 import deepEqual from 'fast-deep-equal';
@@ -104,6 +104,7 @@ export const assetModified = (request) => {
 		archiveName,
 		clientId,
 		clientSecret,
+		properties,
 		remoteAddresses,
 		url: hostname,
 		imports
@@ -256,7 +257,8 @@ export const assetModified = (request) => {
 							exisitingMediaContent: createMediaResult,
 							key: createMediaResult._path,
 							md5sum: md5sumOfDownload,
-							metadata
+							metadata,
+							properties
 						});
 					} else { // Media already exist
 						const {
@@ -305,20 +307,23 @@ export const assetModified = (request) => {
 						}
 
 						const maybeModifiedMediaContent = updateMetadataOnContent({
+							content: JSON.parse(JSON.stringify(exisitingMediaContent)), // deref so exisitingMediaContent can't be modified
 							md5sum: md5sumOfDownload,
 							metadata,
-							content: JSON.parse(JSON.stringify(exisitingMediaContent))
+							modify: true,
+							properties
 						});
 						//log.info(`maybeModifiedMediaContent:${toStr(maybeModifiedMediaContent)}`);
 
 						if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
-							const differences = diff(exisitingMediaContent, maybeModifiedMediaContent);
+							const differences = detailedDiff(exisitingMediaContent, maybeModifiedMediaContent);
 							log.debug(`_path:${exisitingMediaContent._path} differences:${toStr(differences)}`);
 							modifyMediaContent({
 								exisitingMediaContent,
 								key: exisitingMediaContent._path,
 								md5sum: md5sumOfDownload,
-								metadata
+								metadata,
+								properties
 							});
 						} /*else {
 							log.debug(`_path:${exisitingMediaContent._path} no differences :)`);
