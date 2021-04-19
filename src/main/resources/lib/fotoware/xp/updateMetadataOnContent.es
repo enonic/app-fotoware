@@ -44,16 +44,6 @@ export const updateMetadataOnContent = ({
 	) {
 		content.displayName = title;
 	}
-	//──────────────────────────────────────────────────────────────────────────
-	// Title -> Caption
-	//──────────────────────────────────────────────────────────────────────────
-	if (
-		properties.caption === PROPERTY_OVERWRITE
-		|| (properties.caption === PROPERTY_IF_CHANGED && title !== content.data.fotoWare.metadata[5])
-		|| !modify // ASSUMING PROPERTY_ON_CREATE
-	) {
-		content.data.caption = title;
-	}
 	content.data.fotoWare.metadata[5] = title;
 
 	//──────────────────────────────────────────────────────────────────────────

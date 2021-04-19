@@ -165,7 +165,6 @@ export function post(request) {
 							path,
 							project,
 							propertyArtist: properties.artist,
-							propertyCaption: properties.caption,
 							propertyCopyright: properties.copyright,
 							propertyDescription: properties.description,
 							propertyDisplayName: properties.displayname,

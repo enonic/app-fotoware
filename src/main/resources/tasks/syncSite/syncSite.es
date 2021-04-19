@@ -80,7 +80,6 @@ export function run(params) {
 		path,
 		project,
 		propertyArtist,// = PROPERTY_IF_CHANGED,
-		propertyCaption,// = PROPERTY_IF_CHANGED,
 		propertyCopyright,// = PROPERTY_OVERWRITE,
 		propertyDescription,// = PROPERTY_IF_CHANGED,
 		propertyDisplayName,// = PROPERTY_ON_CREATE,
@@ -92,14 +91,12 @@ export function run(params) {
 		url
 	} = params;
 	//log.debug(`propertyArtist:${propertyArtist}`);
-	//log.debug(`propertyCaption:${propertyCaption}`);
 	//log.debug(`propertyCopyright:${propertyCopyright}`);
 	//log.debug(`propertyDescription:${propertyDescription}`);
 	//log.debug(`propertyDisplayName:${propertyDisplayName}`);
 	//log.debug(`propertyTags:${propertyTags}`);
 	const properties = {
 		artist: propertyArtist,
-		caption: propertyCaption,
 		copyright: propertyCopyright,
 		description: propertyDescription,
 		displayName: propertyDisplayName,

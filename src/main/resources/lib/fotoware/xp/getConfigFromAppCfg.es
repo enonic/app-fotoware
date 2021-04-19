@@ -35,7 +35,6 @@ export function getConfigFromAppCfg() {
 			clientId,
 			properties: {
 				artist = PROPERTY_IF_CHANGED,
-				caption = PROPERTY_IF_CHANGED,
 				copyright = PROPERTY_OVERWRITE,
 				description = PROPERTY_IF_CHANGED,
 				displayName = PROPERTY_ON_CREATE,
@@ -69,7 +68,6 @@ export function getConfigFromAppCfg() {
 				imports: {},
 				properties: {
 					artist,
-					caption,
 					copyright,
 					description,
 					displayName,
