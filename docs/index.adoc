@@ -47,6 +47,20 @@ imports.MyInventedImportId.path = Images from FotoWare <--9-->
 <10> Which query to use when finding what to import. Defaults to `fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg`.
 <11> Name of rendition to use when importing. If the rendition is not supported by an asset type `Original File` is used. Default is `Original File`.
 
+== Renditions = Processing Profiles
+
+Sometimes you don't want to import the orignal images.
+This can be achieved by creating a Processing Profile.
+
+In order to use a Processing Profile on the main Archive (5000-All-Files) you have to make a Processing Profile Set and include the Processing Profile you created in that profile.
+This can be done in the FotoWare Site Configuration/Workflow/Processing Profiles.
+You can also add your Processing Profile to the default Processing Profile Set.
+
+Then you have to make sure that the main archive uses the Processing Profile Set which includes the Processing Profile you want.
+Open the main archive and click the settings icon, then go to the Export and Import tab and select a Processing Profile under Allow users to select processing profile.
+
+Finally you have to input that Processing Profile name in the Enonic XP Fotoware Integration Application Configuration under the configuration option rendition as documented above.
+
 == Webhooks
 
 There are currently 3 webhook API endpoints available:
@@ -98,3 +112,4 @@ Some boolean operator symbols fails.
 * When renaming a file on the FotoWare server, the received asset modified doesn't contain information about the new filename. So we are unable to perform the rename on the Enonic XP side.
 * When duplicating a file on the FotoWare server no asset ingested is sent.
 * When moving a file on the FotoWare server, it actually make a copy, but no asset ingested nor asset modified is sent.
+* Moving an image outside the sync "folder" in Enonic, decouples that image, so that next sync will create a new image withing the sync "folder".
