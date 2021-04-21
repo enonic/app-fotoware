@@ -1,101 +1,120 @@
-= FotoWare Integration Application Documentation
+= FotoWare integration docs
 :toc: right
+:imagesdir: media
+
+Configure Enonic to import your media from Fotoware seamlessly in the background
 
 == Introduction
 
-The Enonic XP integration with FotoWare is made in such a way you may import from multiple FotoWare sites and/or even multiple times from the same FotoWare site.
+Enonic provides an integration with FotoWare that allows you to define imports one or more FotoWare sites and archives into Content Studio. As an example, you might want to import Images, Videos and Documents separately, or to different projects in the CMS.
 
-For example you might want to import Images, Videos and Documents separately.
+== Installation
 
-== Configuration
+NOTE: In order to install and configure this integration you will need administrative permissions both for Enonic and FotoWare.
 
-Notice "mysite" in the example configuration below.
-It's used as a unique key for a FotoWare site.
-When defining imports you have to use the same key.
+The integration is available as an application and can be downloaded and installed from https://market.enonic.com/vendors/enonic/fotoware[Enonic Market].
+
+== Configuration options
+
+The application is adapted for your installation via configuration files.
+The following configuration options are available:
+
+NOTE: "mysite" and "myimport" should be replaced by your preferred labels when creating the configuration
 
 .com.enonic.app.fotoware.cfg
 [source,cfg]
 ----
-sites.MyInventedSiteId.clientId = abcd <--1-->
-sites.MyInventedSiteId.clientSecret = abcd <--2-->
-sites.MyInventedSiteId.url = https://mysite.fotoware.cloud <--3-->
-#sites.MyInventedSiteId.archiveName = 5000-All-files <--4-->
-#sites.MyInventedSiteId.allowWebhookFromIp = 127.0.0.1,127.0.0.2 <--5-->
+sites.mysite.clientId = abcd <--1-->
+sites.mysite.clientSecret = abcd <--2-->
+sites.mysite.url = https://mysite.fotoware.cloud <--3-->
+#sites.mysite.archiveName = 5000-All-files <--4-->
+#sites.mysite.allowWebhookFromIp = 127.0.0.1,127.0.0.2 <--5-->
+#sites.mysite.properties.displayName = onCreate <--6-->
+#sites.mysite.properties.artist = ifChanged
+#sites.mysite.properties.copyright = overwrite
+#sites.mysite.properties.tags = ifChanged
+#sites.mysite.properties.description = ifChanged
 
-#sites.MyInventedSiteId.properties.displayName = onCreate <--6-->
-#sites.MyInventedSiteId.properties.artist = ifChanged
-#sites.MyInventedSiteId.properties.copyright = overwrite
-#sites.MyInventedSiteId.properties.tags = ifChanged
-#sites.MyInventedSiteId.properties.description = ifChanged
-
-imports.MyInventedImportId.site = MyInventedSiteId <--7-->
-imports.MyInventedImportId.project = default <--8-->
-imports.MyInventedImportId.path = Images from FotoWare <--9-->
-#imports.MyInventedImportId.query = fn:*.jpg|fn:*.png <--10-->
-#imports.MyInventedImportId.rendition = 4096 max width <--11-->
+imports.myimport.site = mysite <--7-->
+imports.myimport.project = myproject <--8-->
+#imports.myimport.path = fotoware <--9-->
+#imports.myimport.query = fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg <--10-->
+#imports.myimport.rendition = 4096 max width <--11-->
 ----
 
-<1> OAuth 2.0 Client ID
-<2> OAuth 2.0 Client Secret
-<3> Url of your FotoWare site.
-<4> What is the name of the magic archive that contains all the files. Default is `5000-All-files`. Used to be `5000-Archive`.
-<5> Allow receiving webhooks from these IP addresses. Defaults to `localhost`.
-<6> Choose when to update properties to allow changing them on Enonic side. onCreate means only when media created in Enonic XP. ifChanged means when changed in FotoWare. overwrite always uses the FotoWare value.
-<7> Which fotoware site configuration to import from.
-<8> Which Enonic XP Project to import to.
-<9> Which path within the Enonic XP Project to import to. Defaults to `fotoware`.
-<10> Which query to use when finding what to import. Defaults to `fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg`.
-<11> Name of rendition to use when importing. If the rendition is not supported by an asset type `Original File` is used. Default is `Original File`.
+<1> OAuth 2.0 Client ID for your FotoWare installation (site). Read more about Auth below.
+<2> OAuth 2.0 Client Secret for your FotoWare installation. Read more about Auth below.
+<3> Url of your FotoWare installation i.e. https://mycompany.fotoware.com.
+<4> Optional: Name of the archive that contains all the files. Default is `5000-All-files`. Older installations may use `5000-Archive`.
+<5> For security purposes, restrict webhooks to the specified IP addresses. Defaults to `127.0.0.1`. Read more about webhooks below.
+<6> Configure how the import will treat properties stored in Enonic. 
+* `onCreate` means property will only be written when media created (first time) in Enonic. 
+* `ifChanged` means property will updated in Enonic if it is changed in FotoWare. 
+* `overwrite` forces updates of the FotoWare value, also when running a refresh on the import.
+<7> FotoWare site - specifies the FW installation to import from (as defined earlier, i.e. mysite).
+<8> Specified Enonic content project to import to.
+<9> Target path within the Enonic XP Project to import to. Defaults to `fotoware`.
+<10> Optionally specify query to use when finding what to import. Defaults to `fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg`.
+<11> Optionally specify a rendition in FotoWare. If the rendition is not supported by an asset type `Original File` is used. Default is `Original File`. Read more about renditions below.
 
-== Renditions = Processing Profiles
 
-Sometimes you don't want to import the orignal images.
-This can be achieved by creating a Processing Profile.
+== Auth
+To enable communication between Enonic and FotoWare, simply add an application in Fotoware from `Settings / Integrations / Applications`.
 
-In order to use a Processing Profile on the main Archive (5000-All-Files) you have to make a Processing Profile Set and include the Processing Profile you created in that profile.
-This can be done in the FotoWare Site Configuration/Workflow/Processing Profiles.
-You can also add your Processing Profile to the default Processing Profile Set.
+image::auth.png[Creathing authentication tokens, 807]
 
-Then you have to make sure that the main archive uses the Processing Profile Set which includes the Processing Profile you want.
-Open the main archive and click the settings icon, then go to the Export and Import tab and select a Processing Profile under Allow users to select processing profile.
+By giving the application a name, a client ID and secret will automatically be generated and made available for you.
 
-Finally you have to input that Processing Profile name in the Enonic XP Fotoware Integration Application Configuration under the configuration option rendition as documented above.
 
 == Webhooks
 
-There are currently 3 webhook API endpoints available:
+To get continuous updates with new and modified files from FotoWare without running the import again, you need to activate webhooks in FotoWare, and enable reception in your Enonic instance. The allowWebhookFromIp allows communication from your FotoWare instance to Enonic.
 
-- http://localhost:8080/webapp/com.enonic.app.fotoware/asset/ingested
-- http://localhost:8080/webapp/com.enonic.app.fotoware/asset/modified
-- http://localhost:8080/webapp/com.enonic.app.fotoware/asset/deleted
+=== Setting up endpoint
 
-Where you can reach them depends on your vhost configuration.
+The integration also features a service with the following internal URL pattern:
 
-There is also an endpoint which just gives you a webpage with an icon, so you can test from a webbrowser what url is correct.
+    http://server:8080/webapp/com.enonic.app.fotoware
 
-- http://localhost:8080/webapp/com.enonic.app.fotoware
+Accessing the URL directly should serve an icon. More interestingly however, the webapp contains three endpoints that will be used by FotoWare's webhooks.
 
-When you have found the correct url, you need to configure webhooks on your FotoWare site: https://mysite.fotoware.cloud.
+- /asset/ingested
+- /asset/modified
+- /asset/deleted
 
-=== Remote addresses
+The endpoint's internal URL is generally not exposed to the public internet. As such, we recommend setting up a vhost, and ingress/proxy in your hosting environment to make it public.
 
-In order to protect against attacks you have to configure a whitelist of IP addresses from which to allow webhook requests.
+=== Activating Webhooks in FotoWare
 
-See the link:#_configuration[Configuration] section above.
+With the integration endpoint safely exposed, you'll need to activate webhooks on your FotoWare instance. You will be able to do this from `Settings / Integrations / Webhooks`.
+
+If you exposed the integration endpoint on this URL: http(s)://myserver/fwxp, the configuration in FotoWare should look something like this:
+
+image::webhooks.png[Setting up webhooks, 882]
+
+== Renditions
+
+If you for some reason don't want to import the orignal images, or restrict imported images to a maximum size, this can be achieved by creating a rendition (or so-called Processing Profile) in FotoWare.
+
+To enable this, you need to perform the following steps in your FotoWare instance:
+
+. Create a processing profile matching your requirements (this can be defined from `FotoWare Site Configuration / Workflow / Processing Profiles`
+. The processing profile now needs to be added to a Processing Profile Set, also available in the Workflow menu. We recommend simply adding it to the `Default` set.
+. Finally, make sure the archive is configured to use the correct Processing Profile Set. Normally, you should not need to change anything here, as `Default` is the standard setting. You can find this configuration from `All files / settings / Export and import`Then select the profile set under Àllow users to select processing profile`.
 
 
 == FotoWare API Documentation
+
+The integration uses FotoWare's standard API. For more information about the API, vitsit their documentation:
 
 - https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API
 - https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview
 - https://api.fotoware.com/
 
 
-=== Authorization
+== Query
 
-- https://learn.fotoware.com/Integrations_and_APIs/Authorizing_applications_using_OAuth/03_Authorizing_a_client_using_OAuth_2.0/Non-interactive_application_authorization_with_OAuth_2.0
-
-=== Query
+For more details on how to create queries, visit the FotoWare documentation:
 
 - https://learn.fotoware.com/On-Premises/FotoWeb/Navigating_and_searching_to_find_your_assets/Searching_in_FotoWeb/001_Searching_for_assets/FotoWare_Search_Expressions_Reference
 
@@ -106,10 +125,15 @@ Some boolean operator symbols fails.
 - Use `NOT` not `-`
 ====
 
+== Organising images
+
+You may organise or rename files in Enonic as you desire within the FotoWare folder, and even re-name them. If you however move the file out of this folder, the image is considered a local CMS image. During the next syncronisation, a new instance of the image will be imported from FotoWare and placed in the original location.
 
 == Known Issues
 
-* When renaming a file on the FotoWare server, the received asset modified doesn't contain information about the new filename. So we are unable to perform the rename on the Enonic XP side.
-* When duplicating a file on the FotoWare server no asset ingested is sent.
-* When moving a file on the FotoWare server, it actually make a copy, but no asset ingested nor asset modified is sent.
-* Moving an image outside the sync "folder" in Enonic, decouples that image, so that next sync will create a new image withing the sync "folder".
+Renaming of files in FotoWare:: FotoWare does not have a unique ID for the assets. The integration uses the filenames as unique identifier when syncronising content. However, when renaming a file in FotoWare, the webhooks currently does not provide the new name of the file. As such, we are unable to persist update the reference to the asset. The items get detached in Enonic, and you will end up with two similar files. We have filed an issue with FotoWare to get this resolved.
+
+Duplicating files in FotoWare:: When duplicating a file on the FotoWare server no asset ingested is sent, and we are not able to get the file instantly. You will need to perform a syncronisation.
+
+Moving files in FotoWare:: When moving a file in FotoWare, it actually make a copy, but no asset ingested nor asset modified is sent. As such, we cannot get this file without performing a syncronisation.
+
