@@ -71,6 +71,10 @@ Integration with Fotoware
 
 * Build system upgrades:
   * Node 14.17.0
+  * Babel modules 7.14.4
+  * Core-js 3.13.1
+  * Webpack 5.38.1
+  * All node modules up to date
 
 ### 1.0.0
 
