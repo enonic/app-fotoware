@@ -67,6 +67,11 @@ Integration with Fotoware
 
 ## Changelog
 
+### 1.0.1-SNAPSHOT
+
+* Build system upgrades:
+  * Node 14.17.0
+
 ### 1.0.0
 
 * Keep original FotoWare filename in x-data, to allow rename in Enonic XP
