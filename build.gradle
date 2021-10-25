@@ -49,7 +49,7 @@ dependencies {
 	//include "com.enonic.xp:lib-websocket:${xpVersion}"
 	//include "com.enonic.xp:lib-xslt:${xpVersion}"
 
-	include "com.enonic.lib:lib-admin-ui:3.0.0"
+	include "com.enonic.lib:lib-admin-ui:4.0.2"
 	//include 'com.enonic.lib:lib-cache:2.1.1'
 	//include 'com.enonic.lib:lib-cron:1.1.1'
 	include 'com.enonic.lib:lib-galimatias:1.0.0-B1'
