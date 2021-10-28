@@ -81,14 +81,23 @@ export const assetModified = (request) => {
 	const {
 		href: hrefFromHook, // FQDN
 		data: {
-			filename
+			//filename // Old format
+
+			// New format
+			//metadataDiff
+			assetBefore: {
+				filename: fileNameOld
+			},
+			asset: {
+				filename: fileNameNew
+			}
 		}
 	} = body;
 	//log.debug(`hrefFromHook:${toStr(hrefFromHook)}`);
 	//log.debug(`filename:${toStr(filename)}`);
 
-	if (filename.startsWith('.')) {
-		log.warning(`Skipping filename:${filename} because it starts with a dot, so probabbly a hidden file.`);
+	if (fileNameOld.startsWith('.') || fileNameNew.startsWith('.')) {
+		log.warning(`Skipping fileNameOld:${fileNameOld} fileNameNew:${fileNameNew} because it starts with a dot, so probabbly a hidden file.`);
 		return {
 			body: {},
 			contentType: 'application/json;charset=utf-8'
@@ -153,29 +162,29 @@ export const assetModified = (request) => {
 			description: '',
 			func: () => {
 				const contentQueryResult = queryForFilename({
-					filename,
+					filename: fileNameOld,
 					path
 				});
 				let exisitingMediaContent;
 				if (contentQueryResult.total === 0) {
 					// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
-					exisitingMediaContent = getContentByKey({key: `/${path}/${filename}`});
+					exisitingMediaContent = getContentByKey({key: `/${path}/${fileNameOld}`});
 				} else if (contentQueryResult.total === 1) {
 					exisitingMediaContent = contentQueryResult.hits[0];
 				} else if (contentQueryResult.total > 1) {
-					log.error(`Found more than one content with FotoWare filename:${filename} ids:${contentQueryResult.hits.map(({_id}) => _id).join(', ')}`);
+					log.error(`Found more than one content with FotoWare fileNameOld:${fileNameOld} ids:${contentQueryResult.hits.map(({_id}) => _id).join(', ')}`);
 					exisitingMediaContent = -1;
 				}
 
 				if (!exisitingMediaContent) {
-					log.error(`path:${path} name:${filename} not found! Perhaps missed assetIngested, or assetDeleted arrived before assetModified.`);
+					log.error(`path:${path} fileNameOld:${fileNameOld} not found! Perhaps missed assetIngested, or assetDeleted arrived before assetModified.`);
 				}
 
 				const queryResult = doQuery({
 					accessToken,
 					blacklistedCollections: {}, // NOTE Intentional hardcode
 					hostname,
-					q: `(${query})AND(fn:${filename})`,
+					q: `(${query})AND(fn:${fileNameNew})`,
 					searchURL,
 					whitelistedCollections: { // NOTE Intentional hardcode
 						[archiveName]: true
@@ -189,9 +198,9 @@ export const assetModified = (request) => {
 				} = queryResult;
 
 				if (assetCountTotal === 0) {
-					log.warning(`filename:${filename} not found when querying!`);
+					log.warning(`fileNameNew:${fileNameNew} not found when querying!`);
 				} else if (assetCountTotal > 1) {
-					log.error(`Querying for filename:${filename} returned more than one asset!`);
+					log.error(`Querying for fileNameNew:${fileNameNew} returned more than one asset!`);
 				} else {
 					const {
 						//doctype,
@@ -205,8 +214,8 @@ export const assetModified = (request) => {
 					} = collections[0].assets[0];
 					//log.info(`filenameFromQuery:${toStr(filenameFromQuery)}`);
 					//log.info(`metadata:${toStr(metadata)}`);
-					if (filename !== filenameFromQuery) {
-						throw new Error(`filename:${filename} from assetModified does not match filename:${filenameFromQuery} from query result`);
+					if (fileNameNew !== filenameFromQuery) {
+						throw new Error(`fileNameNew:${fileNameNew} from assetModified does not match filename:${filenameFromQuery} from query result`);
 					}
 					const renditionsObj = {};
 					renditions.forEach(({
@@ -245,11 +254,11 @@ export const assetModified = (request) => {
 						const parentPath = `/${path}`;
 						const createMediaResult = createMedia({
 							parentPath,
-							name: filename,
+							name: fileNameNew,
 							data: downloadRenditionResponse.bodyStream
 						});
 						if (!createMediaResult) {
-							const errMsg = `Something went wrong when creating parentPath:${parentPath} name:${filename}!`;
+							const errMsg = `Something went wrong when creating parentPath:${parentPath} fileNameNew:${fileNameNew}!`;
 							log.error(errMsg);
 							throw new Error(errMsg);
 						}
@@ -270,38 +279,38 @@ export const assetModified = (request) => {
 						} = exisitingMediaContent;
 						const md5sumOfExisitingMediaContent = md5sumFromContent || md5(readText(getAttachmentStream({
 							key: exisitingMediaContent._path,
-							name: filename
+							name: fileNameOld
 						})));
 						//log.info(`md5sumOfExisitingMediaContent:${toStr(md5sumOfExisitingMediaContent)}`);
 						if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
 							log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
 							// TODO Modify attachment
-							try {
+							/*try {
 								addAttachment({
 									key: exisitingMediaContent._path,
 									//mimeType: doctype, // 'image' is a invalid mimetype
-									mimeType: getMimeType(filename),
-									name: filename,
+									mimeType: getMimeType(fileNameNew),
+									name: fileNameNew,
 									data: downloadRenditionResponse.bodyStream
 								});
 							} catch (e) {
 								// Just to see what happens if you try to add an attachment that already exists
-								log.error(e);
-								log.error(e.class.name);
-								log.error(e.message);
-								removeAttachment({
-									key: exisitingMediaContent._path,
-									name: filename
-								});
-								// NOTE re-add old attachment with old name? nah, that information is in versions
-								addAttachment({
-									key: exisitingMediaContent._path,
-									//mimeType: doctype, // 'image' is a invalid mimetype
-									mimeType: getMimeType(filename),
-									name: filename,
-									data: downloadRenditionResponse.bodyStream
-								});
-							}
+							log.error(e);
+							log.error(e.class.name);
+							log.error(e.message);*/
+							removeAttachment({
+								key: exisitingMediaContent._path,
+								name: fileNameOld
+							});
+							// NOTE re-add old attachment with old name? nah, that information is in versions
+							addAttachment({
+								key: exisitingMediaContent._path,
+								//mimeType: doctype, // 'image' is a invalid mimetype
+								mimeType: getMimeType(fileNameNew),
+								name: fileNameNew,
+								data: downloadRenditionResponse.bodyStream
+							});
+							//}
 						} else {
 							log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 						}
