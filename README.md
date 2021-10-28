@@ -63,11 +63,12 @@ Integration with Fotoware
 
 | App version | XP version |
 | ----------- | ---------- |
+| 2.0.0 | 7.5.0 |
 | 1.0.0 | 7.5.0 |
 
 ## Changelog
 
-### 1.0.1-SNAPSHOT
+### 2.0.0-SNAPSHOT
 
 * Build system upgrades:
   * Gradle 5.6.4 -> 6.9
