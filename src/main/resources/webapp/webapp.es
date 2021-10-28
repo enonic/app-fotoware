@@ -1,3 +1,6 @@
+import '@enonic/global-polyfill'; // Required by reflect-metadata
+import 'reflect-metadata'; // Required by set-value
+
 import Router from '/lib/router';
 //import {toStr} from '/lib/util';
 //import {assetUrl} from '/lib/xp/portal';

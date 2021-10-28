@@ -2,12 +2,13 @@
 //──────────────────────────────────────────────────────────────────────────────
 // Imports
 //──────────────────────────────────────────────────────────────────────────────
+import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 //import GetGoogleFonts from 'get-google-fonts';
 import glob from 'glob';
 //import GoogleFontsPlugin from 'google-fonts-webpack-plugin';
 import path from 'path';
-//import webpack from 'webpack';
+import webpack from 'webpack';
 
 //new GetGoogleFonts().download('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap');
 
@@ -242,6 +243,7 @@ if (SERVER_JS_FILES.length) {
 			hints: false
 		},
 		plugins: [
+			new CaseSensitivePathsPlugin(),
 			new CopyPlugin({
 				patterns: [
 					{ context: NODE_MODULES_CONTEXT, from: '@babel/standalone/babel.*.js', to: 'assets/js/@babel/standalone/[name][ext]' },
@@ -251,6 +253,9 @@ if (SERVER_JS_FILES.length) {
 					{ context: NODE_MODULES_CONTEXT, from: 'react-dom/umd/react-dom.*.js', to: 'assets/js/react-dom/[name][ext]' },
 				]
 			}),
+			new webpack.ProvidePlugin({
+				Buffer: ['buffer', 'Buffer']
+			})
 			/*
 			Not Webpack 5 compatible?
 			[webpack-cli] TypeError: compiler.plugin is not a function

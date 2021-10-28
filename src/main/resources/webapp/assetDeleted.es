@@ -4,7 +4,8 @@
 //import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
 
-import * as setIn from 'set-value';
+//import 'reflect-metadata';
+import * as setIn from 'set-value'; // requires reflect-metadata
 import * as traverse from 'traverse';
 
 // Enonic modules
