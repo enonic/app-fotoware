@@ -25,7 +25,7 @@ import {
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
 //import {readText} from '/lib/xp/io';
-import {submit} from '/lib/xp/task';
+import {executeFunction} from '/lib/xp/task';
 
 // FotoWare modules
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
@@ -151,9 +151,9 @@ export const assetDeleted = (request) => {
 					idProvider: 'system'
 				},
 				principals: ['role:system.admin']
-			}, () => submit({
+			}, () => executeFunction({
 				description: '',
-				task: () => {
+				func: () => {
 					const contentQueryResult = queryForFilename({
 						filename,
 						path
@@ -262,7 +262,7 @@ export const assetDeleted = (request) => {
 						}
 					} // else exisitingMedia
 				} // task
-			}) // submit
+			}) // executeFunction
 		); // runInContext
 	}); // forEach
 

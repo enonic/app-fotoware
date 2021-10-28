@@ -14,7 +14,7 @@ import {
 	create as createRepo,
 	list as listRepos
 }  from '/lib/xp/repo';
-import {submit} from '/lib/xp/task';
+import {executeFunction} from '/lib/xp/task';
 
 runInContext({
 	repository: 'system-repo',
@@ -24,9 +24,9 @@ runInContext({
 		idProvider: 'system'
 	},
 	principals: ['role:system.admin']
-}, () => submit({
+}, () => executeFunction({
 	description: `Creating repoId:${REPO_ID} branch:${REPO_BRANCH} (if needed)`,
-	task: () => {
+	func: () => {
 		const repoList = listRepos();
 		//log.debug(`repoList:${toStr(repoList)}`);
 

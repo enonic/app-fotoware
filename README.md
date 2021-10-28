@@ -63,7 +63,7 @@ Integration with Fotoware
 
 | App version | XP version |
 | ----------- | ---------- |
-| 2.0.0 | 7.5.0 |
+| 2.0.0 | 7.7.2 |
 | 1.0.0 | 7.5.0 |
 
 ## Changelog

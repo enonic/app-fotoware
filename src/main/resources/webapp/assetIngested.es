@@ -21,8 +21,8 @@ import {
 import {run as runInContext} from '/lib/xp/context';
 import {readText} from '/lib/xp/io';
 import {
-	submit//,
-	//submitNamed
+	executeFunction//,
+	//submitTask
 } from '/lib/xp/task';
 
 // FotoWare modules
@@ -123,8 +123,8 @@ export const assetIngested = (request) => {
 		return {status: 404};
 	}
 
-	/*submitNamed({
-		name: 'assetIngested',
+	/*submitTask({
+		descriptor: 'assetIngested',
 		config: {
 			archiveName,
 			clientId,
@@ -134,7 +134,7 @@ export const assetIngested = (request) => {
 			imports,
 			url
 		} // config
-	}); // submitNamed*/
+	}); // submitTask*/
 
 	/*
 	// This probably need to be totally unique, so that only once can run at a time.
@@ -184,9 +184,9 @@ export const assetIngested = (request) => {
 					idProvider: 'system'
 				},
 				principals: ['role:system.admin']
-			}, () => submit({
+			}, () => executeFunction({
 				description: '',
-				task: () => {
+				func: () => {
 					const contentQueryResult = queryForFilename({
 						filename,
 						path
@@ -367,7 +367,7 @@ export const assetIngested = (request) => {
 						}
 					}
 				} // task
-			}) // submit
+			}) // executeFunction
 		); // runInContext
 	}); // forEach
 	//unschedule({name: CRON_TASK_NAME});

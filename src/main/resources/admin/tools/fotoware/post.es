@@ -10,7 +10,7 @@ import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {run as runInContext} from '/lib/xp/context';
 import {connect} from '/lib/xp/node';
 import {assetUrl as getAssetUrl} from '/lib/xp/portal';
-import {submitNamed} from '/lib/xp/task';
+import {submitTask} from '/lib/xp/task';
 
 export function post(request) {
 	//log.debug(`request:${toStr(request)}`);
@@ -154,8 +154,8 @@ export function post(request) {
 							idProvider: 'system'
 						},
 						principals: ['role:system.admin']
-					}, () => submitNamed({
-						name: 'syncSite',
+					}, () => submitTask({
+						descriptor: 'syncSite',
 						config: {
 							archiveName,
 							boolResume,
