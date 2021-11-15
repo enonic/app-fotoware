@@ -72,7 +72,7 @@ export const assetModified = (request) => {
 	let body;
 	try {
 		body = JSON.parse(request.body);
-		//log.debug(`body:${toStr(body)}`);
+		log.debug(`body:${toStr(body)}`);
 	} catch (e) {
 		log.error(`Something went wrong when trying to parse request body ${toStr(request)}`);
 		return {status: 404};
