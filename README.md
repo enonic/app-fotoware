@@ -70,6 +70,8 @@ Integration with Fotoware
 
 ### 2.0.0-SNAPSHOT
 
+* Replace set-value with dot2val
+  * set-value now requires Reflect. Polyfilling Reflect doesn't seem to work.
 * Build system upgrades:
   * Gradle 5.6.4 -> 6.9
   * Node 14.16.0 -> 16.13.0

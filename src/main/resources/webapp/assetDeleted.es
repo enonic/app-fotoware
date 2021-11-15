@@ -1,11 +1,18 @@
+// Polyfills
+//import '@enonic/global-polyfill'; // Required by reflect-metadata
+
+// The reflect-metadata polyfill should be imported only once in your entire application because the Reflect object is meant to be a global singleton.
+// More details about this can be found here. (https://github.com/inversify/InversifyJS/issues/262#issuecomment-227593844)
+//import 'reflect-metadata'; // Required by set-value
+
 // Node modules
 //import {diff} from 'deep-object-diff';
 
 //import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
 
-//import 'reflect-metadata';
-import * as setIn from 'set-value'; // requires reflect-metadata
+//import * as setIn from 'set-value'; // Requires reflect-metadata
+import {set as setIn} from 'dot2val';
 import * as traverse from 'traverse';
 
 // Enonic modules
