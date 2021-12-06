@@ -32,23 +32,17 @@ import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 
+import {buildLicensedTo} from '/lib/fotoware/xp/buildLicensedTo';
+import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid'
 
 export const assetModified = (request) => {
 	//log.debug(`request:${toStr(request)}`);
 
 	const licenseDetails = validateLicense({appKey: app.name});
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
-	const licenseValid = !!(licenseDetails && !licenseDetails.expired);
-	const licensedTo = licenseDetails
-		? (
-			licenseDetails.expired
-				? 'License expired!'
-				: `Licensed to ${licenseDetails.issuedTo}`
-		)
-		: 'Unlicensed!';
 
-	if (!licenseValid) {
-		log.error(licensedTo);
+	if (!isLicenseValid(licenseDetails)) {
+		log.error(buildLicensedTo(licenseDetails));
 		return {status: 404};
 	}
 

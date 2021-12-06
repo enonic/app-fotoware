@@ -33,7 +33,8 @@ const extensions = [
 	'.es',
 	'.es6', // lib-static
 	'.js',
-	'.json'
+	'.json',
+	'.ts'
 ]; // used in resolve
 const outputPath = path.join(__dirname, DST_DIR);
 
@@ -70,7 +71,7 @@ const SERVER_JS_FILES = glob.sync(`${SRC_DIR}/**/${JS_EXTENSION_GLOB_BRACE}`, {
 });
 //console.log(`SERVER_JS_FILES:${toStr(SERVER_JS_FILES)}`);
 
-const SERVER_JS_TEST = /\.(es6?|js)$/i; // Will need js for node module depenencies
+const SERVER_JS_TEST = /\.(es6?|ts|js)$/i; // Will need js for node module depenencies
 
 const SS_ALIAS = {};
 const SS_EXTERNALS = [
@@ -171,6 +172,7 @@ if (SERVER_JS_FILES.length) {
 							'array-includes'
 						],
 						presets: [
+							'@babel/preset-typescript',
 							[
 								'@babel/preset-env',
 								{
