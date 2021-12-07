@@ -34,7 +34,8 @@ const extensions = [
 	'.es6', // lib-static
 	'.js',
 	'.json',
-	'.ts'
+	'.ts',
+	'.d.ts'
 ]; // used in resolve
 const outputPath = path.join(__dirname, DST_DIR);
 

@@ -7,7 +7,7 @@ import Router from '/lib/router';
 import {getResource} from '/lib/xp/io';
 
 import {assetIngested} from '/webapp/assetIngested';
-import {assetModified} from '/webapp/assetModified';
+import {assetModified} from '/webapp/asset/modified';
 import {assetDeleted} from '/webapp/assetDeleted';
 import {exportPublished} from '/webapp/exportPublished';
 import {exportRevoked} from '/webapp/exportRevoked';

@@ -1,4 +1,5 @@
 //import {toStr} from '/lib/util';
+// @ts-ignore
 import {deepen} from '/lib/fotoware/xp/deepen';
 //import {deepen} from './deepen';
 //import {capitalize} from '/lib/fotoware/xp/capitalize';
@@ -6,13 +7,18 @@ import {
 	PROPERTY_ON_CREATE,
 	PROPERTY_IF_CHANGED,
 	PROPERTY_OVERWRITE
+	// @ts-ignore
 } from '/lib/fotoware/xp/constants';
+
+
+import {app, log} from '../../xp/globals';
+import {AppConfig} from './AppConfig';
 
 
 export function getConfigFromAppCfg() {
 	//log.debug(`app.config:${toStr(app.config)}`);
 
-	const config = deepen(app.config);
+	const config :AppConfig = deepen(app.config);
 	//log.debug(`config:${toStr(config)}`);
 
 	const {
@@ -24,7 +30,8 @@ export function getConfigFromAppCfg() {
 
 	const sitesConfigs = {};
 
-	Object.keys(sites).forEach((site) => {
+	Object.keys(sites).forEach((siteName) => {
+		const siteConfig = sites[siteName];
 		//log.debug(`site:${toStr(site)}`);
 		const {
 			//archiveName = '5000-Archive',
@@ -40,7 +47,7 @@ export function getConfigFromAppCfg() {
 				displayName = PROPERTY_ON_CREATE,
 				tags = PROPERTY_IF_CHANGED
 			} = {}
-		} = sites[site];
+		} = siteConfig;
 		//log.info(`allowWebhookFromIp:${toStr(allowWebhookFromIp)}`);
 		/*log.debug(`${toStr({
 			clientId,
@@ -48,18 +55,18 @@ export function getConfigFromAppCfg() {
 			url
 		})}`);*/
 		if (!clientId) {
-			log.error(`Site ${site} is missing clientId!`);
+			log.error(`Site ${siteName} is missing clientId!`);
 		} else if(!clientSecret) {
-			log.error(`Site ${site} is missing clientSecret!`);
+			log.error(`Site ${siteName} is missing clientSecret!`);
 		} else if(!url) {
-			log.error(`Site ${site} is missing url!`);
+			log.error(`Site ${siteName} is missing url!`);
 		} else {
 			const remoteAddresses = {};
 			allowWebhookFromIp.split(/\s*,\s*/).forEach((ip) => {
 				remoteAddresses[ip] = true;
 			});
 			//log.info(`remoteAddresses:${toStr(remoteAddresses)}`);
-			sitesConfigs[site] = {
+			sitesConfigs[siteName] = {
 				archiveName,
 				url,
 				remoteAddresses,
@@ -81,13 +88,14 @@ export function getConfigFromAppCfg() {
 
 	const projectPaths = {};
 	Object.keys(imports).forEach((importName) => {
+		const importObj = imports[importName];
 		const {
 			project,
 			path = 'fotoware',
 			query = 'fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg',
 			rendition = 'Original File',
 			site
-		} = imports[importName];
+		} = importObj;
 		//log.info(`project:${toStr(project)}`);
 		//log.info(`path:${toStr(path)}`);
 		//log.info(`query:${toStr(query)}`);
