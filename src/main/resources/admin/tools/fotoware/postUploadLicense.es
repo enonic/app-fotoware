@@ -3,6 +3,7 @@ import {
 	validateLicense
 } from '/lib/license';
 import {toStr} from '/lib/util';
+import {getToolUrl} from '/lib/xp/admin';
 import {readText} from '/lib/xp/io';
 import {
 	assetUrl as getAssetUrl,
@@ -30,6 +31,7 @@ export function postUploadLicense(request) {
 	log.info(`boolLicenseInstalled:${toStr(boolLicenseInstalled)}`);
 
 	const assetsUrl = getAssetUrl({path: ''});
+	const fotowareAdminUrl = getToolUrl(app.name, 'fotoware');
 
 	return {
 		body: `<!DOCTYPE html>
@@ -41,7 +43,7 @@ export function postUploadLicense(request) {
 		<meta name="theme-color" content="#ffffff">
 
 		<title>License ${boolLicenseInstalled ? 'Installed' : 'Invalid!'}</title>
-		<meta http-equiv="refresh" content="5;URL='${boolLicenseInstalled ? '.' : './uploadLicense'}'" />
+		<meta http-equiv="refresh" content="5;URL='${boolLicenseInstalled ? fotowareAdminUrl : './uploadLicense'}'" />
 
 		<link rel="shortcut icon" href="${assetsUrl}/images/ico/fotoware.ico">
 		<link rel="stylesheet" type="text/css" href="${assetsUrl}/admin/common/styles/lib.css">
