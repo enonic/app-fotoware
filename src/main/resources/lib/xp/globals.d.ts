@@ -1,8 +1,13 @@
-//declare global {
+export {};
+
+declare global {
+	interface AppConfigObject {
+		[key :string] :any
+	}
 	interface App {
-		readonly config: { // Object of unknown structure
-		}
+		readonly config :AppConfigObject
 		readonly name :string
+		readonly version :string
 	}
 	interface Log {
 		debug(s: string): void
@@ -10,7 +15,6 @@
 		info(s: string): void
 		warning(s: string): void
 	}
-//}
-
-export const app :App;
-export const log :Log;
+	const app :App;
+	const log :Log;
+}

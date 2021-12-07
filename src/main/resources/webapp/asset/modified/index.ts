@@ -13,8 +13,9 @@ import {executeFunction} from '/lib/xp/task';
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 // @ts-ignore
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
-// @ts-ignore
+
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
+
 // @ts-ignore
 import {buildLicensedTo} from '/lib/fotoware/xp/buildLicensedTo';
 // @ts-ignore
@@ -23,10 +24,9 @@ import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid'
 import {modifyInImport} from './modifyInImport';
 
 
-import {AssetModified} from '../../../lib/fotoware/Fotoware';
-import {SiteConfig/*, SitesConfig*/} from '../../../lib/fotoware/xp/AppConfig';
-import {app, log} from '../../../lib/xp/globals';
-import {Request} from '../../../lib/xp/Request';
+import {AssetModified} from '/lib/fotoware/Fotoware';
+import {SiteConfig} from '/lib/fotoware/xp/AppConfig';
+import {Request} from '/lib/xp/Request';
 
 
 export const assetModified = (request :Request) => {
@@ -41,7 +41,7 @@ export const assetModified = (request :Request) => {
 	}
 
 	const {
-		sitesConfig// :SitesConfig
+		sitesConfigs
 	} = getConfigFromAppCfg();
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
@@ -98,14 +98,14 @@ export const assetModified = (request :Request) => {
 	}
 
 	const url = new URL(hrefFromHook);
-	const site = url.getHost().replace('.fotoware.cloud', '');
+	const siteName :string = url.getHost().replace('.fotoware.cloud', '');
 	//log.debug(`site:${toStr(site)}`);
 
-	const siteConfig :SiteConfig = sitesConfig[site];
+	const siteConfig :SiteConfig = sitesConfigs[siteName];
 	if (!siteConfig) {
-		log.debug(`sitesConfigs:${toStr(sitesConfig)}`);
-		log.debug(`Object.keys(sitesConfigs):${toStr(Object.keys(sitesConfig))}`);
-		log.error(`Can't find siteConfig for site:${site}!`);
+		log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
+		log.debug(`Object.keys(sitesConfigs):${toStr(Object.keys(sitesConfigs))}`);
+		log.error(`Can't find siteConfig for site:${siteName}!`);
 		return {
 			status: 500
 		};

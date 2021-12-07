@@ -11,14 +11,17 @@ import {
 } from '/lib/fotoware/xp/constants';
 
 
-import {app, log} from '../../xp/globals';
-import {AppConfig} from './AppConfig';
+import {SitesConfigs} from './AppConfig';
+
+interface GetConfigFromAppCfgReturnType {
+	sitesConfigs: SitesConfigs
+}
 
 
-export function getConfigFromAppCfg() {
+export function getConfigFromAppCfg() :GetConfigFromAppCfgReturnType {
 	//log.debug(`app.config:${toStr(app.config)}`);
 
-	const config :AppConfig = deepen(app.config);
+	const config = deepen(app.config);
 	//log.debug(`config:${toStr(config)}`);
 
 	const {
@@ -28,7 +31,7 @@ export function getConfigFromAppCfg() {
 	//log.debug(`sites:${toStr(sites)}`);
 	//log.debug(`imports:${toStr(imports)}`);
 
-	const sitesConfigs = {};
+	const sitesConfigs :SitesConfigs = {};
 
 	Object.keys(sites).forEach((siteName) => {
 		const siteConfig = sites[siteName];

@@ -34,7 +34,6 @@ import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 
 
-import {log} from '../../../lib/xp/globals';
 import {MediaContent} from '../../../lib/fotoware/xp/MediaContent';
 
 

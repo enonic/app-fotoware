@@ -22,7 +22,7 @@ import webpack from 'webpack';
 //──────────────────────────────────────────────────────────────────────────────
 //const MODE = 'development';
 const MODE = 'production';
-const JS_EXTENSION_GLOB_BRACE = '*.{es,es6,mjs,jsx,flow,js}';
+const JS_EXTENSION_GLOB_BRACE = '*.{es,es6,mjs,jsx,flow,js,ts}';
 const ASSETS_PATH_GLOB_BRACE = '{site/assets,assets}';
 
 const SRC_DIR = 'src/main/resources';
@@ -74,10 +74,14 @@ const SERVER_JS_FILES = glob.sync(`${SRC_DIR}/**/${JS_EXTENSION_GLOB_BRACE}`, {
 
 const SERVER_JS_TEST = /\.(es6?|ts|js)$/i; // Will need js for node module depenencies
 
-const SS_ALIAS = {};
+const SS_ALIAS = {
+	'/lib/fotoware/': path.resolve(__dirname, 'src/main/resources/lib/fotoware/')
+};
+
 const SS_EXTERNALS = [
 	// /^\//
 	'/lib/cron',
+	/^\/lib\/fotoware/,
 	'/lib/galimatias',
 	'/lib/http-client',
 	'/lib/license',

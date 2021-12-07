@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"baseUrl": "src/main/resources",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"outDir": "build/tsc",
+		"paths": {
+			"/lib/fotoware/*": ["lib/fotoware/*"],
+			"/lib/xp/*": ["lib/xp/*"]
+		},
+		"rootDirs": ["src/main/resources"],
+		"target": "ES5"
+	},
+	"files": [
+      "./src/main/resources/services/sitesConfigs/sitesConfigs.ts"
+  	],
+	"include": [
+      "src/main/resources/**/*"
+    ]
+}

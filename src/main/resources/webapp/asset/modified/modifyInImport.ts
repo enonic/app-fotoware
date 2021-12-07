@@ -26,7 +26,6 @@ import {requestRendition} from '/lib/fotoware/api/requestRendition';
 // @ts-ignore
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 
-import {log} from '../../../lib/xp/globals';
 import {MediaContent} from '../../../lib/fotoware/xp/MediaContent';
 import {handleExistingMediaContent} from './handleExistingMediaContent';
 import {handleMissingMediaContent} from './handleMissingMediaContent';

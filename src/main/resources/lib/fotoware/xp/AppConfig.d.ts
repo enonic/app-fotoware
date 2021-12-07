@@ -3,15 +3,15 @@ interface Import {
 	readonly project :string
 	readonly query :string
 	readonly rendition :string
-	readonly site :string
+	readonly site? :string
 }
 
 interface Imports {
-	readonly [key :string]: Import
+	[key :string]: Import // Not readonly
 }
 
 export interface SiteConfig {
-	readonly allowWebhookFromIp :string
+	readonly allowWebhookFromIp? :string
 	readonly archiveName :string
 	readonly clientId :string
 	readonly clientSecret :string
@@ -29,11 +29,11 @@ export interface SiteConfig {
 	readonly url :string
 }
 
-export interface SitesConfig {
-	readonly [key :string]: SiteConfig
+export interface SitesConfigs {
+	[key :string]: SiteConfig // Not readonly
 }
 
 export interface AppConfig {
 	readonly imports :Imports
-	readonly sites :SitesConfig
+	readonly sites :SitesConfigs
 }

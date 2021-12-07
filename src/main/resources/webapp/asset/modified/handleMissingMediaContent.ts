@@ -6,8 +6,6 @@ import {
 // @ts-ignore
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 
-import {log} from '../../../lib/xp/globals';
-
 
 interface HandleMissingMediaContent {
 	readonly downloadRenditionResponse :any

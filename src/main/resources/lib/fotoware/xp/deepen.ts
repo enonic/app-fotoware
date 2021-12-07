@@ -1,8 +1,11 @@
 //import {toStr} from '/lib/util';
+
+import {AppConfig} from './AppConfig';
+
 // https://stackoverflow.com/questions/7793811/convert-javascript-dot-notation-object-to-nested-object
 // NOTE: This is risky if you have a same-name top level property. Wrap from t=oo; to t[key] = o[k] in if (k.indexOf('.') !== -1) ... – brandonscript Apr 14 '14 at 19:14
 // NOTE: It also doesn't work if you have more than one top-level key. – brandonscript Apr 14 '14 at 19:15
-export function deepen(o) {
+export function deepen(o :AppConfigObject) :AppConfig {
 	const oo = {};
 	Object.keys(o).forEach((k) => {
 		//log.debug(`k:${toStr(k)}`);
@@ -42,7 +45,7 @@ export function deepen(o) {
 		//log.debug(`t4:${toStr(t)}`);
 	});
 	//log.debug(`oo:${toStr(oo)}`);
-	return oo;
+	return oo as AppConfig;
 }
 
 // https://stackoverflow.com/questions/19098797/fastest-way-to-flatten-un-flatten-nested-json-objects
