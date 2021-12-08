@@ -22,7 +22,7 @@ import webpack from 'webpack';
 //──────────────────────────────────────────────────────────────────────────────
 //const MODE = 'development';
 const MODE = 'production';
-const JS_EXTENSION_GLOB_BRACE = '*.{es,es6,mjs,jsx,flow,js,ts}';
+const JS_EXTENSION_GLOB_BRACE = '*.{ts,es,es6,mjs,jsx,flow,js}';
 const ASSETS_PATH_GLOB_BRACE = '{site/assets,assets}';
 
 const SRC_DIR = 'src/main/resources';
@@ -30,12 +30,12 @@ const DST_DIR = 'build/resources/main';
 
 const context = path.resolve(__dirname, SRC_DIR);
 const extensions = [
+	'.ts',
+	'.d.ts',
 	'.es',
 	'.es6', // lib-static
 	'.js',
-	'.json',
-	'.ts',
-	'.d.ts'
+	'.json'
 ]; // used in resolve
 const outputPath = path.join(__dirname, DST_DIR);
 
@@ -75,6 +75,7 @@ const SERVER_JS_FILES = glob.sync(`${SRC_DIR}/**/${JS_EXTENSION_GLOB_BRACE}`, {
 const SERVER_JS_TEST = /\.(es6?|ts|js)$/i; // Will need js for node module depenencies
 
 const SS_ALIAS = {
+	'@enonic/js-utils': path.resolve(__dirname, 'node_modules/@enonic/js-utils/src/'),
 	'/lib/fotoware/': path.resolve(__dirname, 'src/main/resources/lib/fotoware/')
 };
 

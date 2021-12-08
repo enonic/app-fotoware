@@ -1,12 +1,14 @@
 {
 	"compilerOptions": {
-		"baseUrl": "src/main/resources",
+		"baseUrl": ".",
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"outDir": "build/tsc",
 		"paths": {
-			"/lib/fotoware/*": ["lib/fotoware/*"],
-			"/lib/xp/*": ["lib/xp/*"]
+			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
+			"/lib/fotoware/*": ["src/main/resources/lib/fotoware/*"],
+			"/lib/xp/*": ["src/main/resources/lib/xp/*"],
+			"/tasks/*": ["src/main/resources/tasks/*"]
 		},
 		"rootDirs": ["src/main/resources"],
 		"target": "ES5"

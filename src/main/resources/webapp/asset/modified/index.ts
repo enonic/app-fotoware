@@ -3,17 +3,11 @@
 import {URL} from '/lib/galimatias';
 // @ts-ignore
 import {validateLicense} from '/lib/license';
+import {toStr} from '@enonic/js-utils';
 // @ts-ignore
-import {toStr} from '/lib/util';
-// @ts-ignore
-import {executeFunction} from '/lib/xp/task';
+import {submitTask} from '/lib/xp/task';
 
 // FotoWare modules
-// @ts-ignore
-import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
-// @ts-ignore
-import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
-
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 
 // @ts-ignore
@@ -21,12 +15,11 @@ import {buildLicensedTo} from '/lib/fotoware/xp/buildLicensedTo';
 // @ts-ignore
 import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid'
 
-import {modifyInImport} from './modifyInImport';
-
 
 import {AssetModified} from '/lib/fotoware/Fotoware';
 import {SiteConfig} from '/lib/fotoware/xp/AppConfig';
 import {Request} from '/lib/xp/Request';
+import {HandleAssetModifiedParams} from '/tasks/handleAssetModifiedHook/handleAssetModifiedHook';
 
 
 export const assetModified = (request :Request) => {
@@ -39,11 +32,6 @@ export const assetModified = (request :Request) => {
 		log.error(buildLicensedTo(licenseDetails));
 		return {status: 404};
 	}
-
-	const {
-		sitesConfigs
-	} = getConfigFromAppCfg();
-	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 	const {
 		headers: {
@@ -92,14 +80,18 @@ export const assetModified = (request :Request) => {
 	if (fileNameOld.startsWith('.') || fileNameNew.startsWith('.')) {
 		log.warning(`Skipping fileNameOld:${fileNameOld} fileNameNew:${fileNameNew} because it starts with a dot, so probabbly a hidden file.`);
 		return {
-			body: {},
-			contentType: 'application/json;charset=utf-8'
+			status: 200
 		};
 	}
 
 	const url = new URL(hrefFromHook);
 	const siteName :string = url.getHost().replace('.fotoware.cloud', '');
 	//log.debug(`site:${toStr(site)}`);
+
+	const {
+		sitesConfigs
+	} = getConfigFromAppCfg();
+	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
 	const siteConfig :SiteConfig = sitesConfigs[siteName];
 	if (!siteConfig) {
@@ -111,59 +103,22 @@ export const assetModified = (request :Request) => {
 		};
 	}
 
-	//log.debug(`sites:${toStr(sites)}`);
 	const {
-		archiveName,
-		clientId,
-		clientSecret,
-		properties,
-		remoteAddresses,
-		url: hostname,
-		imports
+		remoteAddresses
 	} = siteConfig;
-	//log.debug(`clientId:${toStr(clientId)}`);
-	//log.debug(`clientSecret:${toStr(clientSecret)}`);
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
 	if (!Object.keys(remoteAddresses).includes(remoteAddress)) {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}
-
-	executeFunction({
-		description: '',
-		func: () => {
-			const {accessToken} = getAccessToken({
-				hostname,
-				clientId,
-				clientSecret
-			});
-			//log.debug(`accessToken:${toStr(accessToken)}`);
-
-			const {
-				renditionRequest,
-				searchURL
-			} = getPrivateFullAPIDescriptor({
-				accessToken,
-				hostname
-			});
-			//log.debug(`searchURL:${toStr(searchURL)}`);
-			//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
-			Object.keys(imports).forEach((importName) => {
-				modifyInImport({
-					accessToken,
-					archiveName,
-					fileNameNew,
-					fileNameOld,
-					hostname,
-					importName,
-					imports,
-					properties,
-					renditionRequest,
-					searchURL
-				});
-			}); // forEach import
-		} // func
-	}); // executeFunction
+	submitTask({
+		descriptor: 'handleAssetModifiedHook',
+		config: {
+			fileNameNew,
+			fileNameOld,
+			siteName
+		} as HandleAssetModifiedParams
+	});
 	return {
 		body: {},
 		contentType: 'application/json;charset=utf-8'
