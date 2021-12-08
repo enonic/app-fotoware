@@ -1,6 +1,8 @@
+//import {toStr} from '@enonic/js-utils';
+
 //import {getCollectionList} from './get';
 import {getCollectionList} from '/lib/fotoware/api/collectionList/get';
-//import {toStr} from '/lib/util';
+
 
 export const paginateCollectionList = ({
 	accessToken,

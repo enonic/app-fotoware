@@ -1,3 +1,5 @@
+import {toStr} from '@enonic/js-utils';
+
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
@@ -11,7 +13,6 @@ import {
 	REPO_ID
 } from '/lib/fotoware/xp/constants';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
-import {toStr} from '/lib/util';
 import {
 	create as createContent,
 	get as getContentByKey
@@ -22,6 +23,7 @@ import {connect} from '/lib/xp/node';
 import {handleExistingMedia} from './handleExistingMedia';
 import {handleNewMedia} from './handleNewMedia';
 import {Progress} from './Progress';
+
 
 const CT_COLLECTION = `${app.name}:collection`;
 

@@ -1,4 +1,5 @@
 // Node modules
+import {toStr} from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
 
 //import * as deepEqual from 'fast-deep-equal';
@@ -8,8 +9,6 @@ import deepEqual from 'fast-deep-equal';
 // @ts-ignore
 import {md5} from '/lib/text-encoding';
 
-// @ts-ignore
-import {toStr} from '/lib/util';
 
 import {
 	addAttachment,

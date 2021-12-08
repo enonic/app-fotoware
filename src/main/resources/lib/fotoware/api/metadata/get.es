@@ -1,9 +1,13 @@
+import {
+	forceArray,
+	toStr
+} from '@enonic/js-utils';
+
 //import * as deepEqual from 'fast-deep-equal';
 import deepEqual from 'fast-deep-equal';
 
 import {request} from '/lib/http-client';
-import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
+
 
 export const getMetadataView = ({
 	accessToken,

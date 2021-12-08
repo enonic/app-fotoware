@@ -1,9 +1,11 @@
+import {toStr} from '@enonic/js-utils';
+
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 import {
 	delete as deleteContent,
 	modify as modifyContent
 } from '/lib/xp/content';
-import {toStr} from '/lib/util';
+
 
 export const modifyMediaContent = ({
 	exisitingMediaContent, // is undefined when creating

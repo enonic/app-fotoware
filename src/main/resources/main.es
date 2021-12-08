@@ -1,4 +1,4 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
 import {
 	CHILD_ORDER,
 	PERMISSIONS,

@@ -1,3 +1,9 @@
+import {
+	forceArray,
+	isString,
+	toStr
+} from '@enonic/js-utils';
+
 import {detailedDiff} from 'deep-object-diff';
 //import HumanDiff from 'human-object-diff';
 import deepEqual from 'fast-deep-equal';
@@ -10,9 +16,6 @@ import {
 	X_APP_NAME
 } from '/lib/fotoware/xp/constants';
 import {unforceArray} from '/lib/fotoware/xp/unforceArray';
-import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
-import {isString} from '/lib/util/value';
 
 
 /*const { diff: diffTags } = new HumanDiff({

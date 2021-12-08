@@ -1,4 +1,5 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
+
 // @ts-ignore
 import {deepen} from '/lib/fotoware/xp/deepen';
 //import {deepen} from './deepen';

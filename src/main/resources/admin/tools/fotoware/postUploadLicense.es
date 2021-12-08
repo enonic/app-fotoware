@@ -1,8 +1,9 @@
+import {toStr} from '@enonic/js-utils';
+
 import {
 	installLicense,
 	validateLicense
 } from '/lib/license';
-import {toStr} from '/lib/util';
 import {getToolUrl} from '/lib/xp/admin';
 import {readText} from '/lib/xp/io';
 import {

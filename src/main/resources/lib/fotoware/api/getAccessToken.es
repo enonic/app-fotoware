@@ -1,10 +1,12 @@
+import {toStr} from '@enonic/js-utils';
+
 import {request} from '/lib/http-client';
 /*import {
 	//base64Encode,
 	base64UrlDecode
 } from '/lib/text-encoding';*/
-import {toStr} from '/lib/util';
 //import {readText} from '/lib/xp/io';
+
 
 /*function decodeAccessToken(accessToken) {
 	//const a = JWT.AccessToken.verify(accessToken);

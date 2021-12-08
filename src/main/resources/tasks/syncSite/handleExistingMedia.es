@@ -1,3 +1,4 @@
+import {toStr} from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
 //import HumanDiff from 'human-object-diff';
 import deepEqual from 'fast-deep-equal';
@@ -9,7 +10,6 @@ import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 
 import {md5} from '/lib/text-encoding';
-import {toStr} from '/lib/util';
 //import {sanitize} from '/lib/xp/common';
 import {
 	addAttachment,

@@ -1,4 +1,5 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
+
 import {query as queryForContent} from '/lib/xp/content';
 
 

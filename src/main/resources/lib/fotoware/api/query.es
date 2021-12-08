@@ -1,3 +1,4 @@
+import {toStr} from '@enonic/js-utils';
 //import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
 
@@ -5,7 +6,6 @@ import {getMetadataView} from '/lib/fotoware/api/metadata/get';
 import {paginate} from '/lib/fotoware/api/paginate';
 import {camelize} from '/lib/fotoware/xp/camelize';
 import {request} from '/lib/http-client';
-import {toStr} from '/lib/util';
 
 
 export function query(params) {

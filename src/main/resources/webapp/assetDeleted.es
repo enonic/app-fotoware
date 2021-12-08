@@ -6,6 +6,10 @@
 //import 'reflect-metadata'; // Required by set-value
 
 // Node modules
+import {
+	isString,
+	toStr
+} from '@enonic/js-utils';
 //import {diff} from 'deep-object-diff';
 
 //import * as deepEqual from 'fast-deep-equal';
@@ -19,8 +23,6 @@ import * as traverse from 'traverse';
 import {URL} from '/lib/galimatias';
 import {validateLicense} from '/lib/license';
 //import {md5} from '/lib/text-encoding';
-import {toStr} from '/lib/util';
-import {isString} from '/lib/util/value';
 import {
 	//addAttachment,
 	//createMedia,

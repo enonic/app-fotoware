@@ -1,4 +1,5 @@
 // Node modules
+import {toStr} from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
 
 import deepEqual from 'fast-deep-equal';
@@ -9,7 +10,6 @@ import deepEqual from 'fast-deep-equal';
 import {URL} from '/lib/galimatias';
 import {validateLicense} from '/lib/license';
 import {md5} from '/lib/text-encoding';
-import {toStr} from '/lib/util';
 import {
 	addAttachment,
 	createMedia,

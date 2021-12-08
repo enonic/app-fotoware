@@ -1,5 +1,7 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
+
 import {request as send} from '/lib/http-client';
+
 
 export function paginate({
 	doPaginate = true,

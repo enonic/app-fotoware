@@ -1,5 +1,6 @@
+import {toStr} from '@enonic/js-utils';
+
 import {request} from '/lib/http-client';
-import {toStr} from '/lib/util';
 
 /*
 
