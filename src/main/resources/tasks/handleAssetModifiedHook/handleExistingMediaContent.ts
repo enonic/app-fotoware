@@ -15,6 +15,7 @@ import {
 	get as getContentByKey,
 	getAttachmentStream,
 	modify as modifyContent,
+	move as moveContent,
 	publish,
 	removeAttachment
 	// @ts-ignore
@@ -33,7 +34,7 @@ import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 
 
-import {MediaContent} from '../../../lib/fotoware/xp/MediaContent';
+import {MediaContent} from '/lib/fotoware/xp/MediaContent';
 
 
 interface HandleExistingMediaContent {
@@ -64,6 +65,9 @@ export function handleExistingMediaContent({
 		data: {
 			'fotoWare': {
 				'md5sum': md5sumFromContent
+			} = {},
+			media: {
+				attachment: existingAttachmentName
 			} = {}
 		} = {}
 	} = exisitingMediaContent;
@@ -148,13 +152,34 @@ export function handleExistingMediaContent({
 	} /*else {
 		log.debug(`_path:${exisitingMediaContent._path} no differences :)`);
 	}*/
+	if (
+		fileNameNew !== fileNameOld // Renamed in FotoWare
+		&& fileNameOld === existingAttachmentName // Name not overridden in Enonic
+	) {
+		log.debug(`Moving content _path:${exisitingMediaContent._path} to fileNameNew:${fileNameNew}...`);
+		try {
+			const movedContent = moveContent({ // NOTE: This doesn't update DisplayName!
+				source: exisitingMediaContentId, // Path or id of the content to be moved or renamed
+				target: fileNameNew // New path or name for the content. If the target ends in slash '/', it specifies the parent path where to be moved. Otherwise it means the new desired path or name for the content
+			});
+			log.debug(`movedContent:${toStr(movedContent)}`);
+			log.debug(`Moved content ${exisitingMediaContent._path} to ${movedContent._path}.`);
+		} catch (e) {
+			if (e.code == 'contentAlreadyExists') {
+        		log.error(`Error when moving ${exisitingMediaContent._path} to ${fileNameNew}: There is already a content in the target specified!`);
+    		} else {
+        		log.error(`Unexpected error when moving ${exisitingMediaContent._path} to ${fileNameNew}: ${e.message}`, e);
+    		}
+			// Will do publishing even if move failed...
+		}
+	}
 	if (isPublished({
 		key: exisitingMediaContentId,
 		project
 	})) {
 		const publishParams = {
 			includeDependencies: false,
-			keys:[exisitingMediaContent._path], // Path is easier to use when debugging, unless publishRes always reports id anyway?
+			keys:[exisitingMediaContentId],
 			sourceBranch: 'draft',
 			targetBranch: 'master'
 		};

@@ -7,10 +7,10 @@ import {
 // @ts-ignore
 import {run as runInContext} from '/lib/xp/context';
 
-// @ts-ignore
 import {
 	executeFunction,
 	sleep
+	// @ts-ignore
 } from '/lib/xp/task';
 
 // FotoWare modules
@@ -20,8 +20,8 @@ import {query as doQuery} from '/lib/fotoware/api/query';
 // @ts-ignore
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 
-import {MediaContent} from '../../lib/fotoware/xp/MediaContent';
-import {handleAsset} from './handleAsset'
+import {MediaContent} from '/lib/fotoware/xp/MediaContent';
+import {handleAsset} from '/tasks/handleAssetModifiedHook/handleAsset'
 
 
 interface ModifyInImportParams {

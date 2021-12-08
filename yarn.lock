@@ -1442,7 +1442,7 @@
   resolved "https://registry.yarnpkg.com/@enonic/global-polyfill/-/global-polyfill-1.0.0.tgz#a9393b2efe746a484af95fb1f848b2903b3d38c6"
   integrity sha512-UYw+d/dNC9z8CqrTc9zHzOrDr9xypFN0hu5fhc8dKxdhtvzfsf1EipwG1wB5XRm61G6KOeK/wEM1vqeGM/0dag==
 
-"@enonic/js-utils@^0.7.1":
+"@enonic/js-utils@0.7.1":
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.7.1.tgz#91624bb5559f4c2e657ab99a42a4fe8abe907635"
   integrity sha512-7OtZXg81l0Ir8OFZPy0teoJINK/xu7L+2bEuzrpuYKczsq9ag/XxcAvXIkbtuHiecTwMrch1mOjJTZCF8jU4wQ==

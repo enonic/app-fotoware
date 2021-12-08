@@ -10,10 +10,10 @@ declare global {
 		readonly version :string
 	}
 	interface Log {
-		debug(s: string): void
-		error(s: string): void
-		info(s: string): void
-		warning(s: string): void
+		debug(...s :string[]): void
+		error(...s :string[]): void
+		info(...s :string[]): void
+		warning(...s :string[]): void
 	}
 	const app :App;
 	const log :Log;
