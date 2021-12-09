@@ -1,5 +1,6 @@
 export interface MediaContent {
 	_id: string
+	_name :string
 	_path :string
 	data: {
 		fotoWare: { // Custom requireValid must be false
@@ -9,4 +10,5 @@ export interface MediaContent {
 			attachment :string
 		}
 	}
+	displayName :string
 }
