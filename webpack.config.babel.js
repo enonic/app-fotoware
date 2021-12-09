@@ -99,6 +99,7 @@ const SS_EXTERNALS = [
 	'/lib/xp/node',
 	'/lib/xp/portal',
 	'/lib/xp/repo',
+	'/lib/xp/scheduler',
 	'/lib/xp/task'
 ];
 
