@@ -1,11 +1,16 @@
+import {toStr} from '@enonic/js-utils';
+import '@enonic/nashorn-polyfills'; // Needed by uuid
+import { v4 as uuidv4 } from 'uuid';
+
 // Enonic modules
 // @ts-ignore
 import {URL} from '/lib/galimatias';
 // @ts-ignore
 import {validateLicense} from '/lib/license';
-import {toStr} from '@enonic/js-utils';
 // @ts-ignore
-import {submitTask} from '/lib/xp/task';
+import {run as runInContext} from '/lib/xp/context';
+// @ts-ignore
+import {create as scheduleTask} from '/lib/xp/scheduler'
 
 // FotoWare modules
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
@@ -20,6 +25,9 @@ import {AssetModified} from '/lib/fotoware/Fotoware';
 import {SiteConfig} from '/lib/fotoware/xp/AppConfig';
 import {Request} from '/lib/xp/Request';
 import {HandleAssetModifiedParams} from '/tasks/handleAssetModifiedHook/handleAssetModifiedHook';
+
+
+const A_MINUTE_IN_MS = 60 * 1000;
 
 
 export const assetModified = (request :Request) => {
@@ -111,14 +119,34 @@ export const assetModified = (request :Request) => {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}
-	submitTask({
-		descriptor: 'handleAssetModifiedHook',
-		config: {
-			fileNameNew,
-			fileNameOld,
-			siteName
-		} as HandleAssetModifiedParams
-	});
+	runInContext({
+		repository: 'system-scheduler',
+		branch: 'master',
+		user: {
+			login: 'su', // So Livetrace Tasks reports correct user
+			idProvider: 'system'
+		},
+		principals: ['role:system.admin']
+	}, () => {
+		const taskDescriptor = `${app.name}:handleAssetModifiedHook`;
+		scheduleTask({
+			config: {
+				fileNameNew,
+				fileNameOld,
+				siteName
+			} as HandleAssetModifiedParams,
+			description: `Handle asset modified webhook for site:${siteName} file:${fileNameNew}`,
+			descriptor: taskDescriptor,
+			enabled: true,
+			name: `${taskDescriptor}-${uuidv4()}`, // unique job name
+			schedule: {
+				// timeZone is optional for type: 'ONE_TIME'
+				type: 'ONE_TIME',
+				value: new Date(Date.now() + A_MINUTE_IN_MS).toISOString()
+			}//,
+			//user: 'user:system:su' // string | optional | principal key of the user that submitted the task
+		}); // scheduleTask
+	}); // runInContext
 	return {
 		body: {},
 		contentType: 'application/json;charset=utf-8'

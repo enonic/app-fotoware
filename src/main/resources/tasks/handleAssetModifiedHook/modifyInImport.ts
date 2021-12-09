@@ -7,11 +7,8 @@ import {
 // @ts-ignore
 import {run as runInContext} from '/lib/xp/context';
 
-import {
-	executeFunction,
-	sleep
-	// @ts-ignore
-} from '/lib/xp/task';
+// @ts-ignore
+import {executeFunction} from '/lib/xp/task';
 
 // FotoWare modules
 // @ts-ignore
@@ -38,9 +35,6 @@ interface ModifyInImportParams {
 	readonly renditionRequest :string
 	readonly searchURL :string
 }
-
-
-const FIVE_MINUTES_IN_MS = 1000 * 60 * 5;
 
 
 export function modifyInImport({
@@ -102,14 +96,8 @@ export function modifyInImport({
 			//log.info(`queryResult:${toStr(queryResult)}`);
 
 			if (queryResult.assetCountTotal === 0) {
-				log.warning(`fileNameNew:${fileNameNew} not found when querying, trying again in 5 minutes...`);
-				sleep(FIVE_MINUTES_IN_MS);
-				queryResult = doQuery(doQueryParams);
-				//log.info(`queryResult:${toStr(queryResult)}`);
-				if (queryResult.assetCountTotal === 0) {
-					log.error(`fileNameNew:${fileNameNew} still not found after 5 minutes, giving up!`);
-					return;
-				}
+				log.warning(`fileNameNew:${fileNameNew} not found when querying`);
+				return;
 			}
 
 			if (queryResult.assetCountTotal > 1) {
