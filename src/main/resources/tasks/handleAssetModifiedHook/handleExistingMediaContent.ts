@@ -1,5 +1,8 @@
 // Node modules
-import {toStr} from '@enonic/js-utils';
+import {
+	toStr,
+	trimExt
+} from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
 
 //import * as deepEqual from 'fast-deep-equal';
@@ -62,6 +65,7 @@ export function handleExistingMediaContent({
 	log.debug(`exisitingMediaContent:${toStr(exisitingMediaContent)}`);
 	const {
 		_id: exisitingMediaContentId,
+		displayName: existingDisplayName,
 		data: {
 			'fotoWare': {
 				'md5sum': md5sumFromContent
@@ -116,9 +120,12 @@ export function handleExistingMediaContent({
 		modifyContent({
 			key: exisitingMediaContentId,
 			editor: (mediaContent: MediaContent) => {
-				log.debug(`soon to be modified mediaContent:${toStr(mediaContent)}`);
+				//log.debug(`soon to be modified mediaContent:${toStr(mediaContent)}`);
+				if (existingDisplayName === trimExt(existingAttachmentName)) {
+					mediaContent.displayName = trimExt(fileNameNew);
+				}
 				mediaContent.data.media.attachment = fileNameNew;
-				log.debug(`modified mediaContent:${toStr(mediaContent)}`);
+				//log.debug(`modified mediaContent:${toStr(mediaContent)}`);
 				return mediaContent;
 			},
 			requireValid: false // No mapping defined for property md5sum with value
