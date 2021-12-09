@@ -46,6 +46,7 @@ dependencies {
 	include "com.enonic.xp:lib-node:${xpVersion}"
 	include "com.enonic.xp:lib-portal:${xpVersion}"
 	include "com.enonic.xp:lib-repo:${xpVersion}"
+	include "com.enonic.xp:lib-scheduler:${xpVersion}"
 	include "com.enonic.xp:lib-task:${xpVersion}"
 	//include "com.enonic.xp:lib-thymeleaf:${xpVersion}"
 	//include "com.enonic.xp:lib-websocket:${xpVersion}"
