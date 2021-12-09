@@ -60,6 +60,7 @@
     "@babel/preset-env": "7.15.8",
     "@babel/preset-typescript": "7.15.0",
     "@babel/register": "7.15.3",
+    "@types/uuid": "^8.3.3",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.3",
     "babel-plugin-array-includes": "2.0.3",
@@ -74,6 +75,7 @@
     "get-google-fonts": "1.2.2",
     "glob": "7.2.0",
     "path": "0.12.7",
+    "polyfill-crypto.getrandomvalues": "^1.0.0",
     "webpack": "5.60.0",
     "webpack-cli": "4.9.1"
   },

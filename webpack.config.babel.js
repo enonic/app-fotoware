@@ -22,7 +22,7 @@ import webpack from 'webpack';
 //──────────────────────────────────────────────────────────────────────────────
 //const MODE = 'development';
 const MODE = 'production';
-const JS_EXTENSION_GLOB_BRACE = '*.{ts,es,es6,mjs,jsx,flow,js}';
+const JS_EXTENSION_GLOB_BRACE = '*.{ts,es,es6,mjs,jsx,flow,js,cjs}';
 const ASSETS_PATH_GLOB_BRACE = '{site/assets,assets}';
 
 const SRC_DIR = 'src/main/resources';
@@ -31,10 +31,12 @@ const DST_DIR = 'build/resources/main';
 const context = path.resolve(__dirname, SRC_DIR);
 const extensions = [
 	'.ts',
+	'.mjs',
 	'.d.ts',
 	'.es',
 	'.es6', // lib-static
 	'.js',
+	'.cjs',
 	'.json'
 ]; // used in resolve
 const outputPath = path.join(__dirname, DST_DIR);
@@ -76,6 +78,7 @@ const SERVER_JS_TEST = /\.(es6?|ts|js)$/i; // Will need js for node module depen
 
 const SS_ALIAS = {
 	'@enonic/js-utils': path.resolve(__dirname, 'node_modules/@enonic/js-utils/src/'),
+	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/global'),
 	'/lib/fotoware/': path.resolve(__dirname, 'src/main/resources/lib/fotoware/')
 };
 
@@ -263,7 +266,10 @@ if (SERVER_JS_FILES.length) {
 				]
 			}),
 			new webpack.ProvidePlugin({
-				Buffer: ['buffer', 'Buffer']
+				Buffer: ['buffer', 'Buffer']//,
+
+				// Not always polyfilled only when identifier global found
+				//global: path.resolve(__dirname, 'src/main/resources/lib/nashorn/global.mjs')
 			})
 			/*
 			Not Webpack 5 compatible?
