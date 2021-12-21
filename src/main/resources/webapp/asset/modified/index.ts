@@ -1,6 +1,7 @@
 import {toStr} from '@enonic/js-utils';
 import '@enonic/nashorn-polyfills'; // Needed by uuid
 import { v4 as uuidv4 } from 'uuid';
+import getIn from 'get-value';
 
 // Enonic modules
 // @ts-ignore
@@ -64,26 +65,31 @@ export const assetModified = (request :Request) => {
 		return {status: 404};
 	}
 
-	const {
-		data: {
-			//filename // Old format
-
-			// New format
-			//metadataDiff
-			/*assetBefore: { // This format only existed for a short while?
-				filename: fileNameOld
-			} = {},*/
-			asset: {
-				filename: fileNameNew
-			} = {}
-		} = {},
-		href: hrefFromHook, // FQDN
-		'previous-name': fileNameOld
-	} = body;
+	let fileNameNewVar, fileNameOldVar, hrefFromHookVar;
+	try {
+		fileNameNewVar = getIn(body, 'data.asset.filename');
+		fileNameOldVar = getIn(body, 'data.previous-name');
+		hrefFromHookVar = getIn(body, 'data.href');
+		if (!fileNameNewVar) {
+			throw `Unable to get fileNameNew from data.asset.filename in body:${toStr(body)}`;
+		}
+		if (!fileNameOldVar) {
+			log.warning(`Unable to get fileNameOld from previous-name in body:${toStr(body)}`);
+			fileNameOldVar = fileNameNewVar; // Perhaps this modify is simply not a rename, just some other change...
+		}
+		if (!hrefFromHookVar) {
+			throw `Unable to get hrefFromHook from data.href in body:${toStr(body)}`;
+		}
+	} catch (e) {
+		log.error(`Something is wrong with asset modified body:${toStr(body)}`, e);
+		return {status: 400};
+	}
+	const fileNameNew = fileNameNewVar;
+	const fileNameOld = fileNameOldVar;
+	const hrefFromHook = hrefFromHookVar;
 	//log.debug(`fileNameNew:${toStr(fileNameNew)}`);
 	//log.debug(`fileNameOld:${toStr(fileNameOld)}`);
 	//log.debug(`hrefFromHook:${toStr(hrefFromHook)}`);
-	//log.debug(`filename:${toStr(filename)}`);
 
 	if (fileNameOld.startsWith('.') || fileNameNew.startsWith('.')) {
 		log.warning(`Skipping fileNameOld:${fileNameOld} fileNameNew:${fileNameNew} because it starts with a dot, so probabbly a hidden file.`);
