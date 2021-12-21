@@ -1,5 +1,5 @@
 import {
-	createMedia,
+	createMedia
 	// @ts-ignore
 } from '/lib/xp/content';
 
@@ -8,12 +8,12 @@ import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 
 
 interface HandleMissingMediaContent {
-	readonly downloadRenditionResponse :any
+	readonly downloadRenditionResponse :unknown
 	readonly fileNameNew :string
-	readonly metadata :any
+	readonly metadata :unknown
 	readonly md5sumOfDownload :string
 	readonly path :string
-	readonly properties :any
+	readonly properties :unknown
 }
 
 

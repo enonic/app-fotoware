@@ -1,6 +1,6 @@
 // Enonic modules
 import {
-	get as getContentByKey,
+	get as getContentByKey
 	// @ts-ignore
 } from '/lib/xp/content';
 
@@ -92,7 +92,7 @@ export function modifyInImport({
 					[archiveName]: true
 				}
 			};
-			let queryResult = doQuery(doQueryParams);
+			const queryResult = doQuery(doQueryParams);
 			//log.info(`queryResult:${toStr(queryResult)}`);
 
 			if (queryResult.assetCountTotal === 0) {

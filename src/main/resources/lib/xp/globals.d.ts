@@ -2,7 +2,7 @@ export {};
 
 declare global {
 	interface AppConfigObject {
-		[key :string] :any
+		[key :string] :unknown
 	}
 	interface App {
 		readonly config :AppConfigObject
