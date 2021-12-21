@@ -61,6 +61,8 @@
     "@babel/preset-typescript": "7.15.0",
     "@babel/register": "7.15.3",
     "@types/uuid": "^8.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.8.0",
+    "@typescript-eslint/parser": "^5.8.0",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.3",
     "babel-plugin-array-includes": "2.0.3",
@@ -76,6 +78,7 @@
     "glob": "7.2.0",
     "path": "0.12.7",
     "polyfill-crypto.getrandomvalues": "^1.0.0",
+    "typescript": "^4.5.4",
     "webpack": "5.60.0",
     "webpack-cli": "4.9.1"
   },
@@ -83,6 +86,7 @@
   "private": true,
   "scripts": {
     "fonts": "get-google-fonts -i 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap' -o './src/main/resources/assets/fonts'",
+    "lint": "npx eslint src",
     "webpack": "node_modules/webpack-cli/bin/cli.js",
     "webpack:watch": "node_modules/webpack-cli/bin/cli.js -w --stdin"
   }

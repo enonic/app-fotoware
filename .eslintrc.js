@@ -2,8 +2,10 @@ module.exports = {
 
 	// https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/style.js
 	extends: [
-		'eslint:recommended',
 		//'airbnb-base',
+		//'eslint:recommended',
+		'plugin:@typescript-eslint/eslint-recommended',
+		'plugin:@typescript-eslint/recommended',
 		'plugin:react/recommended',
 		'plugin:jsx-a11y/recommended',
 		'plugin:react-hooks/recommended'
@@ -47,7 +49,7 @@ module.exports = {
 
 	}, //globals
 
-	parser: 'babel-eslint',
+	//parser: 'babel-eslint',
 
 	parserOptions: {
 		allowImportExportEverywhere: false,
@@ -70,12 +72,14 @@ module.exports = {
 	},
 
 	plugins: [
+		'@typescript-eslint',
 		'import',
 		'react',
 		'jsx-a11y'
 	],
 
 	rules: { // https://eslint.org/docs/rules
+		'@typescript-eslint/ban-ts-comment': ['off'],
 		'comma-dangle': ['error', {
 			arrays: 'ignore',
 			objects: 'never',
@@ -119,6 +123,12 @@ module.exports = {
 		//'react/react-in-jsx-scope': 'off', // Since React is a global
 		'spaced-comment': ['off'],
 		strict: 1
-	} // rules
+	}, // rules
+
+	settings: {
+		react: {
+			version: 'detect'
+		}
+	} // settings
 
 } // module.exports

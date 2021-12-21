@@ -1,8 +1,25 @@
 {
 	"compilerOptions": {
+		"allowJs": false,
 		"baseUrl": ".",
+		"declaration": false,
+		"declarationMap": false,
+		"downlevelIteration": true,
+		"importHelpers": true,
+		"importsNotUsedAsValues": "error",
+		"inlineSourceMap": false,
+		"inlineSources": false,
+		"listEmittedFiles": true,
+		"listFiles": false,
 		"module": "commonjs",
 		"moduleResolution": "node",
+		"noEmitOnError": true,
+		"noErrorTruncation": true,
+		"noImplicitAny": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUncheckedIndexedAccess": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"outDir": "build/tsc",
 		"paths": {
 			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
@@ -10,9 +27,18 @@
 			"/lib/xp/*": ["src/main/resources/lib/xp/*"],
 			"/tasks/*": ["src/main/resources/tasks/*"]
 		},
+		"removeComments": true,
+		"resolveJsonModule": true,
 		"rootDirs": ["src/main/resources"],
+		"sourceMap": false,
+		"strict": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
 		"target": "ES5"
 	},
+	"exclude": [
+		"node_modules"
+	],
 	"files": [
       "./src/main/resources/services/sitesConfigs/sitesConfigs.ts"
   	],

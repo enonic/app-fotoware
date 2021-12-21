@@ -42,13 +42,13 @@ import {MediaContent} from '/lib/fotoware/xp/MediaContent';
 
 interface HandleExistingMediaContent {
 	exisitingMediaContent :MediaContent
-	downloadRenditionResponse :any
+	downloadRenditionResponse :unknown
 	fileNameNew :string
 	fileNameOld :string
 	md5sumOfDownload :string
-	metadata :any
+	metadata :unknown
 	project :string
-	properties :any
+	properties :unknown
 }
 
 
