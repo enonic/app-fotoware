@@ -64,7 +64,7 @@ const getAsset = buildGetter('assets', {
 		//log.debug(`request:${toStr(request)}`);
 		if (!request.rawPath.startsWith('/admin/tool/com.enonic.app.fotoware/fotoware/')) {
 			log.error(`request.rawPath:${toStr(request.rawPath)}`);
-			throw Error('Ooops');
+			throw new Error('Ooops');
 		}
 		return request.rawPath.substring('/admin/tool/com.enonic.app.fotoware/fotoware/'.length);
 	},*/

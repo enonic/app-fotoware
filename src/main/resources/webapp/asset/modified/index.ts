@@ -65,20 +65,20 @@ export const assetModified = (request :Request) => {
 		return {status: 404};
 	}
 
-	let fileNameNewVar, fileNameOldVar, hrefFromHookVar;
+	let fileNameNewVar :string, fileNameOldVar :string, hrefFromHookVar :string;
 	try {
 		fileNameNewVar = getIn(body, 'data.asset.filename');
 		fileNameOldVar = getIn(body, 'data.previous-name');
-		hrefFromHookVar = getIn(body, 'data.href');
+		hrefFromHookVar = getIn(body, 'href');
 		if (!fileNameNewVar) {
-			throw `Unable to get fileNameNew from data.asset.filename in body:${toStr(body)}`;
+			throw new Error(`Unable to get fileNameNew from data.asset.filename in body:${toStr(body)}`);
 		}
 		if (!fileNameOldVar) {
 			log.warning(`Unable to get fileNameOld from previous-name in body:${toStr(body)}`);
 			fileNameOldVar = fileNameNewVar; // Perhaps this modify is simply not a rename, just some other change...
 		}
 		if (!hrefFromHookVar) {
-			throw `Unable to get hrefFromHook from data.href in body:${toStr(body)}`;
+			throw new Error(`Unable to get hrefFromHook from href in body:${toStr(body)}`);
 		}
 	} catch (e) {
 		log.error(`Something is wrong with asset modified body:${toStr(body)}`, e);
