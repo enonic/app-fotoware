@@ -1,6 +1,6 @@
 import {toStr} from '@enonic/js-utils';
-import '@enonic/nashorn-polyfills'; // Needed by uuid
-import { v4 as uuidv4 } from 'uuid';
+//import '@enonic/nashorn-polyfills'; // Needed by uuid
+//import { v4 as uuidv4 } from 'uuid';
 import getIn from 'get-value';
 
 // Enonic modules
@@ -9,9 +9,17 @@ import {URL} from '/lib/galimatias';
 // @ts-ignore
 import {validateLicense} from '/lib/license';
 // @ts-ignore
+import {generatePassword} from '/lib/xp/auth';
+// @ts-ignore
 import {run as runInContext} from '/lib/xp/context';
 // @ts-ignore
-import {create as scheduleTask} from '/lib/xp/scheduler'
+import {sanitize} from '/lib/xp/common';
+import {
+	create as scheduleTask//,
+	//delete as deleteTask,
+	//get as getTask
+	// @ts-ignore
+} from '/lib/xp/scheduler';
 
 // FotoWare modules
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
@@ -68,14 +76,14 @@ export const assetModified = (request :Request) => {
 	let fileNameNewVar :string, fileNameOldVar :string, hrefFromHookVar :string;
 	try {
 		fileNameNewVar = getIn(body, 'data.asset.filename');
-		fileNameOldVar = getIn(body, 'data.previous-name');
+		fileNameOldVar = getIn(body, 'previous-name');
 		hrefFromHookVar = getIn(body, 'href');
 		if (!fileNameNewVar) {
 			throw new Error(`Unable to get fileNameNew from data.asset.filename in body:${toStr(body)}`);
 		}
 		if (!fileNameOldVar) {
-			log.warning(`Unable to get fileNameOld from previous-name in body:${toStr(body)}`);
-			fileNameOldVar = fileNameNewVar; // Perhaps this modify is simply not a rename, just some other change...
+			log.debug(`Unable to get fileNameOld from previous-name in body:${toStr(body)}`);
+			fileNameOldVar = fileNameNewVar; // When previous-name is not present, it's not a rename, just a metadata change.
 		}
 		if (!hrefFromHookVar) {
 			throw new Error(`Unable to get hrefFromHook from href in body:${toStr(body)}`);
@@ -144,7 +152,8 @@ export const assetModified = (request :Request) => {
 			description: `Handle asset modified webhook for site:${siteName} file:${fileNameNew}`,
 			descriptor: taskDescriptor,
 			enabled: true,
-			name: `${taskDescriptor}-${uuidv4()}`, // unique job name
+			//name: `${taskDescriptor}-${uuidv4()}`, // unique job name // ERROR For some reason this fails!!!
+			name: `${taskDescriptor}-${sanitize(generatePassword())}`, // unique job name
 			schedule: {
 				// timeZone is optional for type: 'ONE_TIME'
 				type: 'ONE_TIME',
