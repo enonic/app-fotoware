@@ -95,6 +95,7 @@ const SS_EXTERNALS = [
 	'/lib/util/data',
 	'/lib/util/value',
 	'/lib/xp/admin',
+	'/lib/xp/auth',
 	'/lib/xp/common',
 	'/lib/xp/context',
 	'/lib/xp/content',
