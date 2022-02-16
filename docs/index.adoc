@@ -47,9 +47,9 @@ imports.myimport.project = myproject <--8-->
 <3> Url of your FotoWare installation i.e. https://mycompany.fotoware.com.
 <4> Optional: Name of the archive that contains all the files. Default is `5000-All-files`. Older installations may use `5000-Archive`.
 <5> For security purposes, restrict webhooks to the specified IP addresses. Defaults to `127.0.0.1`. Read more about webhooks below.
-<6> Configure how the import will treat properties stored in Enonic. 
-* `onCreate` means property will only be written when media created (first time) in Enonic. 
-* `ifChanged` means property will updated in Enonic if it is changed in FotoWare. 
+<6> Configure how the import will treat properties stored in Enonic.
+* `onCreate` means property will only be written when media created (first time) in Enonic.
+* `ifChanged` means property will updated in Enonic if it is changed in FotoWare.
 * `overwrite` forces updates of the FotoWare value, also when running a refresh on the import.
 <7> FotoWare site - specifies the FW installation to import from (as defined earlier, i.e. mysite).
 <8> Specified Enonic content project to import to.
@@ -88,9 +88,14 @@ The endpoint's internal URL is generally not exposed to the public internet. As 
 
 With the integration endpoint safely exposed, you'll need to activate webhooks on your FotoWare instance. You will be able to do this from `Settings / Integrations / Webhooks`.
 
-If you exposed the integration endpoint on this URL: http(s)://myserver/fwxp, the configuration in FotoWare should look something like this:
+If you exposed the integration endpoint on this URL: http(s)://company.enonic.cloud/hooks, the configuration in FotoWare should look something like this:
 
 image::webhooks.png[Setting up webhooks, 882]
+
+[IMPORTANT]
+====
+Make certain you have selected version 2 format under the asset modified webhook configuration.
+====
 
 == Renditions
 
@@ -136,4 +141,3 @@ Renaming of files in FotoWare:: FotoWare does not have a unique ID for the asset
 Duplicating files in FotoWare:: When duplicating a file on the FotoWare server no asset ingested is sent, and we are not able to get the file instantly. You will need to perform a syncronisation.
 
 Moving files in FotoWare:: When moving a file in FotoWare, it actually make a copy, but no asset ingested nor asset modified is sent. As such, we cannot get this file without performing a syncronisation.
-
