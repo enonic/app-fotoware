@@ -12,7 +12,7 @@ plugins {
 
 repositories {
 	xp.enonicRepo()
-	jcenter()
+	mavenCentral()
 	//mavenLocal() // Local maven repo may contain outdated packages
 }
 
