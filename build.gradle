@@ -2,7 +2,7 @@ plugins {
 	id 'java' // Needed for assemble and build
 	//id 'maven' // When is this needed?
 	id 'maven-publish' // Provides publishing and publishToMavenLocal
-	id 'com.enonic.defaults' version '2.0.1' // Publishing
+	id 'com.enonic.defaults' version '2.1.1' // Publishing
 	id 'com.enonic.xp.app' version '3.2.0'
 
 	//id 'com.moowork.node' version '1.3.1'
