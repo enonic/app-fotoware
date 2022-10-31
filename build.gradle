@@ -62,7 +62,7 @@ dependencies {
 	include 'com.enonic.lib:lib-router:2.1.0'
 	//include 'com.enonic.lib:menu:1.3.3'
 	include "com.enonic.lib:lib-static:0.1.0"
-	include 'com.enonic.lib:lib-text-encoding:2.0.0'
+	include 'com.enonic.lib:lib-text-encoding:2.1.1'
 	//include 'com.enonic.lib:lib-util:2.2.1'
 
 	// WARNING: If you use include files, jar file will be missing dependencies, you have to add them manually!
