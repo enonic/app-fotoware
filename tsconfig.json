@@ -22,8 +22,11 @@
 		"noUnusedParameters": true,
 		"outDir": "build/tsc",
 		"paths": {
+			// Production (should be commented in on commit)
 			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
 			"/lib/fotoware/*": ["src/main/resources/lib/fotoware/*"],
+			"/lib/xp/content": ["node_modules/@enonic-types/lib-content"],
+			"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
 			"/lib/xp/*": ["src/main/resources/lib/xp/*"],
 			"/tasks/*": ["src/main/resources/tasks/*"]
 		},
@@ -34,15 +37,18 @@
 		"strict": true,
 		"strictFunctionTypes": true,
 		"strictNullChecks": true,
-		"target": "ES5"
+		"target": "ES5",
+		"types": [
+			"@enonic-types/global"
+		]
 	},
 	"exclude": [
 		"node_modules"
 	],
 	"files": [
-      "./src/main/resources/services/sitesConfigs/sitesConfigs.ts"
-  	],
+		"./src/main/resources/services/sitesConfigs/sitesConfigs.ts"
+	],
 	"include": [
-      "src/main/resources/**/*"
-    ]
+		"src/main/resources/**/*"
+	]
 }
