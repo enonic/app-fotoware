@@ -1,13 +1,10 @@
+import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
+import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
+
+
 // Enonic modules
-import {
-	get as getContentByKey
-	// @ts-ignore
-} from '/lib/xp/content';
-
-// @ts-ignore
+import {get as getContentByKey} from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
-
-// @ts-ignore
 import {executeFunction} from '/lib/xp/task';
 
 // FotoWare modules
@@ -17,7 +14,6 @@ import {query as doQuery} from '/lib/fotoware/api/query';
 // @ts-ignore
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 
-import {MediaContent} from '/lib/fotoware/xp/MediaContent';
 import {handleAsset} from '/tasks/handleAssetModifiedHook/handleAsset'
 
 
@@ -29,7 +25,7 @@ interface ModifyInImportParams {
 	readonly hostname :string
 	readonly path :string
 	readonly project :string
-	readonly properties :unknown
+	readonly properties :SiteConfig['properties']
 	readonly query :string
 	readonly rendition :string
 	readonly renditionRequest :string
@@ -66,10 +62,10 @@ export function modifyInImport({
 				filename: fileNameOld,
 				path
 			});
-			let exisitingMediaContent :MediaContent;
+			let exisitingMediaContent :MediaContent|null|undefined|-1;
 			if (contentQueryResult.total === 0) {
 				// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
-				exisitingMediaContent = getContentByKey({key: `/${path}/${fileNameOld}`});
+				exisitingMediaContent = getContentByKey<MediaContent>({key: `/${path}/${fileNameOld}`});
 			} else if (contentQueryResult.total === 1) {
 				exisitingMediaContent = contentQueryResult.hits[0];
 			} else if (contentQueryResult.total > 1) {

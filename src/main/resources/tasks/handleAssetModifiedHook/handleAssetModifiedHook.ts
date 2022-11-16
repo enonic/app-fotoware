@@ -1,3 +1,6 @@
+import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
+
+
 import {toStr} from '@enonic/js-utils';
 // @ts-ignore
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
@@ -5,8 +8,6 @@ import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyInImport} from '/tasks/handleAssetModifiedHook/modifyInImport';
-
-import {SiteConfig} from '/lib/fotoware/xp/AppConfig';
 
 
 export interface HandleAssetModifiedParams {

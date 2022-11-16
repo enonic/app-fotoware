@@ -1,6 +1,9 @@
+import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
+import type {Asset} from '/types';
+
+
 // @ts-ignore
 import {md5} from '/lib/text-encoding';
-// @ts-ignore
 import {readText} from '/lib/xp/io';
 
 // @ts-ignore
@@ -22,6 +25,9 @@ export function handleAsset({
 	properties,
 	rendition,
 	renditionRequest
+} :{
+	asset: Asset
+	properties: SiteConfig['properties']
 }) {
 	const {
 		//doctype,
@@ -38,7 +44,7 @@ export function handleAsset({
 	if (fileNameNew !== filenameFromQuery) {
 		throw new Error(`fileNameNew:${fileNameNew} from assetModified does not match filename:${filenameFromQuery} from query result`);
 	}
-	const renditionsObj = {};
+	const renditionsObj: Record<string,string> = {};
 	renditions.forEach(({
 		//default,
 		//description,

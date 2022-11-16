@@ -1,14 +1,16 @@
+import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
 import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
+import type {Metadata} from '/types';
 
 
 // Node modules
 import {
+	// forceArray,
 	isString,
-	toStr,
-	trimExt
+	toStr//,
+	// trimExt
 } from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
-
 //import * as deepEqual from 'fast-deep-equal';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
@@ -18,136 +20,41 @@ import {md5} from '/lib/text-encoding';
 
 
 import {
-	addAttachment,
 	get as getContentByKey,
 	getAttachmentStream,
-	modify as modifyContent,
+	// modify as modifyContent,
 	move as moveContent,
-	publish,
-	removeAttachment
+	publish
 } from '/lib/xp/content';
 
-// import {updateMedia} from '/lib/fotoware/content'; // TODO Use this instead of removeAttachment and addAttachment
-
+// import {getArtist} from '/lib/fotoware/asset/metadata/getArtist';
+// import {getCopyright} from '/lib/fotoware/asset/metadata/getCopyright';
+// import {getTags} from '/lib/fotoware/asset/metadata/getTags';
+import {updateMedia} from '/lib/fotoware/content';
+import {ContentAlreadyExistsException} from '/lib/xp/ContentAlreadyExistsException';
 import {getMimeType, readText} from '/lib/xp/io';
-
 // @ts-ignore
 import {isPublished} from '/lib/fotoware/xp/isPublished';
-
 // @ts-ignore
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
-
+// import {shouldUpdateArtist} from '/lib/fotoware/xp/shouldUpdateArtist';
+// import {shouldUpdateCopyright} from '/lib/fotoware/xp/shouldUpdateCopyright';
+// import {shouldUpdateTags} from '/lib/fotoware/xp/shouldUpdateTags';
 // @ts-ignore
-import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
+import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent'; // TODO should use updateMedia instead!
 
 
 interface HandleExistingMediaContent {
-	exisitingMediaContent :MediaContent
-	downloadRenditionResponse :{
+	exisitingMediaContent: MediaContent
+	downloadRenditionResponse: {
 		bodyStream: object|null
 	}
-	fileNameNew :string
-	fileNameOld :string
-	md5sumOfDownload :string
-	metadata :unknown
-	project :string
-	properties :unknown
-}
-
-type Branch = string | null
-type ContentPath = string
-type RepositoryId = string | null
-
-class ContentAlreadyExistsException extends /*NotFoundException*/ Error {
-
-	private static buildMessage(path: ContentPath, repositoryId: RepositoryId, branch: Branch): string {
-		// Source Java Implementation
-		// return Stream.of(
-		// 	MessageFormat.format(
-		// 		"Content at path [{0}]", path
-		// 	),
-		// 	repositoryId != null ? MessageFormat.format( "in repository [{0}]", repositoryId ) : "",
-		// 	branch != null ? MessageFormat.format( "in branch [{0}]", branch ) : "",
-		// 	"already exists"
-		// )
-		// 	.filter( Predicate.not( String::isEmpty ) )
-		// 	.collect( Collectors.joining( " " ) );
-
-		// Implementation using array, filter out empty, join on single space
-		return [
-			`Content at path [${path}]`,
-			repositoryId != null
-				? `in repository [${repositoryId}] `
-				: undefined,
-			branch != null
-				? `in branch [${branch}] `
-				: undefined,
-			'already exists'
-		].filter(x=>x).join(' ');
-
-		// Implementation using string concat and making sure whitespace is correct
-		// return `Content at path [${path}] ${
-		// 	repositoryId != null ? `in repository [${repositoryId}] `: ''
-		// }${
-		// 	branch != null ? `in branch [${branch}] `: ''
-		// }already exists`;
-	}
-
-	// Defined in Error (super)
-	// cause: unknown
-	// columnNumber: number // Non-standard
-	// fileName: string // Non-standard
-	// lineNumber: number // Non-standard
-	// message: string
-	// name: string
-	// stack: any // Non-standard
-
-	// Static property 'name' conflicts with built-in property 'Function.name' of constructor function 'ContentAlreadyExistsException'.
-	// static name = 'com.enonic.xp.content.ContentAlreadyExistsException';
-
-	readonly branch: Branch
-	public readonly code: string // Perhaps defined in NotFoundException
-	readonly path: ContentPath
-	readonly repositoryId: RepositoryId
-
-	constructor(
-		path: ContentPath,
-		repositoryId: RepositoryId = null, // NOTE: The null fallback is deprecated
-		branch: Branch = null, // NOTE: The null fallback is deprecated
-		// ...params: unknown[]
-	) {
-		super(
-			ContentAlreadyExistsException.buildMessage(
-				path, repositoryId, branch
-			),
-			// ...params
-		);
-		this.path = path;
-		this.repositoryId = repositoryId;
-		this.branch = branch;
-		this.code = 'contentAlreadyExists';
-		this.name = 'com.enonic.xp.content.ContentAlreadyExistsException';
-	}
-
-	public getBranch() {
-		return this.branch;
-	}
-
-	// Doesn't exist on Error, perhaps it exists on NotFoundException
-	public getCode() {
-		return this.code;
-	}
-
-	public getContentPath() {
-		return this.path;
-	}
-
-	public getRepositoryId() {
-		return this.repositoryId;
-	}
-
-	// Defined in Error (super)
-	//public toString()
+	fileNameNew: string
+	fileNameOld: string
+	md5sumOfDownload: string
+	metadata: Metadata
+	project: string
+	properties: SiteConfig['properties']
 }
 
 
@@ -162,9 +69,10 @@ export function handleExistingMediaContent({
 	properties
 } :HandleExistingMediaContent) {
 	log.debug(`exisitingMediaContent:${toStr(exisitingMediaContent)}`);
+
 	const {
 		_id: exisitingMediaContentId,
-		displayName: existingDisplayName,
+		// displayName: existingDisplayName,
 		data: {
 			'fotoWare': {
 				'md5sum': md5sumFromContent
@@ -174,78 +82,76 @@ export function handleExistingMediaContent({
 			} = {}
 		} = {}
 	} = exisitingMediaContent;
+
 	if (!isString(existingAttachmentName)) {
 		log.error('exisitingMediaContent.data.media.attachment is not a string! exisitingMediaContentId:%s', exisitingMediaContentId);
 		throw new Error(`exisitingMediaContent.data.media.attachment is not a string!`);
 	}
+
 	const exisitingMediaContentAttachmentStream = getAttachmentStream({
 		key: exisitingMediaContentId,
 		name: fileNameOld
 	});
+
 	if (exisitingMediaContentAttachmentStream == null) {
 		log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContentId, fileNameOld);
 		throw new Error(`Unable to getAttachmentStream for ${fileNameOld}!`);
 	}
+
 	const md5sumOfExisitingMediaContent = md5sumFromContent || md5(readText(exisitingMediaContentAttachmentStream));
 	//log.info(`md5sumOfExisitingMediaContent:${toStr(md5sumOfExisitingMediaContent)}`);
+
 	if (
 		md5sumOfDownload !== md5sumOfExisitingMediaContent
 		|| fileNameNew !== fileNameOld
 	) {
 		log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
-		// TODO Modify attachment
-		/*try {
-			addAttachment({
-				key: exisitingMediaContent._path,
-				//mimeType: doctype, // 'image' is a invalid mimetype
-				mimeType: getMimeType(fileNameNew),
-				name: fileNameNew,
-				data: downloadRenditionResponse.bodyStream
-			});
-		} catch (e) {
-			// Just to see what happens if you try to add an attachment that already exists
-		log.error(e);
-		log.error(e.class.name);
-		log.error(e.message);*/
-		removeAttachment({
-			key: exisitingMediaContentId, // Path or id to the content
-			name: fileNameOld // Attachment name, or array of names
-		});
-		const contentAfterRemoveAttachment = getContentByKey({key: exisitingMediaContentId});
-		log.debug(`contentAfterRemoveAttachment:${toStr(contentAfterRemoveAttachment)}`);
 
 		if (downloadRenditionResponse.bodyStream == null) {
 			log.error('downloadRenditionResponse.bodyStream is null! fileNameOld:%s', fileNameOld);
 			throw new Error(`downloadRenditionResponse.bodyStream is null! fileNameOld:${fileNameOld}`);
 		}
 
-		// NOTE re-add old attachment with old name? nah, that information is in versions
-		addAttachment({
-			key: exisitingMediaContentId, // Path or id to the content
-			//mimeType: doctype, // 'image' is a invalid mimetype
-			mimeType: getMimeType(fileNameNew), // Attachment content type
-			name: fileNameNew, // Attachment name
-			data: downloadRenditionResponse.bodyStream // Stream with the binary data for the attachment
-		});
-		const contentAfterAddAttachment = getContentByKey({key: exisitingMediaContentId});
-		log.debug(`contentAfterAddAttachment:${toStr(contentAfterAddAttachment)}`);
-
-		modifyContent({
+		// const potentialNewArtist = getArtist(metadata);
+		// const potentialNewCopyright = getCopyright(metadata);
+		// const potentialNewTags = getTags(metadata);
+		updateMedia({
+			/*artist: shouldUpdateArtist({ // TODO updateMedia doesn't handle when artist is an array
+				artist: potentialNewArtist,
+				content: exisitingMediaContent,
+				modify: true, // We know the mediacontent already existed (wasn't just created)
+				properties
+			})
+				? potentialNewArtist
+				: exisitingMediaContent.data.artist,*/
+			// caption
+			/*copyright: shouldUpdateCopyright({
+				copyright: potentialNewCopyright,
+				content: exisitingMediaContent,
+				modify: true, // We know the mediacontent already existed (wasn't just created)
+				properties
+			})
+				? potentialNewCopyright
+					? forceArray(potentialNewCopyright).join(', ')
+					: undefined
+				: exisitingMediaContent.data.copyright,*/
+			data: downloadRenditionResponse.bodyStream, // Stream with the binary data for the attachment,
+			// focalX
+			// focalY
 			key: exisitingMediaContentId,
-			editor: (mediaContent: MediaContent) => {
-				//log.debug(`soon to be modified mediaContent:${toStr(mediaContent)}`);
-				if (existingDisplayName === trimExt(existingAttachmentName)) {
-					mediaContent.displayName = trimExt(fileNameNew);
-				}
-				mediaContent.data.media.attachment = fileNameNew;
-				//log.debug(`modified mediaContent:${toStr(mediaContent)}`);
-				return mediaContent;
-			},
-			requireValid: false // No mapping defined for property md5sum with value
+			mimeType: getMimeType(fileNameNew),
+			name: fileNameNew//,
+			/*tags: shouldUpdateTags({ // TODO updateMedia doesn't handle when tags is an array
+				tags: potentialNewTags,
+				content: exisitingMediaContent,
+				modify: true, // We know the mediacontent already existed (wasn't just created)
+				properties
+			})
+				? potentialNewTags
+				: exisitingMediaContent.data.tags*/
 		});
-		const contentAfterModifyMediaName = getContentByKey({key: exisitingMediaContentId});
-		log.debug(`contentAfterModifyMediaName:${toStr(contentAfterModifyMediaName)}`);
-		//}
+		const contentUpdateMedia = getContentByKey({key: exisitingMediaContentId});
+		log.debug(`contentUpdateMedia:${toStr(contentUpdateMedia)}`);
 	} else {
 		log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 	}
@@ -286,7 +192,7 @@ export function handleExistingMediaContent({
 			log.debug(`Moved content ${exisitingMediaContent._path} to ${movedContent._path}.`);
 		} catch (e) {
 			if (
-				e instanceof ContentAlreadyExistsException
+				e instanceof ContentAlreadyExistsException // TODO The java e is probably not an instance of the js class!
 				&& e.code == 'contentAlreadyExists'
 				// && e.getCode() == 'contentAlreadyExists'
 			) {

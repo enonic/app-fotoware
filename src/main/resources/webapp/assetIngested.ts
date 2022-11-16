@@ -1,5 +1,14 @@
+// import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
+import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
+import type {Request} from '/lib/xp/Request';
+import type {Asset} from '/types';
+
+
 // Node modules
-import {toStr} from '@enonic/js-utils';
+import {
+	arrayIncludes,
+	toStr
+} from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
 
 import deepEqual from 'fast-deep-equal';
@@ -7,32 +16,44 @@ import deepEqual from 'fast-deep-equal';
 
 // Enonic modules
 //import {schedule, unschedule} from '/lib/cron';
+import {updateMedia} from '/lib/fotoware/content';
+//@ts-ignore
 import {URL} from '/lib/galimatias';
+//@ts-ignore
 import {validateLicense} from '/lib/license';
+//@ts-ignore
 import {md5} from '/lib/text-encoding';
 import {
-	addAttachment,
 	createMedia,
 	get as getContentByKey,
 	getAttachmentStream,
-	publish,
-	removeAttachment
+	publish
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
-import {readText} from '/lib/xp/io';
+import {getMimeType, readText} from '/lib/xp/io';
 import {
 	executeFunction//,
 	//submitTask
 } from '/lib/xp/task';
 
 // FotoWare modules
+//@ts-ignore
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
+// import {getArtist} from '/lib/fotoware/asset/metadata/getArtist';
+// import {getCopyright} from '/lib/fotoware/asset/metadata/getCopyright';
+// import {getTags} from '/lib/fotoware/asset/metadata/getTags';
+//@ts-ignore
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
+//@ts-ignore
 import {query as doQuery} from '/lib/fotoware/api/query';
+//@ts-ignore
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
+//@ts-ignore
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
+//@ts-ignore
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
+//@ts-ignore
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 
@@ -40,7 +61,7 @@ import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 //const CRON_DELAY = 1000 * 60; // A minute in milliseconds
 
 
-export const assetIngested = (request) => {
+export const assetIngested = (request: Request) => {
 	log.info(`request:${toStr(request)}`);
 
 	const licenseDetails = validateLicense({appKey: app.name});
@@ -100,11 +121,16 @@ export const assetIngested = (request) => {
 	}
 
 	const url = new URL(hrefFromHook);
-	const site = url.getHost().replace('.fotoware.cloud', '');
+	const site = url.getHost().replace('.fotoware.cloud', '') as string;
 	//log.debug(`site:${toStr(site)}`);
 
 	const {sitesConfigs} = getConfigFromAppCfg();
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
+
+	const siteConfig = sitesConfigs[site];
+	if (!siteConfig) {
+		throw new Error(`Unable to find site configuration for site:${site}`);
+	}
 
 	const {
 		archiveName,
@@ -114,11 +140,11 @@ export const assetIngested = (request) => {
 		remoteAddresses,
 		url: hostname,
 		imports
-	} = sitesConfigs[site];
+	} = siteConfig;
 	//log.debug(`clientId:${toStr(clientId)}`);
 	//log.debug(`clientSecret:${toStr(clientSecret)}`);
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
-	if (!Object.keys(remoteAddresses).includes(remoteAddress)) {
+	if (!arrayIncludes(Object.keys(remoteAddresses), remoteAddress)) {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}
@@ -169,12 +195,16 @@ export const assetIngested = (request) => {
 	//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
 
 	Object.keys(imports).forEach((importName) => {
+		const anImport = imports[importName];
+		if (!anImport) {
+			throw new Error(`No import with the name ${importName}!`);
+		}
 		const {
 			project,
 			path,
 			query,
 			rendition
-		} = imports[importName];
+		} = anImport;
 		runInContext(
 			{
 				repository: `com.enonic.cms.${project}`,
@@ -191,19 +221,26 @@ export const assetIngested = (request) => {
 						filename,
 						path
 					});
-					let exisitingMediaContent;
+					let exisitingMediaContent: MediaContent|null|undefined|-1;
 					if (contentQueryResult.total === 0) {
 						// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
-						exisitingMediaContent = getContentByKey({key: `/${path}/${filename}`});
+						exisitingMediaContent = getContentByKey<MediaContent>({key: `/${path}/${filename}`});
 					} else if (contentQueryResult.total === 1) {
 						exisitingMediaContent = contentQueryResult.hits[0];
 					} else if (contentQueryResult.total > 1) {
-						log.error(`Found more than one content with FotoWare filename:${filename} ids:${contentQueryResult.hits.map(({_id}) => _id).join(', ')}`);
+						log.error(
+							'Found more than one content with FotoWare filename:%s ids:%s',
+							filename,
+							contentQueryResult.hits.map(({_id}) => _id).join(', ')
+						);
 						exisitingMediaContent = -1;
 					}
 
 					if (exisitingMediaContent) {
-						log.error(`_path:${exisitingMediaContent._path} found! Perhaps missed assetDeleted?`);
+						log.error(
+							'_path:%s found! Perhaps missed assetDeleted?',
+							(exisitingMediaContent as MediaContent)._path
+						);
 					}
 
 					const queryResult = doQuery({
@@ -235,11 +272,11 @@ export const assetIngested = (request) => {
 							//metadataObj,
 							//renditionHref
 							renditions
-						} = collections[0].assets[0];
+						} = collections[0].assets[0] as Asset;
 						if (filename !== filenameFromQuery) {
 							throw new Error(`filename:${filename} from assetIngested does not match filename:${filenameFromQuery} from query result`);
 						}
-						const renditionsObj = {};
+						const renditionsObj: Record<string,string> = {};
 						renditions.forEach(({
 							//default,
 							//description,
@@ -263,7 +300,9 @@ export const assetIngested = (request) => {
 							hostname,
 							renditionServiceShortAbsolutePath: renditionRequest,
 							renditionUrl
-						});
+						}) as {
+							bodyStream: object/*|null*/
+						};
 						if (!downloadRenditionResponse) {
 							throw new Error(`Something went wrong when downloading rendition for renditionUrl:${renditionUrl}!`);
 						}
@@ -298,35 +337,32 @@ export const assetIngested = (request) => {
 									} = {}
 								} = {}
 							} = exisitingMediaContent;
-							const md5sumOfExisitingMediaContent = md5sumFromContent || md5(readText(getAttachmentStream({
+
+							const exisitingMediaContentAttachmentStream = getAttachmentStream({
 								key: exisitingMediaContent._path,
 								name: filename
-							})));
+							});
+
+							if (exisitingMediaContentAttachmentStream == null) {
+								log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContent._path, filename);
+								throw new Error(`Unable to getAttachmentStream for ${filename}!`);
+							}
+
+							const md5sumOfExisitingMediaContent = md5sumFromContent || md5(readText(exisitingMediaContentAttachmentStream));
 							if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
 								log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
-								// TODO Modify attachment
-								try {
-									addAttachment({
-										key: exisitingMediaContent._path,
-										name: filename,
-										data: downloadRenditionResponse.bodyStream
-									});
-								} catch (e) {
-									// Just to see what happens if you try to add an attachment that already exists
-									log.error(e);
-									log.error(e.class.name);
-									log.error(e.message);
-									removeAttachment({
-										key: exisitingMediaContent._path,
-										name: filename
-									});
-									// NOTE re-add old attachment with old name? nah, that information is in versions
-									addAttachment({
-										key: exisitingMediaContent._path,
-										name: filename,
-										data: downloadRenditionResponse.bodyStream
-									});
-								}
+								updateMedia({
+									// artist: getArtist(metadata) // TODO updateMedia doesn't handle when artist is an array
+									// caption
+									// copyright: getCopyright(metadata)
+									data: downloadRenditionResponse.bodyStream, // Stream with the binary data for the attachment,
+									// focalX
+									// focalY
+									key: exisitingMediaContent._path,
+									mimeType: getMimeType(filename),
+									name: filename//,
+									// tags: getTags(metadata) // TODO updateMedia doesn't handle when tags is an array
+								});
 							} else {
 								log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 							}
@@ -334,7 +370,7 @@ export const assetIngested = (request) => {
 								content: JSON.parse(JSON.stringify(exisitingMediaContent)), // deref so exisitingMediaContent can't be modified
 								md5sum: md5sumOfDownload,
 								metadata,
-								modify: true,
+								modify: true, // TODO shouldn't this be false, since ingest is create and not modify???
 								properties
 							});
 							if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {

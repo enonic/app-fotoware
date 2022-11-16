@@ -1,3 +1,10 @@
+import type {AssetModified} from '/lib/fotoware/Fotoware';
+import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
+import type {Request} from '/lib/xp/Request';
+import type {HandleAssetModifiedParams} from '/tasks/handleAssetModifiedHook/handleAssetModifiedHook';
+
+
+
 import {toStr} from '@enonic/js-utils';
 //import '@enonic/nashorn-polyfills'; // Needed by uuid
 //import { v4 as uuidv4 } from 'uuid';
@@ -8,17 +15,13 @@ import getIn from 'get-value';
 import {URL} from '/lib/galimatias';
 // @ts-ignore
 import {validateLicense} from '/lib/license';
-// @ts-ignore
 import {generatePassword} from '/lib/xp/auth';
-// @ts-ignore
 import {run as runInContext} from '/lib/xp/context';
-// @ts-ignore
 import {sanitize} from '/lib/xp/common';
 import {
 	create as scheduleTask//,
 	//delete as deleteTask,
 	//get as getTask
-	// @ts-ignore
 } from '/lib/xp/scheduler';
 
 // FotoWare modules
@@ -28,12 +31,6 @@ import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {buildLicensedTo} from '/lib/fotoware/xp/buildLicensedTo';
 // @ts-ignore
 import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid'
-
-
-import {AssetModified} from '/lib/fotoware/Fotoware';
-import {SiteConfig} from '/lib/fotoware/xp/AppConfig';
-import {Request} from '/lib/xp/Request';
-import {HandleAssetModifiedParams} from '/tasks/handleAssetModifiedHook/handleAssetModifiedHook';
 
 
 const A_MINUTE_IN_MS = 60 * 1000;
