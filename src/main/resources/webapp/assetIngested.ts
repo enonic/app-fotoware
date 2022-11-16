@@ -16,6 +16,7 @@ import deepEqual from 'fast-deep-equal';
 
 // Enonic modules
 //import {schedule, unschedule} from '/lib/cron';
+import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 import {updateMedia} from '/lib/fotoware/content';
 //@ts-ignore
 import {URL} from '/lib/galimatias';
@@ -89,7 +90,7 @@ export const assetIngested = (request: Request) => {
 	//log.debug(`remoteAddress:${toStr(remoteAddress)}`);
 	//log.debug(`userAgent:${toStr(userAgent)}`);
 
-	if (userAgent !== 'FotoWeb/8.0') {
+	if (!arrayIncludes(SUPPORTED_USERAGENTS, userAgent)) {
 		log.error(`Illegal userAgent in request! ${toStr(request)}`);
 		return {status: 404};
 	}

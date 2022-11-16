@@ -7,6 +7,7 @@
 
 // Node modules
 import {
+	arrayIncludes,
 	isString,
 	toStr
 } from '@enonic/js-utils';
@@ -37,6 +38,7 @@ import {executeFunction} from '/lib/xp/task';
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
+import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
@@ -70,7 +72,7 @@ export const assetDeleted = (request) => {
 	//log.debug(`remoteAddress:${toStr(remoteAddress)}`);
 	//log.debug(`userAgent:${toStr(userAgent)}`);
 
-	if (userAgent !== 'FotoWeb/8.0') {
+	if (!arrayIncludes(SUPPORTED_USERAGENTS, userAgent)) {
 		log.error(`Illegal userAgent in request! ${toStr(request)}`);
 		return {status: 404};
 	}
