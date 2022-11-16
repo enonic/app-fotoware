@@ -9,6 +9,7 @@ import {
 //──────────────────────────────────────────────────────────────────────────────
 type Nullable<T> = T | null;
 
+type Artist = string
 type ByteSource = unknown
 type ContentMapper = unknown // TODO Record<string,unknown> ?
 
@@ -31,7 +32,7 @@ interface UpdateMediaParams {
 	key: string
 	name: string
 	// Optional
-	artist?: string
+	artist?: Artist
 	caption?: string
 	copyright?: string
 	data?: ByteSource

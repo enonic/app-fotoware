@@ -24,14 +24,10 @@ import {URL} from '/lib/galimatias';
 import {validateLicense} from '/lib/license';
 //import {md5} from '/lib/text-encoding';
 import {
-	//addAttachment,
-	//createMedia,
 	delete as deleteContent,
 	get as getContentByKey,
-	//getAttachmentStream,
 	publish,
 	query as queryContent
-	//removeAttachment
 } from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
 //import {readText} from '/lib/xp/io';
