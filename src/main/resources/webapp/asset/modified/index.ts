@@ -5,7 +5,10 @@ import type {HandleAssetModifiedParams} from '/tasks/handleAssetModifiedHook/han
 
 
 
-import {toStr} from '@enonic/js-utils';
+import {
+	arrayIncludes,
+	toStr
+} from '@enonic/js-utils';
 //import '@enonic/nashorn-polyfills'; // Needed by uuid
 //import { v4 as uuidv4 } from 'uuid';
 import getIn from 'get-value';
@@ -24,6 +27,7 @@ import {
 	//get as getTask
 } from '/lib/xp/scheduler';
 
+import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 // FotoWare modules
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 
@@ -56,7 +60,7 @@ export const assetModified = (request :Request) => {
 	//log.debug(`remoteAddress:${toStr(remoteAddress)}`);
 	//log.debug(`userAgent:${toStr(userAgent)}`);
 
-	if (userAgent !== 'FotoWeb/8.0') {
+	if (!arrayIncludes(SUPPORTED_USERAGENTS, userAgent)) {
 		log.error(`Illegal userAgent in request! ${toStr(request)}`);
 		return {status: 404};
 	}
