@@ -27,6 +27,44 @@ export function query(params: {
 		searchURL,
 		whitelistedCollections
 	} = params;
+	log.warning('hostname:%s', hostname);
+	log.warning('searchURL:%s', searchURL);
+	log.warning('q:%s', q);
+
+	// https://www.w3schools.com/tags/ref_urlencode.ASP
+	// Complete set of special characters in RegExp
+	// /[\!\@\#\$\%\^\&\*\)\(\+\=\.\<\>\{\}\[\]\:\;\'\"\|\~\`\_\-]/g
+	const url = `${hostname}${
+		searchURL
+			.replace('{?q}', `?q=${
+				q
+					// .replace(new RegExp(' ', 'g'), '%20')
+					.replace(/ /g, '%20')
+					// .replace(new RegExp('(', 'g'), '%28')
+					// .replace(/\(/g, '%28')
+					.replace(/[(]/g, '%28')
+					// .replace(new RegExp(')', 'g'), '%29')
+					// .replace(/\)/g, '%29')
+					.replace(/[)]/g, '%29')
+					// .replace(new RegExp('*', 'g'), '%2A')
+					// .replace(/\*/g, '%2A')
+					.replace(/[*]/g, '%2A')
+					// .replace(new RegExp('.', 'g'), '%2E')
+					// .replace(/\./g, '%2E')
+					.replace(/[.]/g, '%2E')
+					// .replace(new RegExp(':', 'g'), '%3A')
+					// .replace(/\:/g, '%3A')
+					.replace(/[:]/g, '%3A')
+					// .replace(new RegExp('_', 'g'), '%5F')
+					// .replace(/\_/g, '%5F')
+					.replace(/[_]/g, '%5F')
+					// .replace(new RegExp('|', 'g'), '%7C')
+					// .replace(/\|/g, '%7C')
+					.replace(/[|]/g, '%7C')
+			}`)
+	}`;
+	log.warning('url:%s', url);
+	// NOTE Removing the ending slash gives 404
 	const queryRequest = {
 		contentType: 'application/json',
 		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
@@ -41,11 +79,7 @@ export function query(params: {
 			access_token: accessToken//,
 			//q
 		},*/
-		url: `${hostname}${searchURL
-			.replace('{?q}', `?q=${q}`)
-			.replace(' ', '%20')
-		}`
-		// NOTE Removing the ending slash gives 404
+		url
 	}
 	//log.debug(`queryRequest:${toStr(queryRequest)}`);
 
