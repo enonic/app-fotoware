@@ -1,5 +1,4 @@
-import type {AssetModified} from '/lib/fotoware/Fotoware';
-import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
+import type {AssetModified} from '/lib/fotoware';
 import type {Request} from '/lib/xp/Request';
 import type {HandleAssetModifiedParams} from '/tasks/handleAssetModifiedHook/handleAssetModifiedHook';
 
@@ -7,6 +6,7 @@ import type {HandleAssetModifiedParams} from '/tasks/handleAssetModifiedHook/han
 
 import {
 	arrayIncludes,
+	startsWith,
 	toStr
 } from '@enonic/js-utils';
 //import '@enonic/nashorn-polyfills'; // Needed by uuid
@@ -30,10 +30,7 @@ import {
 import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 // FotoWare modules
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
-
-// @ts-ignore
 import {buildLicensedTo} from '/lib/fotoware/xp/buildLicensedTo';
-// @ts-ignore
 import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid'
 
 
@@ -65,9 +62,9 @@ export const assetModified = (request :Request) => {
 		return {status: 404};
 	}
 
-	let body :AssetModified;
+	let body;
 	try {
-		body = JSON.parse(request.body);
+		body = JSON.parse(request.body) as AssetModified;
 		log.debug(`body:${toStr(body)}`);
 	} catch (e) {
 		log.error(`Something went wrong when trying to parse request body ${toStr(request)}`);
@@ -100,7 +97,7 @@ export const assetModified = (request :Request) => {
 	//log.debug(`fileNameOld:${toStr(fileNameOld)}`);
 	//log.debug(`hrefFromHook:${toStr(hrefFromHook)}`);
 
-	if (fileNameOld.startsWith('.') || fileNameNew.startsWith('.')) {
+	if (startsWith(fileNameOld, '.') || startsWith(fileNameNew, '.')) {
 		log.warning(`Skipping fileNameOld:${fileNameOld} fileNameNew:${fileNameNew} because it starts with a dot, so probabbly a hidden file.`);
 		return {
 			status: 200
@@ -116,7 +113,7 @@ export const assetModified = (request :Request) => {
 	} = getConfigFromAppCfg();
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-	const siteConfig :SiteConfig = sitesConfigs[siteName];
+	const siteConfig = sitesConfigs[siteName];
 	if (!siteConfig) {
 		log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 		log.debug(`Object.keys(sitesConfigs):${toStr(Object.keys(sitesConfigs))}`);
@@ -130,7 +127,7 @@ export const assetModified = (request :Request) => {
 		remoteAddresses
 	} = siteConfig;
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
-	if (!Object.keys(remoteAddresses).includes(remoteAddress)) {
+	if (!arrayIncludes(Object.keys(remoteAddresses),remoteAddress)) {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}

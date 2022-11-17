@@ -1,14 +1,24 @@
+import type {AllowOrDenyCollectionsRecord} from '/lib/fotoware/types';
+
+
 import {toStr} from '@enonic/js-utils';
 //import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
-
 import {getMetadataView} from '/lib/fotoware/api/metadata/get';
 import {paginate} from '/lib/fotoware/api/paginate';
 import {camelize} from '/lib/fotoware/xp/camelize';
+//@ts-ignore
 import {request} from '/lib/http-client';
 
 
-export function query(params) {
+export function query(params: {
+	accessToken: string
+	blacklistedCollections: AllowOrDenyCollectionsRecord
+	hostname: string
+	q: string
+	searchURL: string
+	whitelistedCollections: AllowOrDenyCollectionsRecord
+}) {
 	const {
 		accessToken,
 		blacklistedCollections,
@@ -31,7 +41,10 @@ export function query(params) {
 			access_token: accessToken//,
 			//q
 		},*/
-		url: `${hostname}${searchURL.replace('{?q}', `?q=${q}`)}`
+		url: `${hostname}${searchURL
+			.replace('{?q}', `?q=${q}`)
+			.replace(' ', '%20')
+		}`
 		// NOTE Removing the ending slash gives 404
 	}
 	//log.debug(`queryRequest:${toStr(queryRequest)}`);

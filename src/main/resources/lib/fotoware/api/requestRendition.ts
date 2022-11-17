@@ -1,17 +1,37 @@
-import {toStr} from '@enonic/js-utils';
+import type {
+	AccessToken,
+	Cookies,
+	Hostname,
+	RenditionRequest,
+	RenditionUrl,
+	RenditionServiceResponseBodyParsed,
+	Request,
+	Response
+} from '/lib/fotoware';
 
+
+import {toStr} from '@enonic/js-utils';
+//@ts-ignore
 import {request} from '/lib/http-client';
 
 
 export const requestRendition = ({
-	accessToken,
-	cookies,
 	hostname,
 	renditionServiceShortAbsolutePath,
-	renditionUrl
+	renditionUrl,
+	// Optional
+	accessToken,
+	cookies
+}: {
+	hostname: Hostname
+	renditionServiceShortAbsolutePath: RenditionRequest
+	renditionUrl: RenditionUrl
+	// Optional
+	accessToken?: AccessToken
+	cookies?: Cookies
 }) => {
 	//log.info(`renditionUrl:${renditionUrl}`);
-	const renditionServiceRequestParams = {
+	const renditionServiceRequestParams: Request = {
 		/*body: {
 			href: renditionUrl
 		},*/
@@ -74,59 +94,59 @@ export const requestRendition = ({
 		renditionServiceRequestParams.headers.Cookie = cookies.map(({name, value}) => `${name}=${value}`).join('; ');
 	}
 	//log.info(`renditionServiceRequestParams:${toStr(renditionServiceRequestParams)}`);
-	const rendtitionServiceResponse = request(renditionServiceRequestParams);
-	//log.debug(`rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
+	const renditionServiceResponse = request(renditionServiceRequestParams) as Response;
+	//log.debug(`renditionServiceResponse:${toStr(renditionServiceResponse)}`);
 
-	if (rendtitionServiceResponse.status !== 202) {
-		//if (rendtitionServiceResponse.status !== 415) {
-		log.error(`Something went wrong when trying to get rendition url renditionServiceRequestParams:${toStr(renditionServiceRequestParams)} rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
+	if (renditionServiceResponse.status !== 202) {
+		//if (renditionServiceResponse.status !== 415) {
+		log.error(`Something went wrong when trying to get rendition url renditionServiceRequestParams:${toStr(renditionServiceRequestParams)} renditionServiceResponse:${toStr(renditionServiceResponse)}`);
 		//}
 		throw new Error(`Something went wrong when trying to get rendition url renditionUrl:${renditionUrl}`);
 	}
 
-	//if (rendtitionServiceResponse.status === 202) {
-	let rendtitionServiceResponseBodyObj;
+	//if (renditionServiceResponse.status === 202) {
+	let renditionServiceResponseBodyObj;
 	try {
-		rendtitionServiceResponseBodyObj = JSON.parse(rendtitionServiceResponse.body);
+		renditionServiceResponseBodyObj = JSON.parse(renditionServiceResponse.body) as RenditionServiceResponseBodyParsed;
 	} catch (e) {
-		throw new Error(`Something went wrong when trying to JSON parse the response body! rendtitionServiceResponse:${toStr(rendtitionServiceResponse)}`);
+		throw new Error(`Something went wrong when trying to JSON parse the response body! renditionServiceResponse:${toStr(renditionServiceResponse)}`);
 	}
-	//log.debug(`rendtitionServiceResponseBodyObj:${toStr(rendtitionServiceResponseBodyObj)}`);
+	//log.debug(`renditionServiceResponseBodyObj:${toStr(renditionServiceResponseBodyObj)}`);
 
 	const {
 		href
-	} = rendtitionServiceResponseBodyObj;
-	const rendtitionRequestUrl = `${hostname}${href}`;
-	//log.debug(`rendtitionRequestUrl:${toStr(rendtitionRequestUrl)}`);
+	} = renditionServiceResponseBodyObj;
+	const renditionRequestUrl = `${hostname}${href}`;
+	//log.debug(`renditionRequestUrl:${toStr(renditionRequestUrl)}`);
 
-	const pollAndDownloadRenditionRequestParams = {
+	const pollAndDownloadRenditionRequestParams: Request = {
 		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 		method: 'GET',
-		url: rendtitionRequestUrl
+		url: renditionRequestUrl
 	};
 	if (accessToken) {
 		pollAndDownloadRenditionRequestParams.headers = { Authorization: `bearer ${accessToken}` };
 	}
 	//log.debug(`pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)}`);
 
-	let pollAndDownloadRenditionResponse = {
+	let pollAndDownloadRenditionResponse: Response = {
 		status: 202
 	};
 	while (pollAndDownloadRenditionResponse.status === 202) {
 		pollAndDownloadRenditionResponse = request(pollAndDownloadRenditionRequestParams);
 	}
 	if (pollAndDownloadRenditionResponse.status === 410) {
-		log.error(`Rendition no longer available rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionResponse:${toStr(pollAndDownloadRenditionResponse)}`);
+		log.error(`Rendition no longer available renditionServiceResponse:${toStr(renditionServiceResponse)} pollAndDownloadRenditionResponse:${toStr(pollAndDownloadRenditionResponse)}`);
 		throw new Error(`Rendition no longer available renditionUrl:${renditionUrl}`);
 	}
 	if (pollAndDownloadRenditionResponse.status !== 200) {
-		log.error(`Something went wrong while trying to poll and download rendition rendtitionServiceResponse:${toStr(rendtitionServiceResponse)} pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)} pollAndDownloadRenditionResponse:${toStr(pollAndDownloadRenditionResponse)}`);
+		log.error(`Something went wrong while trying to poll and download rendition renditionServiceResponse:${toStr(renditionServiceResponse)} pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)} pollAndDownloadRenditionResponse:${toStr(pollAndDownloadRenditionResponse)}`);
 		throw new Error(`Something went wrong while trying to poll and download rendition renditionUrl:${renditionUrl}`);
 	}
 	/*log.debug(`debug rendition service and download:${toStr({
 		renditionServiceRequestParams,
-		rendtitionServiceResponse,
-		rendtitionServiceResponseBodyObj,
+		renditionServiceResponse,
+		renditionServiceResponseBodyObj,
 		pollAndDownloadRenditionRequestParams,
 		pollAndDownloadRenditionResponse
 	})}`);*/

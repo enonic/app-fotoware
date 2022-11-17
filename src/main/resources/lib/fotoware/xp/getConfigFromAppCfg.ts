@@ -1,6 +1,10 @@
-//import {toStr} from '@enonic/js-utils';
+import type {
+	RemoteAddresses,
+	SitesConfigs
+} from './AppConfig.d';
 
-// @ts-ignore
+
+// import {toStr} from '@enonic/js-utils';
 import {deepen} from '/lib/fotoware/xp/deepen';
 //import {deepen} from './deepen';
 //import {capitalize} from '/lib/fotoware/xp/capitalize';
@@ -8,18 +12,15 @@ import {
 	PROPERTY_ON_CREATE,
 	PROPERTY_IF_CHANGED,
 	PROPERTY_OVERWRITE
-	// @ts-ignore
 } from '/lib/fotoware/xp/constants';
 
-
-import {SitesConfigs} from './AppConfig';
 
 interface GetConfigFromAppCfgReturnType {
 	sitesConfigs: SitesConfigs
 }
 
 
-export function getConfigFromAppCfg() :GetConfigFromAppCfgReturnType {
+export function getConfigFromAppCfg(): GetConfigFromAppCfgReturnType {
 	//log.debug(`app.config:${toStr(app.config)}`);
 
 	const config = deepen(app.config);
@@ -36,6 +37,9 @@ export function getConfigFromAppCfg() :GetConfigFromAppCfgReturnType {
 
 	Object.keys(sites).forEach((siteName) => {
 		const siteConfig = sites[siteName];
+		if (!siteConfig) {
+			throw new Error(`Unable to find site with name:${siteName}!`);
+		}
 		//log.debug(`site:${toStr(site)}`);
 		const {
 			//archiveName = '5000-Archive',
@@ -65,7 +69,7 @@ export function getConfigFromAppCfg() :GetConfigFromAppCfgReturnType {
 		} else if(!url) {
 			log.error(`Site ${siteName} is missing url!`);
 		} else {
-			const remoteAddresses = {};
+			const remoteAddresses: RemoteAddresses = {};
 			allowWebhookFromIp.split(/\s*,\s*/).forEach((ip) => {
 				remoteAddresses[ip] = true;
 			});
@@ -90,9 +94,12 @@ export function getConfigFromAppCfg() :GetConfigFromAppCfgReturnType {
 	}); // foreach
 	//log.info(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-	const projectPaths = {};
+	const projectPaths: Record<string,string> = {};
 	Object.keys(imports).forEach((importName) => {
 		const importObj = imports[importName];
+		if (!importObj) {
+			throw new Error(`Unable to find import with name:${importName}!`);
+		}
 		const {
 			project,
 			path = 'fotoware',

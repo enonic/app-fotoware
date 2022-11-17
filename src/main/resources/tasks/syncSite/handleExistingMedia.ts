@@ -8,17 +8,13 @@ import {detailedDiff} from 'deep-object-diff';
 import deepEqual from 'fast-deep-equal';
 
 //import {assetUpdate} from '/lib/fotoware/api/asset/update';
-//@ts-ignore
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 // import {getArtist} from '/lib/fotoware/asset/metadata/getArtist';
 // import {getCopyright} from '/lib/fotoware/asset/metadata/getCopyright';
 // import {getTags} from '/lib/fotoware/asset/metadata/getTags';
 import {updateMedia} from '/lib/fotoware/content';
-//@ts-ignore
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
-//@ts-ignore
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
-//@ts-ignore
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 //@ts-ignore
 import {md5} from '/lib/text-encoding';

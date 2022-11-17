@@ -1,5 +1,17 @@
-import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
-import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
+import type {
+	AccessToken,
+	ArchiveName,
+	Filename,
+	Hostname,
+	MediaContent,
+	Path,
+	Project,
+	Query,
+	RenditionRequest,
+	RenditionString,
+	SearchURL,
+	SiteConfig
+} from '/lib/fotoware';
 
 
 // Enonic modules
@@ -8,28 +20,24 @@ import {run as runInContext} from '/lib/xp/context';
 import {executeFunction} from '/lib/xp/task';
 
 // FotoWare modules
-// @ts-ignore
 import {query as doQuery} from '/lib/fotoware/api/query';
-
-// @ts-ignore
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
-
 import {handleAsset} from '/tasks/handleAssetModifiedHook/handleAsset'
 
 
 interface ModifyInImportParams {
-	readonly accessToken :string
-	readonly archiveName :string
-	readonly fileNameNew :string
-	readonly fileNameOld :string
-	readonly hostname :string
-	readonly path :string
-	readonly project :string
-	readonly properties :SiteConfig['properties']
-	readonly query :string
-	readonly rendition :string
-	readonly renditionRequest :string
-	readonly searchURL :string
+	readonly accessToken: AccessToken
+	readonly archiveName: ArchiveName
+	readonly fileNameNew: Filename
+	readonly fileNameOld: Filename
+	readonly hostname: Hostname
+	readonly path: Path
+	readonly project: Project
+	readonly properties: SiteConfig['properties']
+	readonly query: Query
+	readonly rendition: RenditionString
+	readonly renditionRequest: RenditionRequest
+	readonly searchURL: SearchURL
 }
 
 
@@ -62,7 +70,7 @@ export function modifyInImport({
 				filename: fileNameOld,
 				path
 			});
-			let exisitingMediaContent :MediaContent|null|undefined|-1;
+			let exisitingMediaContent :MediaContent|null|undefined;
 			if (contentQueryResult.total === 0) {
 				// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
 				exisitingMediaContent = getContentByKey<MediaContent>({key: `/${path}/${fileNameOld}`});

@@ -1,11 +1,21 @@
-import {toStr} from '@enonic/js-utils';
+import type {
+	AccessToken,
+	Hostname,
+	PrivateFullAPIDescriptorResponse
+} from '/lib/fotoware';
 
+
+import {toStr} from '@enonic/js-utils';
+//@ts-ignore
 import {request} from '/lib/http-client';
 
 
 export const getPrivateFullAPIDescriptor = ({
-	hostname,
-	accessToken
+	accessToken,
+	hostname
+}: {
+	accessToken: AccessToken
+	hostname: Hostname
 }) => {
 	const privateFullAPIDescriptorRequestParams = {
 		contentType: 'application/json',
@@ -28,7 +38,7 @@ export const getPrivateFullAPIDescriptor = ({
 
 	let privateFullAPIDescriptorResponseBodyObj;
 	try {
-		privateFullAPIDescriptorResponseBodyObj = JSON.parse(privateFullAPIDescriptorResponse.body);
+		privateFullAPIDescriptorResponseBodyObj = JSON.parse(privateFullAPIDescriptorResponse.body) as PrivateFullAPIDescriptorResponse;
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! privateFullAPIDescriptorResponse:${toStr(privateFullAPIDescriptorResponse)}`);
 	}
