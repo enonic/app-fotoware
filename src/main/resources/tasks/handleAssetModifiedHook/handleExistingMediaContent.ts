@@ -1,6 +1,11 @@
-import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
-import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
-import type {Metadata} from '/types';
+import type {
+	Filename,
+	MediaContent,
+	Metadata,
+	Project,
+	Response,
+	SiteConfig
+} from '/lib/fotoware';
 
 
 // Node modules
@@ -12,7 +17,6 @@ import {
 } from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
 //import * as deepEqual from 'fast-deep-equal';
-// @ts-ignore
 import deepEqual from 'fast-deep-equal';
 
 // @ts-ignore
@@ -33,27 +37,22 @@ import {
 import {updateMedia} from '/lib/fotoware/content';
 import {ContentAlreadyExistsException} from '/lib/xp/ContentAlreadyExistsException';
 import {getMimeType, readText} from '/lib/xp/io';
-// @ts-ignore
 import {isPublished} from '/lib/fotoware/xp/isPublished';
-// @ts-ignore
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 // import {shouldUpdateArtist} from '/lib/fotoware/xp/shouldUpdateArtist';
 // import {shouldUpdateCopyright} from '/lib/fotoware/xp/shouldUpdateCopyright';
 // import {shouldUpdateTags} from '/lib/fotoware/xp/shouldUpdateTags';
-// @ts-ignore
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent'; // TODO should use updateMedia instead!
 
 
 interface HandleExistingMediaContent {
 	exisitingMediaContent: MediaContent
-	downloadRenditionResponse: {
-		bodyStream: object|null
-	}
-	fileNameNew: string
-	fileNameOld: string
+	downloadRenditionResponse: Response
+	fileNameNew: Filename
+	fileNameOld: Filename
 	md5sumOfDownload: string
 	metadata: Metadata
-	project: string
+	project: Project
 	properties: SiteConfig['properties']
 }
 

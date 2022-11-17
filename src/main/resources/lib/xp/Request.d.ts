@@ -1,7 +1,14 @@
 export interface Request {
-	body :string // Often JSON
-	headers: {
-		readonly 'User-Agent' :string
+	body?: string // Often JSON
+	contentType?: string
+	followRedirects?: boolean
+	headers?: {
+		'Accept'?: string
+		'Authorization'?: string
+		'Cookie'?: string
+		'User-Agent'?: string
 	}
-	remoteAddress :string
+	method: 'GET'|'POST'
+	remoteAddress?: string
+	url: string
 }

@@ -38,23 +38,16 @@ import {
 } from '/lib/xp/task';
 
 // FotoWare modules
-//@ts-ignore
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 // import {getArtist} from '/lib/fotoware/asset/metadata/getArtist';
 // import {getCopyright} from '/lib/fotoware/asset/metadata/getCopyright';
 // import {getTags} from '/lib/fotoware/asset/metadata/getTags';
-//@ts-ignore
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
-//@ts-ignore
 import {query as doQuery} from '/lib/fotoware/api/query';
-//@ts-ignore
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
-//@ts-ignore
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
-//@ts-ignore
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
-//@ts-ignore
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 

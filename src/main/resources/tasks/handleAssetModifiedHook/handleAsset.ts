@@ -1,14 +1,22 @@
-import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
-import type {Asset} from '/types';
+import type {
+	AccessToken,
+	Asset,
+	Filename,
+	Hostname,
+	MediaContent,
+	Path,
+	Project,
+	RenditionRequest,
+	RenditionString,
+	SiteConfig
+} from '/lib/fotoware';
 
 
+import {toStr} from '@enonic/js-utils';
 // @ts-ignore
 import {md5} from '/lib/text-encoding';
 import {readText} from '/lib/xp/io';
-
-// @ts-ignore
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
-
 import {handleExistingMediaContent} from './handleExistingMediaContent';
 import {handleMissingMediaContent} from './handleMissingMediaContent';
 
@@ -26,8 +34,17 @@ export function handleAsset({
 	rendition,
 	renditionRequest
 } :{
+	accessToken: AccessToken
 	asset: Asset
+	exisitingMediaContent: MediaContent|null|undefined
+	fileNameNew: Filename
+	fileNameOld: Filename
+	hostname: Hostname
+	path: Path
+	project: Project
 	properties: SiteConfig['properties']
+	rendition: RenditionString
+	renditionRequest: RenditionRequest
 }) {
 	const {
 		//doctype,
@@ -62,6 +79,10 @@ export function handleAsset({
 	//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
 
 	const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'];
+	if (!renditionUrl) {
+		log.error(`Unable to determine renditionUrl from rendition:${rendition} in renditionsObj${toStr(renditionsObj)}!`);
+		throw new Error(`Unable to determine renditionUrl from rendition:${rendition}!`);
+	}
 
 	const downloadRenditionResponse = requestRendition({
 		accessToken,
@@ -72,7 +93,11 @@ export function handleAsset({
 	if (!downloadRenditionResponse) {
 		throw new Error(`Something went wrong when downloading rendition for renditionUrl:${renditionUrl}!`);
 	}
-	const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
+	const stream = downloadRenditionResponse.bodyStream;
+	if (!stream) {
+		throw new Error(`RenditionResponse.bodyStream is Falsy! renditionUrl:${renditionUrl}`);
+	}
+	const md5sumOfDownload = md5(readText(stream)) as string;
 	//log.info(`md5sumOfDownload:${toStr(md5sumOfDownload)}`);
 
 	if (exisitingMediaContent) {

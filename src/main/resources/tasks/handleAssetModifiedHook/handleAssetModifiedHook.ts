@@ -1,10 +1,5 @@
-import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
-
-
 import {toStr} from '@enonic/js-utils';
-// @ts-ignore
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
-// @ts-ignore
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyInImport} from '/tasks/handleAssetModifiedHook/modifyInImport';
@@ -30,7 +25,7 @@ export function run({
 	} = getConfigFromAppCfg();
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
-	const siteConfig :SiteConfig = sitesConfigs[siteName];
+	const siteConfig = sitesConfigs[siteName];
 	if (!siteConfig) {
 		log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 		log.debug(`Object.keys(sitesConfigs):${toStr(Object.keys(sitesConfigs))}`);
@@ -67,12 +62,16 @@ export function run({
 	//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
 
 	Object.keys(imports).forEach((importName) => {
+		const importItem = imports[importName];
+		if (!importItem) {
+			throw new Error(`Unable to find import with name:${importName}!`);
+		}
 		const {
 			project,
 			path,
 			query,
 			rendition
-		} = imports[importName];
+		} = importItem;
 		modifyInImport({
 			accessToken,
 			archiveName,

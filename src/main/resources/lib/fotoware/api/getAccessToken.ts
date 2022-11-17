@@ -1,5 +1,13 @@
-import {toStr} from '@enonic/js-utils';
+import type {
+	ClientId,
+	ClientSecret,
+	Hostname,
+	TokenResponse
+} from '/lib/fotoware';
 
+
+import {toStr} from '@enonic/js-utils';
+//@ts-ignore
 import {request} from '/lib/http-client';
 /*import {
 	//base64Encode,
@@ -34,6 +42,10 @@ export const getAccessToken = ({
 	hostname,
 	clientId,
 	clientSecret
+}: {
+	hostname: Hostname
+	clientId: ClientId
+	clientSecret: ClientSecret
 }) => {
 	const tokenRequestParams = {
 		body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
@@ -61,7 +73,7 @@ export const getAccessToken = ({
 	}
 	let tokenResponseObj;
 	try {
-		tokenResponseObj = JSON.parse(tokenResponse.body);
+		tokenResponseObj = JSON.parse(tokenResponse.body) as TokenResponse;
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! response:${toStr(tokenResponse)}`);
 	}

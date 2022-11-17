@@ -1,9 +1,4 @@
-import {
-	createMedia
-	// @ts-ignore
-} from '/lib/xp/content';
-
-// @ts-ignore
+import {createMedia} from '/lib/xp/content';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 
 

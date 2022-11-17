@@ -22,13 +22,24 @@ export type Metadata = {
 	}
 }
 
+export type RenditionUrl = string
 export type Rendition = {
 	display_name: string
-	href: string
+	href: RenditionUrl
 }
 
 export type Asset = {
 	filename: string
 	metadata: Metadata
 	renditions: Rendition[]
+}
+
+export interface AssetModified {
+	data: {
+		asset: {
+			filename :string
+		}
+	}
+	href :string
+	'previous-name' :string
 }
