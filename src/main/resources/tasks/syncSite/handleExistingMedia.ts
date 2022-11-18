@@ -1,5 +1,14 @@
-import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
-import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
+import type {
+	AccessToken,
+	Filename,
+	Hostname,
+	MediaContent,
+	Metadata,
+	Project,
+	RenditionRequest,
+	RenditionUrl,
+	SiteConfig
+} from '/lib/fotoware';
 
 
 import {toStr} from '@enonic/js-utils';
@@ -49,11 +58,16 @@ export function handleExistingMedia({
 	renditionRequest,
 	renditionUrl
 }: {
+	accessToken: AccessToken
 	boolResume: boolean
 	exisitingMediaContent: MediaContent
-	filename: string
-	project: string
+	filename: Filename
+	hostname: Hostname
+	metadata: Metadata
+	project: Project
 	properties: SiteConfig['properties']
+	renditionRequest: RenditionRequest
+	renditionUrl: RenditionUrl
 }) {
 	//log.debug(`handleExistingMedia properties:${toStr(properties)}`);
 	const {
@@ -65,18 +79,22 @@ export function handleExistingMedia({
 	} = exisitingMediaContent;
 	//log.debug(`_path:${exisitingMediaContent._path} md5sumFromXdata:${md5sumFromXdata}`);
 
-	const exisitingMediaContentAttachmentStream = getAttachmentStream({
-		key: exisitingMediaContent._path,
-		name: filename
-	});
+	let md5sumOfExisitingMediaContent = md5sumFromXdata;
+	if (!md5sumOfExisitingMediaContent) {
+		const exisitingMediaContentAttachmentStream = getAttachmentStream({
+			key: exisitingMediaContent._path,
+			name: filename
+		});
 
-	if (exisitingMediaContentAttachmentStream == null) {
-		log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContent._path, filename);
-		throw new Error(`Unable to getAttachmentStream for ${filename}!`);
+		if (exisitingMediaContentAttachmentStream == null) {
+			log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContent._path, filename);
+			throw new Error(`Unable to getAttachmentStream for ${filename}!`);
+		}
+
+		md5sumOfExisitingMediaContent = md5(readText(exisitingMediaContentAttachmentStream));
+		//log.debug(`_path:${exisitingMediaContent._path} md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent}`);
 	}
 
-	const md5sumOfExisitingMediaContent = md5sumFromXdata || md5(readText(exisitingMediaContentAttachmentStream));
-	//log.debug(`_path:${exisitingMediaContent._path} md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent}`);
 	let md5sumToStore = md5sumOfExisitingMediaContent;
 	//log.debug(`_path:${exisitingMediaContent._path} md5sumToStore:${md5sumToStore}`);
 
@@ -93,6 +111,10 @@ export function handleExistingMedia({
 			// Errors are already logged, simply skip and continue
 		}
 		if (downloadRenditionResponse) {
+			if (downloadRenditionResponse.bodyStream == null) {
+				log.error('downloadRenditionResponse.bodyStream is null! filename:%s', filename);
+				throw new Error(`downloadRenditionResponse.bodyStream is null! filename:${filename}`);
+			}
 			const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
 			if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
 				log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);

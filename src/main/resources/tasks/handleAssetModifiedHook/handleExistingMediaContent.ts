@@ -12,8 +12,8 @@ import type {
 import {
 	// forceArray,
 	isString,
-	toStr//,
-	// trimExt
+	toStr,
+	trimExt
 } from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
 //import * as deepEqual from 'fast-deep-equal';
@@ -26,7 +26,7 @@ import {md5} from '/lib/text-encoding';
 import {
 	get as getContentByKey,
 	getAttachmentStream,
-	// modify as modifyContent,
+	modify as modifyContent,
 	move as moveContent,
 	publish
 } from '/lib/xp/content';
@@ -71,7 +71,7 @@ export function handleExistingMediaContent({
 
 	const {
 		_id: exisitingMediaContentId,
-		// displayName: existingDisplayName,
+		displayName: existingDisplayName,
 		data: {
 			'fotoWare': {
 				'md5sum': md5sumFromContent
@@ -87,25 +87,32 @@ export function handleExistingMediaContent({
 		throw new Error(`exisitingMediaContent.data.media.attachment is not a string!`);
 	}
 
-	const exisitingMediaContentAttachmentStream = getAttachmentStream({
-		key: exisitingMediaContentId,
-		name: fileNameOld
-	});
+	let md5sumOfExisitingMediaContent = md5sumFromContent;
+	if (!md5sumOfExisitingMediaContent) {
+		const exisitingMediaContentAttachmentStream = getAttachmentStream({
+			key: exisitingMediaContentId,
+			name: fileNameOld
+		});
 
-	if (exisitingMediaContentAttachmentStream == null) {
-		log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContentId, fileNameOld);
-		throw new Error(`Unable to getAttachmentStream for ${fileNameOld}!`);
+		if (exisitingMediaContentAttachmentStream == null) {
+			log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContentId, fileNameOld);
+			throw new Error(`Unable to getAttachmentStream for ${fileNameOld}!`);
+		}
+
+		md5sumOfExisitingMediaContent = md5(readText(exisitingMediaContentAttachmentStream));
+		//log.info(`md5sumOfExisitingMediaContent:${toStr(md5sumOfExisitingMediaContent)}`);
 	}
 
-	const md5sumOfExisitingMediaContent = md5sumFromContent || md5(readText(exisitingMediaContentAttachmentStream));
-	//log.info(`md5sumOfExisitingMediaContent:${toStr(md5sumOfExisitingMediaContent)}`);
+	if (md5sumOfDownload === md5sumOfExisitingMediaContent) {
+		log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
+	} else {
+		log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
+	}
 
 	if (
-		md5sumOfDownload !== md5sumOfExisitingMediaContent
-		|| fileNameNew !== fileNameOld
+		md5sumOfDownload !== md5sumOfExisitingMediaContent // Binary changed
+		|| fileNameNew !== fileNameOld // or Renamed
 	) {
-		log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
-
 		if (downloadRenditionResponse.bodyStream == null) {
 			log.error('downloadRenditionResponse.bodyStream is null! fileNameOld:%s', fileNameOld);
 			throw new Error(`downloadRenditionResponse.bodyStream is null! fileNameOld:${fileNameOld}`);
@@ -149,10 +156,26 @@ export function handleExistingMediaContent({
 				? potentialNewTags
 				: exisitingMediaContent.data.tags*/
 		});
-		const contentUpdateMedia = getContentByKey({key: exisitingMediaContentId});
-		log.debug(`contentUpdateMedia:${toStr(contentUpdateMedia)}`);
-	} else {
-		log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
+		const contentAfterUpdateMedia = getContentByKey({key: exisitingMediaContentId});
+		log.debug(`contentAfterUpdateMedia:${toStr(contentAfterUpdateMedia)}`);
+	}
+
+	if (
+		fileNameNew !== fileNameOld // Rename
+		&& existingDisplayName === trimExt(existingAttachmentName)
+	) {
+		modifyContent({
+			key: exisitingMediaContentId,
+			editor: (mediaContent: MediaContent) => {
+				//log.debug(`soon to be modified mediaContent:${toStr(mediaContent)}`);
+				mediaContent.displayName = trimExt(fileNameNew);
+				//log.debug(`modified mediaContent:${toStr(mediaContent)}`);
+				return mediaContent;
+			},
+			requireValid: false // No mapping defined for property md5sum with value
+		});
+		const contentAfterModifyMediaName = getContentByKey({key: exisitingMediaContentId});
+		log.debug(`contentAfterModifyMediaName:${toStr(contentAfterModifyMediaName)}`);
 	}
 
 	const maybeModifiedMediaContent = updateMetadataOnContent({
@@ -177,6 +200,7 @@ export function handleExistingMediaContent({
 	} /*else {
 		log.debug(`_path:${exisitingMediaContent._path} no differences :)`);
 	}*/
+
 	if (
 		fileNameNew !== fileNameOld // Renamed in FotoWare
 		&& fileNameOld === existingAttachmentName // Name not overridden in Enonic
@@ -204,6 +228,7 @@ export function handleExistingMediaContent({
 			// Will do publishing even if move failed...
 		}
 	}
+
 	if (isPublished({
 		key: exisitingMediaContentId,
 		project

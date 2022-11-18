@@ -332,18 +332,24 @@ export const assetIngested = (request: Request) => {
 								} = {}
 							} = exisitingMediaContent;
 
-							const exisitingMediaContentAttachmentStream = getAttachmentStream({
-								key: exisitingMediaContent._path,
-								name: filename
-							});
+							let md5sumOfExisitingMediaContent = md5sumFromContent;
+							if (!md5sumOfExisitingMediaContent) {
+								const exisitingMediaContentAttachmentStream = getAttachmentStream({
+									key: exisitingMediaContent._path,
+									name: filename
+								});
 
-							if (exisitingMediaContentAttachmentStream == null) {
-								log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContent._path, filename);
-								throw new Error(`Unable to getAttachmentStream for ${filename}!`);
+								if (exisitingMediaContentAttachmentStream == null) {
+									log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContent._path, filename);
+									throw new Error(`Unable to getAttachmentStream for ${filename}!`);
+								}
+
+								md5sumOfExisitingMediaContent = md5(readText(exisitingMediaContentAttachmentStream));
 							}
 
-							const md5sumOfExisitingMediaContent = md5sumFromContent || md5(readText(exisitingMediaContentAttachmentStream));
-							if (md5sumOfDownload !== md5sumOfExisitingMediaContent) {
+							if (md5sumOfDownload === md5sumOfExisitingMediaContent) {
+								log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
+							} else {
 								log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} !== md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :(`);
 								updateMedia({
 									// artist: getArtist(metadata) // TODO updateMedia doesn't handle when artist is an array
@@ -357,9 +363,8 @@ export const assetIngested = (request: Request) => {
 									name: filename//,
 									// tags: getTags(metadata) // TODO updateMedia doesn't handle when tags is an array
 								});
-							} else {
-								log.debug(`_path:${exisitingMediaContent._path} md5sumOfDownload:${md5sumOfDownload} === md5sumOfExisitingMediaContent:${md5sumOfExisitingMediaContent} :)`);
 							}
+
 							const maybeModifiedMediaContent = updateMetadataOnContent({
 								content: JSON.parse(JSON.stringify(exisitingMediaContent)), // deref so exisitingMediaContent can't be modified
 								md5sum: md5sumOfDownload,
@@ -367,6 +372,7 @@ export const assetIngested = (request: Request) => {
 								modify: true, // TODO shouldn't this be false, since ingest is create and not modify???
 								properties
 							});
+
 							if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
 								const differences = detailedDiff(exisitingMediaContent, maybeModifiedMediaContent);
 								log.debug(`_path:${exisitingMediaContent._path} differences:${toStr(differences)}`);
@@ -380,6 +386,7 @@ export const assetIngested = (request: Request) => {
 							} /*else {
 								log.debug(`_path:${exisitingMediaContent._path} no differences :)`);
 							}*/
+
 							if (isPublished({
 								key: exisitingMediaContent._path,
 								project
