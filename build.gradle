@@ -62,7 +62,7 @@ dependencies {
 	include 'com.enonic.lib:lib-http-client:3.2.2' // Potensial URL encoding issues
 
 	include 'com.enonic.lib:lib-license:3.0.0'
-	include 'com.enonic.lib:lib-router:2.1.0'
+	include 'com.enonic.lib:lib-router:3.0.1'
 	//include 'com.enonic.lib:menu:1.3.3'
 	include "com.enonic.lib:lib-static:0.1.0"
 	include 'com.enonic.lib:lib-text-encoding:2.1.1'
