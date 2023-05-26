@@ -61,7 +61,7 @@ export const updateMetadataOnContent = ({
 	if (!content.data.fotoWare.metadata) { content.data.fotoWare.metadata = {}; }
 
 	const dereffedMetadata = JSON.parse(JSON.stringify(metadata)) as typeof metadata;
-	log.debug(`dereffedMetadata:${toStr(dereffedMetadata)}`);
+	// log.debug(`dereffedMetadata:${toStr(dereffedMetadata)}`);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Title -> DisplayName
