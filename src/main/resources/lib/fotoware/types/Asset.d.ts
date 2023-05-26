@@ -1,26 +1,26 @@
-import type {OneOrMore} from '@enonic/js-utils/src/types';
-
-
 // NOTE: Since I don't know what data could potentially come in the future,
 // using OneOrMore is the safest.
 
-export type Metadata = {
-	5: { // title used as displayName
-		value: OneOrMore<string>
-	}
-	25: {  // tags
-		value: OneOrMore<string>
-	}
-	80: { // artist
-		value: OneOrMore<string>
-	}
-	116: { // copyright
-		value: OneOrMore<string>
-	}
-	120: {  // description
-		value: OneOrMore<string>
-	}
-}
+export type Metadata = Record<PropertyKey, {
+	value: string|string[]
+}>
+// export type Metadata = {
+// 	5?: { // title used as displayName
+// 		value: string|string[]
+// 	}
+// 	25?: {  // tags
+// 		value: string|string[]
+// 	}
+// 	80?: { // artist
+// 		value: string|string[]
+// 	}
+// 	116?: { // copyright
+// 		value: string|string[]
+// 	}
+// 	120?: {  // description
+// 		value: string|string[]
+// 	}
+// }
 
 export type RenditionUrl = string
 export type Rendition = {

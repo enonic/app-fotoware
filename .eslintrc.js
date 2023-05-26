@@ -82,7 +82,7 @@ module.exports = {
 		'@typescript-eslint/ban-ts-comment': ['off'],
 		'comma-dangle': ['error', {
 			arrays: 'ignore',
-			objects: 'never',
+			objects: 'ignore',
 			imports: 'never',
 			exports: 'never',
 			functions: 'ignore'

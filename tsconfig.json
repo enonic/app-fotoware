@@ -7,7 +7,6 @@
 		"downlevelIteration": true,
 		"esModuleInterop": true,
 		"importHelpers": true,
-		"importsNotUsedAsValues": "error",
 		"inlineSourceMap": false,
 		"inlineSources": false,
 		"listEmittedFiles": true,
@@ -23,44 +22,57 @@
 		"noUnusedParameters": true,
 		"outDir": "build/tsc",
 		"paths": {
+			"/lib/fotoware/xp/capitalize": ["src/main/resources/lib/fotoware/xp/capitalize.ts"],
 			// Production (should be commented in on commit)
 			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
 			"/lib/fotoware": ["src/main/resources/lib/fotoware"],
+			"/lib/fotoware/xp/*": ["src/main/resources/lib/fotoware/xp/*"],
 			"/lib/fotoware/*": ["src/main/resources/lib/fotoware/*"],
+			"/tasks/*": ["src/main/resources/tasks/*"],
+			"/types": ["src/main/resources/lib/fotoware/index.d.ts"],
+			"/types/*": ["src/main/resources/lib/fotoware/types/*"],
+
 			"/lib/xp/auth": ["node_modules/@enonic-types/lib-auth"],
 			"/lib/xp/common": ["node_modules/@enonic-types/lib-common"],
 			"/lib/xp/content": ["node_modules/@enonic-types/lib-content"],
 			"/lib/xp/context": ["node_modules/@enonic-types/lib-context"],
 			"/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
+			"/lib/xp/portal": ["node_modules/@enonic-types/lib-portal"],
 			"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
 			"/lib/xp/scheduler": ["node_modules/@enonic-types/lib-scheduler"],
 			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"],
-			"/lib/xp/*": ["src/main/resources/lib/xp/*"],
-			"/tasks/*": ["src/main/resources/tasks/*"],
-			"/types": ["src/main/resources/lib/fotoware/index.d.ts"],
-			"/types/*": ["src/main/resources/lib/fotoware/types/*"],
+			// "/lib/xp/*": ["src/main/resources/lib/xp/*"],
+
+			// "/*": ["src/main/resources/lib/*"],
+
 			// Development (should be commented out on commit)
 			//"/lib/xp/content": ["../xp/modules/lib/lib-content/src/main/resources/lib/xp/content.ts"],
 		},
 		"removeComments": true,
 		"resolveJsonModule": true,
-		"rootDirs": ["src/main/resources"],
+		"rootDir": ".",
+		"rootDirs": [
+			"src/main/resources",
+			// "node_modules"
+		],
 		"sourceMap": false,
 		"strict": true,
 		"strictFunctionTypes": true,
 		"strictNullChecks": true,
 		"target": "ES5",
-		"types": [
-			"@enonic-types/global"
-		]
+		// "types": [
+		// 	"@enonic-types/global"
+		// ]
+		"verbatimModuleSyntax": false,
 	},
 	"exclude": [
-		"node_modules"
+		"node_modules",
+		// "src/main/resources/**/*.d.ts" // Nope this destroys the globalThis.app
 	],
 	"files": [
 		"./src/main/resources/services/sitesConfigs/sitesConfigs.ts"
 	],
 	"include": [
-		"src/main/resources/**/*"
+		"src/main/resources/**/*.ts"
 	]
 }

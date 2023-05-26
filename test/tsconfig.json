@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"noEmit": true,
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"paths": {
+			"/lib/*": ["../src/main/resources/lib/*"],
+		},
+		"target": "ES5"
+	}
+}
