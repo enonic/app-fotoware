@@ -1,3 +1,6 @@
+import type {SiteConfigProperties} from '/lib/fotoware/xp/AppConfig.d';
+import type {Metadata} from '/types/Asset.d';
+import type {MediaContent} from '/lib/fotoware/xp/MediaContent.d';
 import {
 	forceArray,
 	isString,
@@ -22,6 +25,14 @@ import {unforceArray} from '/lib/fotoware/xp/unforceArray';
 	objectName: 'tags'
 });*/
 
+declare global {
+	interface XpXData {
+		[key: string]: {
+			fotoWare?: MediaContent['data']['fotoWare']
+		}
+	}
+}
+
 
 export const updateMetadataOnContent = ({
 	content,
@@ -29,6 +40,12 @@ export const updateMetadataOnContent = ({
 	metadata,
 	modify = false, // Create is the default
 	properties
+}: {
+	content: Partial<MediaContent>
+	md5sum: string
+	metadata: Metadata
+	modify?: boolean
+	properties: SiteConfigProperties
 }) => {
 	//log.debug(`content:${toStr(content)}`);
 	//log.debug(`updateMetadataOnContent properties:${toStr(properties)}`);
@@ -39,12 +56,12 @@ export const updateMetadataOnContent = ({
 	//
 	// {} is considered Truthy
 	// https://developer.mozilla.org/en-US/docs/Glossary/Truthy
-	if (!content.data) { content.data = {}; }
+	if (!content.data) { content.data = {} as MediaContent['data']; }
 	if (!content.data.fotoWare) { content.data.fotoWare = {}; }
 	if (!content.data.fotoWare.metadata) { content.data.fotoWare.metadata = {}; }
 
-	const dereffedMetadata = JSON.parse(JSON.stringify(metadata));
-	//log.debug(`dereffedMetadata:${toStr(dereffedMetadata)}`);
+	const dereffedMetadata = JSON.parse(JSON.stringify(metadata)) as typeof metadata;
+	log.debug(`dereffedMetadata:${toStr(dereffedMetadata)}`);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Title -> DisplayName
@@ -94,7 +111,10 @@ export const updateMetadataOnContent = ({
 			|| !modify // ASSUMING PROPERTY_ON_CREATE
 		)
 	) {
-		log.debug(`Artist diff:${toStr(detailedDiff(content.data.artist, artist))}`);
+		log.debug(`Artist diff:${toStr(detailedDiff(
+			content.data.artist as object,
+			artist as object
+		))}`);
 		content.data.artist = artist;
 	}
 
@@ -124,7 +144,7 @@ export const updateMetadataOnContent = ({
 		)
 	) {
 		log.debug(`Changing copyright from:${content.data.copyright} to:${copyright}`);
-		content.data.copyright = copyright;
+		content.data.copyright = forceArray(copyright).join(' ');
 	}
 
 	// Enonic doesn't store empty string "", but of course JavaScript does.
@@ -157,7 +177,10 @@ export const updateMetadataOnContent = ({
 			|| !modify // ASSUMING PROPERTY_ON_CREATE
 		)
 	) {
-		log.debug(`Tags diff:${toStr(detailedDiff(content.data.tags, tags))}`);
+		log.debug(`Tags diff:${toStr(detailedDiff(
+			content.data.tags as object,
+			tags as object
+		))}`);
 		content.data.tags = tags;
 	}
 
@@ -180,21 +203,21 @@ export const updateMetadataOnContent = ({
 	if (!content.x) {
 		content.x = {}
 	}
-	if (!content.x.media) {
-		content.x.media = {}
+	if (!content.x['media']) {
+		content.x['media'] = {}
 	}
-	if (!content.x.media.imageInfo) {
-		content.x.media.imageInfo = {}
+	if (!content.x['media']['imageInfo']) {
+		content.x['media']['imageInfo'] = {}
 	}
 	if (
-		content.x.media.imageInfo.description !== description && (
+		content.x['media']['imageInfo']['description'] !== description && (
 			properties.description === PROPERTY_OVERWRITE
 			|| (properties.description === PROPERTY_IF_CHANGED && description !== content.data.fotoWare.metadata[120])
 			|| !modify // ASSUMING PROPERTY_ON_CREATE
 		)
 	) {
-		log.debug(`Changing description from:${content.x.media.imageInfo.description} to:${description}`);
-		content.x.media.imageInfo.description = description;
+		log.debug(`Changing description from:${content.x['media']['imageInfo']['description']} to:${description}`);
+		content.x['media']['imageInfo']['description'] = description;
 	}
 
 	// Enonic doesn't store empty string "", but of course JavaScript does.
@@ -223,37 +246,40 @@ export const updateMetadataOnContent = ({
 
 	//──────────────────────────────────────────────────────────────────────────
 	// The rest (Has no settings for PROPERTY_OVERWRITE, PROPERTY_IF_CHANGED, PROPERTY_ON_CREATE)
-	//──────────────────────────────────────────────────────────────────────────
-	Object.keys(dereffedMetadata).forEach((k) => {
-		const value = unforceArray(dereffedMetadata[k].value);
+	//─────────────────────────────────────────────────────────────────────────
+	// for (const k in dereffedMetadata) {
+	for (const [k, v] of Object.entries(dereffedMetadata)) {
+	// Object.keys(dereffedMetadata).forEach((k) => {
+		// log.debug('typeof k:%s prototype:%s', typeof k, Object.prototype.toString.call(k).slice(8,-1)); // string String
+		const value = unforceArray(v.value);
 		// Enonic doesn't store empty string "", but of course JavaScript does.
 		// The diff tools therefore sees a difference...
-		if (content.data.fotoWare.metadata[k] !== value) {
+		if (content?.data?.fotoWare?.metadata[k] !== value) {
 			if (isString(value) && value.length !== 0) {
 				content.data.fotoWare.metadata[k] = value;
 			} else {
 				delete content.data.fotoWare.metadata[k];
 			}
 		}
-	});
+	}
 
 	// Cleanup for diff
 	if (Object.keys(content.data.fotoWare.metadata).length === 0) {
 		delete content.data.fotoWare.metadata;
 	}
-	if (Object.keys(content.x.media.imageInfo).length === 0) {
-		delete content.x.media.imageInfo;
+	if (Object.keys(content.x['media']['imageInfo']).length === 0) {
+		delete content.x['media']['imageInfo'];
 	}
-	if (Object.keys(content.x.media).length === 0) {
-		delete content.x.media;
+	if (Object.keys(content.x['media']).length === 0) {
+		delete content.x['media'];
 	}
 	if (Object.keys(content.x).length === 0) {
 		delete content.x;
 	}
 
 	// Cleanup old x-data
-	if (content.x && content.x[X_APP_NAME] && content.x[X_APP_NAME].fotoWare) {
-		delete content.x[X_APP_NAME].fotoWare;
+	if (content?.x?.[X_APP_NAME]?.['fotoWare']) {
+		delete (content.x[X_APP_NAME] as unknown as MediaContent['data'])['fotoWare'];
 	}
 
 	//log.debug(`modified content:${toStr(content)}`);

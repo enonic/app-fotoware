@@ -1,6 +1,8 @@
 /.build/
 /.gradle/
+/bin/
 /build/
+/coverage/
 /node_modules/
 /.enonic
 .DS_Store

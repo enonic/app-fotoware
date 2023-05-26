@@ -21,7 +21,7 @@ interface GetConfigFromAppCfgReturnType {
 
 
 export function getConfigFromAppCfg(): GetConfigFromAppCfgReturnType {
-	//log.debug(`app.config:${toStr(app.config)}`);
+	// log.debug(`app.config:${toStr(app.config)}`);
 
 	const config = deepen(app.config);
 	//log.debug(`config:${toStr(config)}`);

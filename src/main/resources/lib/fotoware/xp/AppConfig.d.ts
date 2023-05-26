@@ -14,33 +14,40 @@ interface Import {
 	readonly project: Project
 	readonly query: Query
 	readonly rendition: RenditionString
-	readonly site? :string
+	readonly site?: string
 }
 
 export type Imports = Record<ImportName,Import> // Not readonly
 
 export type RemoteAddresses = Record<RemoteAddress,boolean>
 
+export type SiteConfigPropertyValue =
+	| 'ifChanged'
+	| 'onCreate'
+	| 'overwrite'
+
+export interface SiteConfigProperties {
+	readonly artist: SiteConfigPropertyValue
+	readonly copyright: SiteConfigPropertyValue
+	readonly description: SiteConfigPropertyValue
+	readonly displayName: SiteConfigPropertyValue
+	readonly tags: SiteConfigPropertyValue
+}
+
 export interface SiteConfig {
-	readonly allowWebhookFromIp? :string
+	readonly allowWebhookFromIp?: string
 	readonly archiveName: ArchiveName
 	readonly clientId: ClientId
 	readonly clientSecret: ClientSecret
 	imports: Imports // Not readonly
-	readonly properties: {
-		readonly artist :string
-		readonly copyright :string
-		readonly description :string
-		readonly displayName :string
-		readonly tags :string
-	}
+	readonly properties: SiteConfigProperties
 	readonly remoteAddresses: RemoteAddresses
-	readonly url :string
+	readonly url: string
 }
 
 export type SitesConfigs = Record<SiteName,SiteConfig> // Not readonly
 
 export interface AppConfig {
-	readonly imports :Imports
-	readonly sites :SitesConfigs
+	readonly imports: Imports
+	readonly sites: SitesConfigs
 }
