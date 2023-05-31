@@ -21,9 +21,9 @@ import {
 import {unforceArray} from '/lib/fotoware/xp/unforceArray';
 
 
-/*const { diff: diffTags } = new HumanDiff({
-	objectName: 'tags'
-});*/
+// const { diff: diffTags } = new HumanDiff({
+// 	objectName: 'tags'
+// });
 
 declare global {
 	interface XpXData {
@@ -217,7 +217,7 @@ export const updateMetadataOnContent = ({
 		)
 	) {
 		log.debug(`Changing description from:${content.x['media']['imageInfo']['description']} to:${description}`);
-		content.x['media']['imageInfo']['description'] = description;
+		content.x['media']['imageInfo']['description'] = description ? forceArray(description).join(' ') : undefined;
 	}
 
 	// Enonic doesn't store empty string "", but of course JavaScript does.
