@@ -7,8 +7,8 @@
 		"downlevelIteration": true,
 		"esModuleInterop": true,
 		"importHelpers": true,
-		"inlineSourceMap": false,
-		"inlineSources": false,
+		"inlineSourceMap": false, // Doesn't seem to affect Uncoveraged Lines
+		"inlineSources": false, // Doesn't seem to affect Uncoveraged Lines
 		"listEmittedFiles": true,
 		"listFiles": false,
 		"module": "commonjs",
@@ -48,18 +48,18 @@
 			// Development (should be commented out on commit)
 			//"/lib/xp/content": ["../xp/modules/lib/lib-content/src/main/resources/lib/xp/content.ts"],
 		},
-		"removeComments": true,
+		"removeComments": true, // Doesn't seem to affect Uncoveraged Lines
 		"resolveJsonModule": true,
 		"rootDir": ".",
 		"rootDirs": [
 			"src/main/resources",
 			// "node_modules"
 		],
-		"sourceMap": false,
+		"sourceMap": false, // Affect Uncoveraged Lines, but overridden for tests in jest.config.js
 		"strict": true,
 		"strictFunctionTypes": true,
 		"strictNullChecks": true,
-		"target": "ES5",
+		"target": "ES5", // Affects Uncovered Lines, but seems ok as along as sourceMap: true in jest.config.js
 		// "types": [
 		// 	"@enonic-types/global"
 		// ]

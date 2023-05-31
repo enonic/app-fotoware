@@ -93,6 +93,7 @@
     "get-google-fonts": "^1",
     "glob": "^7",
     "jest": "^29",
+    "jest-environment-jsdom": "^29.5.0",
     "path": "^0",
     "polyfill-crypto.getrandomvalues": "^1",
     "ts-jest": "^29",
@@ -105,11 +106,12 @@
   "name": "TODO",
   "private": true,
   "scripts": {
+    "clean": "rimraf build",
     "check": "concurrently -c auto -g --timings npm:lint npm:check:types",
     "check:types": "npx tsc --noEmit",
     "fonts": "get-google-fonts -i 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap' -o './src/main/resources/assets/fonts'",
     "lint": "npx eslint src/main/resources/**/*.cjs src/main/resources/**/*.es6 src/main/resources/**/*.ts",
-    "test": "jest --coverage",
+    "test": "jest --no-cache --coverage",
     "webpack": "node_modules/webpack-cli/bin/cli.js",
     "webpack:watch": "node_modules/webpack-cli/bin/cli.js -w --stdin"
   }
