@@ -16,7 +16,8 @@ import {print} from 'q-i';
 import {
 	PROPERTY_ON_CREATE,
 	PROPERTY_IF_CHANGED,
-	PROPERTY_OVERWRITE
+	PROPERTY_OVERWRITE,
+	X_APP_NAME
 } from '/lib/fotoware/xp/constants';
 import { updateMetadataOnContent } from '/lib/fotoware/xp/updateMetadataOnContent';
 import { SiteConfigProperties } from '/lib/fotoware/xp/AppConfig';
@@ -452,6 +453,70 @@ describe('lib', () => {
 						modify: true,
 						properties: PROPERTY_POLICY
 					})).toStrictEqual(contentWithExtraMetadataDeleted);
+				});
+
+				// This probably doesn't happen in real life, but it's a good test
+				test('it deletes empty x-data', () => {
+					const mediaContentWithoutImageInfo: MediaContent = {
+						...deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						data: {
+							...deref(MEDIA_CONTENT_WITHOUT_METADATA.data),
+							fotoWare: {
+								md5sum: '1',
+							}
+						},
+						x: {
+							media: {
+								imageInfo: {}
+							}
+						}
+					};
+					const mediaContentWithoutXData: MediaContent = {
+						...deref(mediaContentWithoutImageInfo),
+					}
+					// @ts-ignore
+					delete mediaContentWithoutXData.x;
+					expect(updateMetadataOnContent({
+						content: mediaContentWithoutImageInfo,
+						md5sum: '1',
+						metadata: {},
+						modify: true,
+						properties: PROPERTY_POLICY
+					})).toStrictEqual(mediaContentWithoutXData);
+				});
+
+				test('it deletes old x-data', () => {
+					const mediaContentWithOldXData: MediaContent = {
+						...deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						data: {
+							...deref(MEDIA_CONTENT_WITHOUT_METADATA.data),
+							fotoWare: {
+								md5sum: '1',
+							}
+						},
+						x: {
+							[X_APP_NAME]: {
+								fotoWare: {
+									md5sum: '1',
+									metadata: {
+										5: { value: '5 original value from FotoWare' },
+									}
+								}
+							}
+						}
+					};
+					const mediaContentWithoutOldXData: MediaContent = {
+						...deref(mediaContentWithOldXData),
+					}
+					// @ts-ignore
+					delete mediaContentWithoutOldXData.x;
+					expect(updateMetadataOnContent({
+						content: mediaContentWithOldXData,
+						md5sum: '1',
+						metadata: {},
+						modify: true,
+						properties: PROPERTY_POLICY
+					})).toStrictEqual(mediaContentWithoutOldXData);
 				});
 
 			}); // updateMetadataOnContent

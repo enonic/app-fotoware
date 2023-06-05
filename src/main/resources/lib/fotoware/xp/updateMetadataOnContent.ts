@@ -281,13 +281,17 @@ export const updateMetadataOnContent = ({
 	if (Object.keys(content.x['media']).length === 0) {
 		delete content.x['media'];
 	}
-	if (Object.keys(content.x).length === 0) {
-		delete content.x;
-	}
 
 	// Cleanup old x-data
 	if (content?.x?.[X_APP_NAME]?.['fotoWare']) {
 		delete (content.x[X_APP_NAME] as unknown as MediaContent['data'])['fotoWare'];
+		if (Object.keys(content?.x?.[X_APP_NAME] as unknown as MediaContent['data']).length === 0) {
+			delete (content!.x![X_APP_NAME]); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+		}
+	}
+
+	if (Object.keys(content.x).length === 0) {
+		delete content.x;
 	}
 
 	//log.debug(`modified content:${toStr(content)}`);
