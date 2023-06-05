@@ -519,6 +519,85 @@ describe('lib', () => {
 					})).toStrictEqual(mediaContentWithoutOldXData);
 				});
 
+				//──────────────────────────────────────────────────────────────
+				// At this point 100% Funcs and Line coverage is achieved
+				//──────────────────────────────────────────────────────────────
+
+				test('it handles content without data', () => {
+					const mediaContentWithoutData: MediaContent = deref(MEDIA_CONTENT_WITHOUT_METADATA);
+					// @ts-ignore
+					delete mediaContentWithoutData.data;
+					// print({mediaContentWithoutData}, { maxItems: Infinity });
+
+					const mediaContentWithData: MediaContent = {
+						...deref(mediaContentWithoutData),
+						data: {
+							fotoWare: {
+								md5sum: '1',
+							},
+						} as MediaContent['data']
+					};
+					// print({mediaContentWithData}, { maxItems: Infinity });
+					expect(updateMetadataOnContent({
+						content: mediaContentWithoutData,
+						md5sum: '1',
+						metadata: {},
+						//modify: true,
+						properties: PROPERTY_POLICY
+					})).toStrictEqual(mediaContentWithData);
+				});
+
+				//──────────────────────────────────────────────────────────────
+				// At this point 100% Stmts, Funcs and Line coverage is achieved
+				//──────────────────────────────────────────────────────────────
+
+				test('it handles displayName: PROPERTY_IF_CHANGED', () => {
+					expect(updateMetadataOnContent({
+						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						md5sum: '1',
+						metadata: {
+							5: { value: '5 original value from FotoWare' },
+							25: { value: '25 original value from FotoWare' },
+							80: { value: '80 original value from FotoWare' },
+							116: { value: '116 original value from FotoWare' },
+							120: { value: '120 original value from FotoWare' }
+						},
+						// modify: true,
+						properties: {
+							...deref(PROPERTY_POLICY),
+							displayName: PROPERTY_IF_CHANGED
+						}
+					})).toStrictEqual(NEW_MEDIA_CONTENT);
+				});
+
+				test('it handles artist', () => {
+					const contentWithTwoArtists: MediaContent = deref(NEW_MEDIA_CONTENT);
+					contentWithTwoArtists.data.artist = [
+						'80 original Artist1 from FotoWare',
+						'80 original Artist2 from FotoWare'
+					];
+					contentWithTwoArtists.data.fotoWare!.metadata![80] = [ // eslint-disable-line @typescript-eslint/no-non-null-assertion
+						'80 original Artist1 from FotoWare',
+						'80 original Artist2 from FotoWare'
+					];
+					expect(updateMetadataOnContent({
+						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						md5sum: '1',
+						metadata: {
+							5: { value: '5 original value from FotoWare'},
+							25: { value: '25 original value from FotoWare' },
+							80: { value: [
+								'80 original Artist1 from FotoWare',
+								'80 original Artist2 from FotoWare'
+							] },
+							116: { value: '116 original value from FotoWare' },
+							120: { value: '120 original value from FotoWare' }
+						},
+						// modify: true,
+						properties: PROPERTY_POLICY
+					})).toStrictEqual(contentWithTwoArtists);
+				});
+
 			}); // updateMetadataOnContent
 		}); // xp
 	}); // fotoware
