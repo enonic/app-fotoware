@@ -259,8 +259,6 @@ export const updateMetadataOnContent = ({
 		if (content?.data?.fotoWare?.metadata[k] !== value) {
 			if (isString(value) && value.length !== 0) {
 				content.data.fotoWare.metadata[k] = value;
-			} else {
-				delete content.data.fotoWare.metadata[k];
 			}
 		}
 	}
