@@ -47,8 +47,9 @@ export const updateMetadataOnContent = ({
 	modify?: boolean
 	properties: SiteConfigProperties
 }) => {
-	//log.debug(`content:${toStr(content)}`);
-	//log.debug(`updateMetadataOnContent properties:${toStr(properties)}`);
+	// log.debug(`updateMetadataOnContent content:${toStr(content)}`);
+	// log.debug('updateMetadataOnContent metadata:%s', toStr(metadata));
+	// log.debug(`updateMetadataOnContent properties:${toStr(properties)}`);
 
 	// BUG: Editing image in xp, removes x-data
 	// So we have to store the information elsewhere, lets try normal content properties.
@@ -59,6 +60,7 @@ export const updateMetadataOnContent = ({
 	if (!content.data) { content.data = {} as MediaContent['data']; }
 	if (!content.data.fotoWare) { content.data.fotoWare = {}; }
 	if (!content.data.fotoWare.metadata) { content.data.fotoWare.metadata = {}; }
+	// log.debug('updateMetadataOnContent content.data.fotoWare.metadata:%s', toStr(content.data.fotoWare.metadata));
 
 	const dereffedMetadata = JSON.parse(JSON.stringify(metadata)) as typeof metadata;
 	// log.debug(`dereffedMetadata:${toStr(dereffedMetadata)}`);
@@ -262,6 +264,14 @@ export const updateMetadataOnContent = ({
 			}
 		}
 	}
+
+	// Delete metadata keys that are not in FotoWare anymore
+	Object.keys(content.data.fotoWare.metadata).forEach((key) => {
+		if (!metadata[key]) {
+			log.debug('Deleting metadata key:%s value:%s', key, toStr(content!.data!.fotoWare!.metadata![key]), ); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+			delete content!.data!.fotoWare!.metadata![key]; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+		}
+	});
 
 	// Cleanup for diff
 	if (Object.keys(content.data.fotoWare.metadata).length === 0) {

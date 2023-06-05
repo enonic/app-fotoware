@@ -420,7 +420,7 @@ describe('lib', () => {
 							}
 						}
 					};
-					print({contentWithExtraMetadata}, { maxItems: Infinity });
+					// print({contentWithExtraMetadata}, { maxItems: Infinity });
 
 					const md = deref(contentWithExtraMetadata.data.fotoWare?.metadata);
 					if (md) {
@@ -436,7 +436,7 @@ describe('lib', () => {
 							}
 						}
 					};
-					print({contentWithExtraMetadataDeleted}, { maxItems: Infinity });
+					// print({contentWithExtraMetadataDeleted}, { maxItems: Infinity });
 
 					expect(updateMetadataOnContent({
 						content: contentWithExtraMetadata,
