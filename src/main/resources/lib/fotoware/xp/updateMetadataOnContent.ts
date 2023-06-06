@@ -27,12 +27,34 @@ import {unforceArray} from '/lib/fotoware/xp/unforceArray';
 
 declare global {
 	interface XpXData {
-		[key: string]: {
+		[key: typeof X_APP_NAME]: {
 			fotoWare?: MediaContent['data']['fotoWare']
 		}
 	}
 }
 
+interface NestedRecord {
+	[name: PropertyKey]: NestedRecord | unknown
+}
+
+// Type alias 'NestedRecord' circularly references itself.ts(2456)
+// type NestedRecord = Record<PropertyKey, string|NestedRecord>;
+
+function deleteIn(obj: NestedRecord, path: PropertyKey | PropertyKey[]) {
+	if (!obj || !path) {
+		return;
+	}
+	if (typeof path === 'string') {
+		path = path.split('.');
+	}
+	for (let i = 0; i < (path as PropertyKey[]).length - 1; i++) {
+		obj = obj[(path as PropertyKey[])[i] as PropertyKey] as NestedRecord;
+		if (typeof obj === 'undefined') {
+			return;
+		}
+	}
+	delete obj[(path as PropertyKey[]).pop() as PropertyKey];
+}
 
 export const updateMetadataOnContent = ({
 	content,
@@ -254,9 +276,10 @@ export const updateMetadataOnContent = ({
 	// Object.keys(dereffedMetadata).forEach((k) => {
 		// log.debug('typeof k:%s prototype:%s', typeof k, Object.prototype.toString.call(k).slice(8,-1)); // string String
 		const value = unforceArray(v.value);
+		// log.debug('Setting metadata key:%s to:%s prev:%s', k, toStr(value), toStr(content.data.fotoWare.metadata[k]));
 		// Enonic doesn't store empty string "", but of course JavaScript does.
 		// The diff tools therefore sees a difference...
-		if (content?.data?.fotoWare?.metadata[k] !== value) {
+		if (content.data.fotoWare.metadata[k] !== value) {
 			if (isString(value) && value.length !== 0) {
 				content.data.fotoWare.metadata[k] = value;
 			}
@@ -283,12 +306,15 @@ export const updateMetadataOnContent = ({
 	}
 
 	// Cleanup old x-data
-	if (content?.x?.[X_APP_NAME]?.['fotoWare']) {
-		delete (content.x[X_APP_NAME] as unknown as MediaContent['data'])['fotoWare'];
-		if (Object.keys(content?.x?.[X_APP_NAME] as unknown as MediaContent['data']).length === 0) {
-			delete (content!.x![X_APP_NAME]); // eslint-disable-line @typescript-eslint/no-non-null-assertion
-		}
-	}
+	// if (checkNested(content, 'x', X_APP_NAME, 'fotoWare')) {
+	deleteIn(content, ['x', X_APP_NAME, 'fotoWare']);
+	deleteIn(content, ['x', X_APP_NAME]);
+	// if (content.x[X_APP_NAME] && (content.x[X_APP_NAME] as unknown as MediaContent['data'])['fotoWare']) {
+	// 	delete (content.x[X_APP_NAME] as unknown as MediaContent['data'])['fotoWare'];
+	// 	if (Object.keys(content.x[X_APP_NAME] as unknown as MediaContent['data']).length === 0) {
+	// 		delete (content.x[X_APP_NAME]); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+	// 	}
+	// }
 
 	if (Object.keys(content.x).length === 0) {
 		delete content.x;
