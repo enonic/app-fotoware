@@ -94,6 +94,18 @@ node {
 	version = "${nodeVersion}"
 }
 
+task npmTest(type: NpmTask) {
+	args = [
+		'run',
+		'test'
+	]
+	dependsOn yarn_install
+	environment = [
+		'FORCE_COLOR': 'true',
+	]
+}
+
+test.dependsOn npmTest
 
 //──────────────────────────────────────────────────────────────────────────────
 // Webpack
@@ -120,6 +132,7 @@ task webpack(type:NodeTask) {
 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
 }
 
+jar.dependsOn webpack
 
 task watch(type:NodeTask) {
 	script = file('node_modules/webpack-cli/bin/cli.js')
@@ -137,9 +150,6 @@ task watch(type:NodeTask) {
 processResources {
 	//dependsOn asciidoc
 	//mustRunAfter asciidoc
-
-	dependsOn webpack
-	mustRunAfter webpack
 
 	exclude '**/.gitkeep'
 

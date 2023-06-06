@@ -570,7 +570,7 @@ describe('lib', () => {
 					})).toStrictEqual(NEW_MEDIA_CONTENT);
 				});
 
-				test('it handles artist', () => {
+				test('it handles artist array', () => {
 					const contentWithTwoArtists: MediaContent = deref(NEW_MEDIA_CONTENT);
 					contentWithTwoArtists.data.artist = [
 						'80 original Artist1 from FotoWare',
@@ -596,6 +596,56 @@ describe('lib', () => {
 						// modify: true,
 						properties: PROPERTY_POLICY
 					})).toStrictEqual(contentWithTwoArtists);
+				});
+
+				test('it handles copyright PROPERTY_IF_CHANGED', () => {
+					const contentWithChangedCopyright = deref(NEW_MEDIA_CONTENT);
+					contentWithChangedCopyright.data.copyright = ''
+					delete contentWithChangedCopyright.data.fotoWare!.metadata![116]; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+					expect(updateMetadataOnContent({
+						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						md5sum: '1',
+						metadata: {
+							5: { value: '5 original value from FotoWare' },
+							25: { value: '25 original value from FotoWare' },
+							80: { value: '80 original value from FotoWare' },
+							// 116: { value: '116 original value from FotoWare' }
+							120: { value: '120 original value from FotoWare' }
+						},
+						// modify: true,
+						properties: {
+							...deref(PROPERTY_POLICY),
+							copyright: PROPERTY_IF_CHANGED,
+						}
+					})).toStrictEqual(contentWithChangedCopyright);
+				});
+
+				test('it handles tags array', () => {
+					const contentWithTwoTags: MediaContent = deref(NEW_MEDIA_CONTENT);
+					contentWithTwoTags.data.tags = [
+						'25 original Tag1 from FotoWare',
+						'25 original Tag2 from FotoWare'
+					];
+					contentWithTwoTags.data.fotoWare!.metadata![25] = [ // eslint-disable-line @typescript-eslint/no-non-null-assertion
+						'25 original Tag1 from FotoWare',
+						'25 original Tag2 from FotoWare'
+					];
+					expect(updateMetadataOnContent({
+						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						md5sum: '1',
+						metadata: {
+							5: { value: '5 original value from FotoWare'},
+							25: { value: [
+								'25 original Tag1 from FotoWare',
+								'25 original Tag2 from FotoWare'
+							]},
+							80: { value: '80 original value from FotoWare' },
+							116: { value: '116 original value from FotoWare' },
+							120: { value: '120 original value from FotoWare' }
+						},
+						// modify: true,
+						properties: PROPERTY_POLICY
+					})).toStrictEqual(contentWithTwoTags);
 				});
 
 			}); // updateMetadataOnContent
