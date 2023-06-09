@@ -2,6 +2,7 @@ import type {SiteConfigProperties} from '/lib/fotoware/xp/AppConfig.d';
 import type {Metadata} from '/types/Asset.d';
 import type {MediaContent} from '/lib/fotoware/xp/MediaContent.d';
 import {
+	deleteIn,
 	forceArray,
 	isString,
 	toStr
@@ -31,29 +32,6 @@ declare global {
 			fotoWare?: MediaContent['data']['fotoWare']
 		}
 	}
-}
-
-interface NestedRecord {
-	[name: PropertyKey]: NestedRecord | unknown
-}
-
-// Type alias 'NestedRecord' circularly references itself.ts(2456)
-// type NestedRecord = Record<PropertyKey, string|NestedRecord>;
-
-function deleteIn(obj: NestedRecord, path: PropertyKey | PropertyKey[]) {
-	if (!obj || !path) {
-		return;
-	}
-	if (typeof path === 'string') {
-		path = path.split('.');
-	}
-	for (let i = 0; i < (path as PropertyKey[]).length - 1; i++) {
-		obj = obj[(path as PropertyKey[])[i] as PropertyKey] as NestedRecord;
-		if (typeof obj === 'undefined') {
-			return;
-		}
-	}
-	delete obj[(path as PropertyKey[]).pop() as PropertyKey];
 }
 
 export const updateMetadataOnContent = ({
