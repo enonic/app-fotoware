@@ -24,7 +24,6 @@
 		"paths": {
 			"/lib/fotoware/xp/capitalize": ["src/main/resources/lib/fotoware/xp/capitalize.ts"],
 			// Production (should be commented in on commit)
-			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
 			"/lib/fotoware": ["src/main/resources/lib/fotoware"],
 			"/lib/fotoware/xp/*": ["src/main/resources/lib/fotoware/xp/*"],
 			"/lib/fotoware/*": ["src/main/resources/lib/fotoware/*"],

@@ -1,4 +1,4 @@
-import type {OneOrMore} from '@enonic/js-utils/src/types';
+import type {OneOrMore} from '@enonic/js-utils/types';
 //import {toStr} from '@enonic/js-utils';
 
 // '' -> undefined

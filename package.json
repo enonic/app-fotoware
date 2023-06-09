@@ -3,7 +3,7 @@
   "dependencies": {
     "@babel/standalone": "^7",
     "@enonic/global-polyfill": "^1",
-    "@enonic/js-utils": "^0",
+    "@enonic/js-utils": "^1",
     "@material-ui/core": "^4",
     "buffer": "^6",
     "core-js": "^3",

@@ -1,4 +1,4 @@
-import type {OneOrMore} from '@enonic/js-utils/src/types';
+import type {OneOrMore} from '@enonic/js-utils/types';
 import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
 import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
 
