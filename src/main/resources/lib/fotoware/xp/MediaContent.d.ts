@@ -1,12 +1,8 @@
-import type {
-	// Component,
-	Content
-} from '/lib/xp/content'; // '@enonic-types/core'
+import type { Content } from '/lib/xp/content';
+import type { PageComponent } from '@enonic-types/core';
 
 
-export type MediaContent<
-	Type extends string = 'media:image'
-> = Content<{
+export type MediaContent = Content<{
 	artist?: string|string[]
 	caption?: string
 	copyright?: string
@@ -30,6 +26,6 @@ export type MediaContent<
 	}
 	tags?: string|string[]
 },
-	Type
-	//Component
+	'media:image',
+	PageComponent
 >

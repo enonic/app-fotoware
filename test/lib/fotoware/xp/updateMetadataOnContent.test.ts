@@ -1,4 +1,4 @@
-import type { Component } from '@enonic-types/lib-content';
+import type { PageComponent } from '@enonic-types/core';
 import type {MediaContent} from '/lib/fotoware/xp/MediaContent.d';
 import type {sanitize} from '@enonic-types/lib-common';
 
@@ -12,7 +12,7 @@ import {
 	test
 } from '@jest/globals';
 // @ts-ignore
-import {print} from 'q-i';
+// import {print} from 'q-i';
 import {
 	PROPERTY_ON_CREATE,
 	PROPERTY_IF_CHANGED,
@@ -114,7 +114,7 @@ const MEDIA_CONTENT_WITHOUT_METADATA: MediaContent = {
 	modifiedTime: '2023-05-26T13:00:00.123456Z',
 	originProject: 'originProject',
 	owner: 'user:system:cwe',
-	page: {} as Component,
+	page: {} as PageComponent,
 	type: 'media:image',
 	valid: true,
 	x: {
@@ -127,7 +127,8 @@ const MEDIA_CONTENT_WITHOUT_METADATA: MediaContent = {
 				byteSize: 8
 			}
 		}
-	} as XpXData
+	} as XpXData,
+	fragment: undefined
 }; // MEDIA_CONTENT_WITHOUT_METADATA
 // print(MEDIA_CONTENT_WITHOUT_METADATA, { maxItems: Infinity });
 
