@@ -77,7 +77,6 @@ const SERVER_JS_FILES = glob.sync(`${SRC_DIR}/**/${JS_EXTENSION_GLOB_BRACE}`, {
 const SERVER_JS_TEST = /\.(es6?|ts|js)$/i; // Will need js for node module depenencies
 
 const SS_ALIAS = {
-	'@enonic/js-utils': path.resolve(__dirname, 'node_modules/@enonic/js-utils/src/'),
 	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/global'),
 	'/lib/fotoware/': path.resolve(__dirname, 'src/main/resources/lib/fotoware/')
 };
