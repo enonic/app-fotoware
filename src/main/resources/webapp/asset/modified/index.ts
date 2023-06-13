@@ -37,7 +37,7 @@ import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid'
 const A_MINUTE_IN_MS = 60 * 1000;
 
 
-export const assetModified = (request :Request) => {
+export const assetModified = (request: Request) => {
 	//log.debug(`request:${toStr(request)}`);
 
 	const licenseDetails = validateLicense({appKey: app.name});
@@ -51,11 +51,26 @@ export const assetModified = (request :Request) => {
 	const {
 		headers: {
 			'User-Agent': userAgent
-		},
+		} = {},
 		remoteAddress
 	} = request;
 	//log.debug(`remoteAddress:${toStr(remoteAddress)}`);
 	//log.debug(`userAgent:${toStr(userAgent)}`);
+
+	if (!request.body) {
+		log.error(`Request without body ${toStr(request)}`);
+		return {status: 404};
+	}
+
+	if (!remoteAddress) {
+		log.error(`Request without remoteAddress ${toStr(request)}`);
+		return {status: 404};
+	}
+
+	if (!userAgent) {
+		log.error(`Missing userAgent in request! ${toStr(request)}`);
+		return {status: 404};
+	}
 
 	if (!arrayIncludes(SUPPORTED_USERAGENTS, userAgent)) {
 		log.error(`Illegal userAgent in request! ${toStr(request)}`);
@@ -127,7 +142,7 @@ export const assetModified = (request :Request) => {
 		remoteAddresses
 	} = siteConfig;
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
-	if (!arrayIncludes(Object.keys(remoteAddresses),remoteAddress)) {
+	if (!arrayIncludes(Object.keys(remoteAddresses), remoteAddress)) {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}
@@ -141,12 +156,12 @@ export const assetModified = (request :Request) => {
 		principals: ['role:system.admin']
 	}, () => {
 		const taskDescriptor = `${app.name}:handleAssetModifiedHook`;
-		scheduleTask({
+		scheduleTask<HandleAssetModifiedParams>({
 			config: {
 				fileNameNew,
 				fileNameOld,
 				siteName
-			} as HandleAssetModifiedParams,
+			},
 			description: `Handle asset modified webhook for site:${siteName} file:${fileNameNew}`,
 			descriptor: taskDescriptor,
 			enabled: true,

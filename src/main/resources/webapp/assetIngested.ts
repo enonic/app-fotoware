@@ -1,6 +1,7 @@
 // import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
 import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
-import type {Request} from '/lib/xp/Request';
+import type {Request} from '/lib/fotoware';
+import type { ByteSource } from '/lib/xp/io';
 import type {Asset} from '/types';
 
 
@@ -74,14 +75,29 @@ export const assetIngested = (request: Request) => {
 		return {status: 404};
 	}
 
+	if (!request.body) {
+		log.error(`No body in request! ${toStr(request)}`);
+		return {status: 404};
+	}
+
 	const {
 		headers: {
 			'User-Agent': userAgent
-		},
+		} = {},
 		remoteAddress
 	} = request;
 	//log.debug(`remoteAddress:${toStr(remoteAddress)}`);
 	//log.debug(`userAgent:${toStr(userAgent)}`);
+
+	if (!remoteAddress) {
+		log.error(`No remoteAddress in request! ${toStr(request)}`);
+		return {status: 404};
+	}
+
+	if (!userAgent) {
+		log.error(`No userAgent in request! ${toStr(request)}`);
+		return {status: 404};
+	}
 
 	if (!arrayIncludes(SUPPORTED_USERAGENTS, userAgent)) {
 		log.error(`Illegal userAgent in request! ${toStr(request)}`);
@@ -287,20 +303,18 @@ export const assetIngested = (request: Request) => {
 						});
 						//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
 
-						const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'];
+						const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'] as string;
 
 						const downloadRenditionResponse = requestRendition({
 							accessToken,
 							hostname,
 							renditionServiceShortAbsolutePath: renditionRequest,
 							renditionUrl
-						}) as {
-							bodyStream: object/*|null*/
-						};
+						});
 						if (!downloadRenditionResponse) {
 							throw new Error(`Something went wrong when downloading rendition for renditionUrl:${renditionUrl}!`);
 						}
-						const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream));
+						const md5sumOfDownload = md5(readText(downloadRenditionResponse.bodyStream as ByteSource));
 						if (exisitingMediaContent === -1) {
 							// no-op
 						} else if (!exisitingMediaContent) {
@@ -308,7 +322,7 @@ export const assetIngested = (request: Request) => {
 							const createMediaResult = createMedia({
 								parentPath,
 								name: filename,
-								data: downloadRenditionResponse.bodyStream
+								data: downloadRenditionResponse.bodyStream as ByteSource
 							});
 							if (!createMediaResult) {
 								const errMsg = `Something went wrong when creating parentPath:${parentPath} name:${filename}!`;

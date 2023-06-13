@@ -1,5 +1,8 @@
-import {toStr} from '@enonic/js-utils';
+import type { HttpClient } from '/lib/fotoware';
 
+
+import {toStr} from '@enonic/js-utils';
+// @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
 
 
@@ -7,8 +10,12 @@ export const getCollection = ({
 	accessToken,
 	hostname,
 	shortAbsolutePath
+}: {
+	accessToken: string
+	hostname: string
+	shortAbsolutePath: string
 }) => {
-	const collectionRequestParams = {
+	const collectionRequestParams: HttpClient.Request = {
 		contentType: 'application/json',
 		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 		method: 'GET',

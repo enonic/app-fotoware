@@ -44,6 +44,7 @@ export function shouldUpdateTags({
 
 	if (
 		properties.tags === PROPERTY_IF_CHANGED
+		&& content.data.fotoWare
 		&& content.data.fotoWare.metadata
 		&& content.data.fotoWare.metadata[80]
 		&& tags !== content.data.fotoWare.metadata[80]

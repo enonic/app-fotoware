@@ -1132,6 +1132,11 @@
   resolved "https://registry.yarnpkg.com/@enonic-types/global/-/global-7.13.0-B1.tgz#a7478e806d0c46ff89ab61986a59b8ba4eca379f"
   integrity sha512-SIB76NpqOHTSmNl6iZ97JaGV+r1tOo1KxCWdwd7GzvJ6CA9yczV269lWuyzjcfXVEdRU73MyP00U34EPOR3+pQ==
 
+"@enonic-types/lib-admin@^7.13.0-B1":
+  version "7.13.0-B1"
+  resolved "https://registry.yarnpkg.com/@enonic-types/lib-admin/-/lib-admin-7.13.0-B1.tgz#3ac1349154a4daa6b217e5a917f4c30037966877"
+  integrity sha512-vDggHbPJzLqCmeIdWUZhU4yjMb/zwJPfXSsl23pl6wI4fErTQRirhg+9AaiOgrrWsMUkISVz5WvPXcd61cN9Gw==
+
 "@enonic-types/lib-auth@^7.13.0-B1":
   version "7.13.0-B1"
   resolved "https://registry.yarnpkg.com/@enonic-types/lib-auth/-/lib-auth-7.13.0-B1.tgz#8028f4fa55a7122f3703967a3f4eb69543b74e33"
@@ -1812,6 +1817,11 @@
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.2.tgz#6286b4c7228d58ab7866d19716f3696e03a09397"
   integrity sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==
+
+"@types/traverse@^0.6.32":
+  version "0.6.32"
+  resolved "https://registry.yarnpkg.com/@types/traverse/-/traverse-0.6.32.tgz#f9fdfa40cd4898deaa975a14511aec731de8235e"
+  integrity sha512-RBz2uRZVCXuMg93WD//aTS5B120QlT4lR/gL+935QtGsKHLS6sCtZBaKfWjIfk7ZXv/r8mtGbwjVIee6/3XTow==
 
 "@types/urlencode@^1":
   version "1.1.2"

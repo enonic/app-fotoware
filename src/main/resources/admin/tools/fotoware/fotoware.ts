@@ -1,7 +1,12 @@
-//import {toStr} from '@enonic/js-utils';
+import type {Request} from '/lib/xp/Request';
 
+
+//import {toStr} from '@enonic/js-utils';
+// @ts-expect-error TS2307: Cannot find module '/lib/enonic/static' or its corresponding type declarations.
 import {buildGetter} from '/lib/enonic/static';
+// @ts-expect-error TS2307: Cannot find module '/lib/license' or its corresponding type declarations.
 import {validateLicense} from '/lib/license';
+// @ts-expect-error TS2307: Cannot find module '/lib/router' or its corresponding type declarations.
 import Router from '/lib/router';
 import {
 	getBaseUri,
@@ -34,11 +39,11 @@ const REACT_MODE = 'development';
 
 const router = Router();
 
-export const all = (r) => router.dispatch(r);
+export const all = (r: Request) => router.dispatch(r);
 
-router.post('/', (r) => post(r));
-router.get('/uploadLicense', (r) => getUploadLicenseForm(r));
-router.post('/uploadLicense', (r) => postUploadLicense(r));
+router.post('/', (r: Request) => post(r));
+router.get('/uploadLicense', (/*r: Request*/) => getUploadLicenseForm(/*r*/));
+router.post('/uploadLicense', (r: Request) => postUploadLicense(r));
 
 const getAsset = buildGetter('assets', {
 	//cacheControl: 'public, max-age=31536000, immutable', // This is the default
@@ -70,10 +75,10 @@ const getAsset = buildGetter('assets', {
 	},*/
 	//throwErrors: true
 });
-router.get('/admin/{path:.+}', (r) => getAsset(r));
-router.get('/fonts/{path:.+}', (r) => getAsset(r));
-router.get('/images/{path:.+}', (r) => getAsset(r));
-router.get('/js/{path:.+}', (r) => getAsset(r));
+router.get('/admin/{path:.+}', (r: Request) => getAsset(r));
+router.get('/fonts/{path:.+}', (r: Request) => getAsset(r));
+router.get('/images/{path:.+}', (r: Request) => getAsset(r));
+router.get('/js/{path:.+}', (r: Request) => getAsset(r));
 
 function get(/*request*/) {
 	//log.debug(`request:${toStr(request)}`);
@@ -182,7 +187,7 @@ function get(/*request*/) {
 	}; // return
 } // function get
 
-router.get('/', (r) => get(r));
+router.get('/', (/*r: Request*/) => get(/*r*/));
 
 router.get('/doc', () => ({
 	body: getResource(resolve('./doc.html')).getStream(),

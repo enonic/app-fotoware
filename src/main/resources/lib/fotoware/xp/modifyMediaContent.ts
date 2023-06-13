@@ -1,5 +1,11 @@
-import {toStr} from '@enonic/js-utils';
+import type {
+	MediaContent,
+	Metadata,
+	SiteConfigProperties
+} from '/lib/fotoware';
 
+
+import {toStr} from '@enonic/js-utils';
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 import {
 	delete as deleteContent,
@@ -13,6 +19,12 @@ export const modifyMediaContent = ({
 	md5sum,
 	metadata,
 	properties
+}: {
+	exisitingMediaContent?: Partial<MediaContent>
+	key: string
+	md5sum: string
+	metadata: Metadata
+	properties: SiteConfigProperties
 }) => {
 	//log.debug(`modifyMediaContent properties:${toStr(properties)}`);
 	try {

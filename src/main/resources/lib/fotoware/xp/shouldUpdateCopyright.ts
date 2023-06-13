@@ -44,6 +44,7 @@ export function shouldUpdateCopyright({
 
 	if (
 		properties.copyright === PROPERTY_IF_CHANGED
+		&& content.data.fotoWare
 		&& content.data.fotoWare.metadata
 		&& content.data.fotoWare.metadata[80]
 		&& copyright !== content.data.fotoWare.metadata[80]

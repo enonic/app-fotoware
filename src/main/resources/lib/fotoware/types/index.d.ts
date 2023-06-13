@@ -1,19 +1,39 @@
 export type {
 	Asset,
+	AssetList,
 	AssetModified,
 	Metadata,
 	Rendition,
 	RenditionUrl
-} from './Asset.d'
+} from './Asset.d';
+export type {
+	CollectionList
+} from './Collection.d';
+export type {
+	HttpClient
+} from './HttpClient.d';
+export type {
+	BuiltinFieldsKeys,
+	FieldDescription,
+	FieldDescriptionField,
+	MetadataView,
+	ThumbnailFieldsKeys
+} from './Metadata.d';
+export type {
+	TaskNodeData
+} from './Node.d';
 export type {
 	ArchiveName,
 	ClientId,
 	ClientSecret,
+	Import,
 	Path,
 	Project,
 	Query,
 	RenditionString,
-	SiteConfig
+	SiteConfig,
+	SiteConfigProperties,
+	SiteConfigPropertyValue
 } from '../xp/AppConfig.d'
 export type {MediaContent} from '../xp/MediaContent.d'
 export type {Request} from '../../xp/Request.d'

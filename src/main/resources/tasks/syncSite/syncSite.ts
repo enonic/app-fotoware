@@ -1,5 +1,9 @@
-import {toStr} from '@enonic/js-utils';
+import type { SiteConfigPropertyValue } from '/lib/fotoware';
+import type { Content } from '/lib/xp/portal';
+import type { Journal } from './index.d';
 
+
+import {toStr} from '@enonic/js-utils';
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
@@ -70,7 +74,25 @@ const CT_COLLECTION = `${app.name}:collection`;
 	}
 } // class StateClass*/
 
-export function run(params) {
+export function run(params: {
+	archiveName: string
+	boolResume?: boolean
+	clientId: string
+	clientSecret: string
+	importName: string
+	path: string
+	project: string
+	propertyArtist: SiteConfigPropertyValue
+	propertyCopyright: SiteConfigPropertyValue
+	propertyDescription: SiteConfigPropertyValue
+	propertyDisplayName: SiteConfigPropertyValue
+	propertyTags: SiteConfigPropertyValue
+	query: string
+	rendition: string
+	site: string
+	taskNodeId: string
+	url: string
+}) {
 	//log.debug(`params:${toStr(params)}`);
 
 	const {
@@ -141,8 +163,8 @@ export function run(params) {
 		progress.finishItem(/*'Initializing'*/).setInfo(`Creating target folder ${folderPath} (if needed)`).report();
 		// Progress should be [1/5] Creating target folder /FotoWare (if needed)
 
-		const folderContent = getContentByKey({key: folderPath});
-		if (folderContent && !folderContent.type === CT_COLLECTION) {
+		const folderContent = getContentByKey<Content<Record<string,never>>>({key: folderPath});
+		if (folderContent && folderContent.type !== CT_COLLECTION) {
 			throw new Error(`Content path:${path} not a ${CT_COLLECTION}!`);
 		}
 		if (!folderContent) {
@@ -221,7 +243,7 @@ export function run(params) {
 
 		progress.addItems(assetCountTotal); // Found assets to process
 
-		const journal = {
+		const journal: Journal = {
 			currentAsset: '',
 			errors: [],
 			skipped: [],

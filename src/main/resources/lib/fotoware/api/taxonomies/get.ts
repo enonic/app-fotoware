@@ -1,11 +1,14 @@
 import {toStr} from '@enonic/js-utils';
-
+// @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
 
 
 export function getTaxonomies({
 	accessToken,
 	hostname
+}: {
+	accessToken: string
+	hostname: string
 }) {
 	const getTaxonomiesRequest = {
 		contentType: 'application/json',

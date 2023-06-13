@@ -10,6 +10,12 @@ export const getAndPaginateAssetList = ({
 	shortAbsolutePath,
 	fnHandleAssets,
 	doPaginate = true
+}: {
+	accessToken: string
+	hostname: string
+	shortAbsolutePath: string
+	//fnHandleAssets: (assets: Asset[]) => void // TODO
+	doPaginate?: boolean
 }) => {
 	let assetList = getAssetList({
 		accessToken,

@@ -1,3 +1,9 @@
+import type {
+	MediaContent,
+	Request
+} from '/lib/fotoware';
+
+
 // Polyfills
 //import '@enonic/global-polyfill'; // Required by reflect-metadata
 
@@ -17,11 +23,18 @@ import {
 //import deepEqual from 'fast-deep-equal';
 
 //import * as setIn from 'set-value'; // Requires reflect-metadata
+
+// @ts-expect-error TS7016: Could not find a declaration file for module 'dot2val'
 import {set as setIn} from 'dot2val';
-import * as traverse from 'traverse';
+
+// Type originates at this import. A namespace-style import cannot be called or constructed, and will cause a failure at runtime. Consider using a default import or import require here instead.
+//import * as traverse from 'traverse';
+import traverse from 'traverse';
 
 // Enonic modules
+// @ts-expect-error TS2307: Cannot find module '/lib/galimatias' or its corresponding type declarations
 import {URL} from '/lib/galimatias';
+// @ts-expect-error TS2307: Cannot find module '/lib/license' or its corresponding type declarations
 import {validateLicense} from '/lib/license';
 //import {md5} from '/lib/text-encoding';
 import {
@@ -44,7 +57,7 @@ import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 
 
-export const assetDeleted = (request) => {
+export const assetDeleted = (request: Request) => {
 	//log.info(`request:${toStr(request)}`);
 
 	const licenseDetails = validateLicense({appKey: app.name});
@@ -63,14 +76,29 @@ export const assetDeleted = (request) => {
 		return {status: 404};
 	}
 
+	if (!request.body) {
+		log.error(`No body in request! ${toStr(request)}`);
+		return {status: 404};
+	}
+
 	const {
 		headers: {
 			'User-Agent': userAgent
-		},
+		} = {},
 		remoteAddress
 	} = request;
 	//log.debug(`remoteAddress:${toStr(remoteAddress)}`);
 	//log.debug(`userAgent:${toStr(userAgent)}`);
+
+	if (!remoteAddress) {
+		log.error(`No remoteAddress in request! ${toStr(request)}`);
+		return {status: 404};
+	}
+
+	if (!userAgent) {
+		log.error(`No userAgent in request! ${toStr(request)}`);
+		return {status: 404};
+	}
 
 	if (!arrayIncludes(SUPPORTED_USERAGENTS, userAgent)) {
 		log.error(`Illegal userAgent in request! ${toStr(request)}`);
@@ -110,6 +138,13 @@ export const assetDeleted = (request) => {
 	const {sitesConfigs} = getConfigFromAppCfg();
 	//log.debug(`sitesConfigs:${toStr(sitesConfigs)}`);
 
+	const siteConfig = sitesConfigs[site];
+
+	if (!siteConfig) {
+		log.error(`No siteConfig for site:${site}!`);
+		return {status: 404};
+	}
+
 	const {
 		archiveName,
 		clientId,
@@ -117,7 +152,7 @@ export const assetDeleted = (request) => {
 		remoteAddresses,
 		url: hostname,
 		imports
-	} = sitesConfigs[site];
+	} = siteConfig;
 	//log.debug(`clientId:${toStr(clientId)}`);
 	//log.debug(`clientSecret:${toStr(clientSecret)}`);
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
@@ -144,12 +179,17 @@ export const assetDeleted = (request) => {
 	//log.debug(`renditionRequest:${toStr(renditionRequest)}`);
 
 	Object.keys(imports).forEach((importName) => {
+		const anImport = imports[importName];
+		if (!anImport) {
+			log.error(`No import for importName:${importName} site:${site}!`);
+			return {status: 404};
+		}
 		const {
 			project,
 			path,
 			query//,
 			//rendition
-		} = imports[importName];
+		} = anImport;
 		runInContext(
 			{
 				repository: `com.enonic.cms.${project}`,
@@ -166,10 +206,10 @@ export const assetDeleted = (request) => {
 						filename,
 						path
 					});
-					let exisitingMediaContent;
+					let exisitingMediaContent: MediaContent | -1 | null | undefined;
 					if (contentQueryResult.total === 0) {
 						// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
-						exisitingMediaContent = getContentByKey({key: `/${path}/${filename}`});
+						exisitingMediaContent = getContentByKey<MediaContent>({key: `/${path}/${filename}`});
 					} else if (contentQueryResult.total === 1) {
 						exisitingMediaContent = contentQueryResult.hits[0];
 					} else if (contentQueryResult.total > 1) {
@@ -210,7 +250,7 @@ export const assetDeleted = (request) => {
 							};
 							//log.debug(`queryContentParams:${toStr(queryContentParams)}`);
 
-							const queryContentRes = queryContent(queryContentParams);
+							const queryContentRes = queryContent<MediaContent>(queryContentParams);
 							//log.debug(`queryContentRes:${toStr(queryContentRes)}`);
 
 							queryContentRes.hits = queryContentRes.hits.map(({
@@ -224,17 +264,17 @@ export const assetDeleted = (request) => {
 									_path,
 									type
 								};
-								traverse(rest).forEach(function(value) { // Fat arrow destroys this
+								traverse(rest).forEach(function(value: unknown) { // Fat arrow destroys this
 									//const key = this.key;
 									const path = this.path;//.join('.');
 									//log.debug(`path:${toStr(path)} value:${toStr(value)}`);
 									if (Array.isArray(value) || isString(value)) {
-										if (value.includes(exisitingMediaContent._id)) {
+										if (value.includes((exisitingMediaContent as MediaContent)._id)) {
 											setIn(obj, path, value);
 										}
 									}
 								});
-								return obj;
+								return obj as MediaContent;
 							});
 							log.debug(`queryContentRes:${toStr(queryContentRes)}`);
 

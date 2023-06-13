@@ -1,4 +1,5 @@
-type ByteSource = object
+import type { ByteSource } from '/lib/xp/io';
+
 
 export interface Response {
 	body?: string // Often JSON

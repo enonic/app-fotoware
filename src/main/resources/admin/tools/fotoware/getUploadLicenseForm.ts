@@ -5,6 +5,7 @@ import {
 } from '/lib/xp/admin';
 import {assetUrl as getAssetUrl} from '/lib/xp/portal';
 
+
 export function getUploadLicenseForm() {
 	const assetsUrl = getAssetUrl({path: ''});
 	return {

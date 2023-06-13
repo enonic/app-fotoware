@@ -2,7 +2,12 @@ import {
 	progress as reportProgress
 } from '/lib/xp/task';
 
+
 export class Progress {
+	current: number;
+	info: string;
+	total: number;
+
 	constructor({
 		current = 0,
 		info = 'Initializing',
@@ -18,7 +23,7 @@ export class Progress {
 		return this; // chainable
 	}*/
 
-	setInfo(info) {
+	setInfo(info: string) {
 		this.info = info;
 		return this; // chainable
 	}
@@ -33,12 +38,12 @@ export class Progress {
 		return this; // chainable
 	}
 
-	addItems(count) {
+	addItems(count: number) {
 		this.total += count;
 		return this; // chainable
 	}
 
-	finishItem(info) {
+	finishItem(info?: string) {
 		this.current += 1;
 		if (info) {
 			this.info = info;

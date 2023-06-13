@@ -1,4 +1,6 @@
-export interface Request {
+export interface Request<
+	Params extends Record<string, string> = Record<string, string>
+> {
 	body?: string // Often JSON
 	contentType?: string
 	followRedirects?: boolean
@@ -9,6 +11,7 @@ export interface Request {
 		'User-Agent'?: string
 	}
 	method: 'GET'|'POST'
+	params: Params
 	remoteAddress?: string
 	url: string
 }

@@ -9,6 +9,11 @@ export const paginateCollectionList = ({
 	hostname,
 	collectionList,
 	fnHandleCollections
+}: {
+	accessToken: string
+	hostname: string
+	// collectionList: CollectionList // TODO
+	// fnHandleCollections: (collections: Collection[]) => void // TODO
 }) => {
 	//log.debug(`collectionList:${toStr(collectionList)}`);
 	fnHandleCollections(collectionList.collections);

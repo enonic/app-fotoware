@@ -1,4 +1,9 @@
-import type {AllowOrDenyCollectionsRecord} from '/lib/fotoware/types';
+import type {
+	AllowOrDenyCollectionsRecord,
+	Asset,
+	AssetList,
+	CollectionList
+} from '/lib/fotoware';
 
 
 import {toStr} from '@enonic/js-utils';
@@ -67,7 +72,7 @@ export function query(params: {
 
 	//log.debug(`body:${toStr(queryRequestResponse.body)}`);
 
-	const collectionList = JSON.parse(queryRequestResponse.body);
+	const collectionList = JSON.parse(queryRequestResponse.body) as CollectionList;
 	//log.debug(`collectionList:${toStr(collectionList)}`);
 
 	const {paging} = collectionList;
@@ -80,7 +85,7 @@ export function query(params: {
 	let assetCountTotal = 0;
 	const fields = {};
 	const unknownFields = {};
-	const metadataHrefs = {};
+	const metadataHrefs = {} as Record<string, boolean>;
 
 	const collections = collectionList.data.map(({
 		assetCount,
@@ -139,12 +144,17 @@ export function query(params: {
 		// Skipping filter 17.3
 		// Skipping previous metadataHrefs 2.74 // I'm happy with this result
 		//const metaDataViews = {};
-		const collectionObj = {
+		interface CollectionObj {
+			assetCount: number
+			assets: Asset[]
+			collectionId: string
+		}
+		const collectionObj: CollectionObj = {
 			collectionId,
 			assetCount,
 			assets: []
 		};
-		paginate({
+		paginate<AssetList>({
 			//doPaginate: false, // DEBUG
 			fnHandlePage: (page) => {
 				//log.debug(`page:${toStr(page)}`);
