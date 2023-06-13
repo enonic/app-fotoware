@@ -9,6 +9,11 @@ export const getAndPaginateCollectionList = ({
 	hostname,
 	shortAbsolutePath,
 	fnHandleCollections
+}: {
+	accessToken: string
+	hostname: string
+	shortAbsolutePath: string
+	// fnHandleCollections: (collections: Collection[]) => void // TODO
 }) => {
 	//log.debug(`shortAbsolutePath:${toStr(shortAbsolutePath)}`);
 	let collectionList = getCollectionList({

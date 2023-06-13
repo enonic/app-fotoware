@@ -1,5 +1,13 @@
-//import {toStr} from '@enonic/js-utils';
+import type {
+	Import,
+	Request,
+	SiteConfig,
+	TaskNodeData
+} from '/lib/fotoware';
 
+
+//import {toStr} from '@enonic/js-utils';
+// @ts-expect-error TS2307: Cannot find module '/lib/license' or its corresponding type declarations.
 import {validateLicense} from '/lib/license';
 import {
 	CHILD_ORDER,
@@ -13,7 +21,14 @@ import {connect} from '/lib/xp/node';
 import {assetUrl as getAssetUrl} from '/lib/xp/portal';
 import {submitTask} from '/lib/xp/task';
 
-export function post(request) {
+
+export function post(request: Request<{
+	importName?: string
+	resume?: string
+	site?: string
+	stop?: string
+	taskNodeId?: string
+}>) {
 	//log.debug(`request:${toStr(request)}`);
 	const assetsUrl = getAssetUrl({path: ''});
 
@@ -63,6 +78,9 @@ export function post(request) {
 			stop = 'false'
 		}
 	} = request;
+	if (!site) {
+		throw new Error('Missing required parameter "site"!');
+	}
 	//log.debug(`resume:${toStr(resume)}`);
 	const boolResume = resume !== 'false';
 	const boolStop = stop !== 'false';
@@ -91,7 +109,7 @@ export function post(request) {
 		});
 		if(boolStop) {
 			if (taskNodeId) {
-				suConnection.modify({
+				suConnection.modify<TaskNodeData>({
 					key: taskNodeId,
 					editor: (node) => {
 						node.data.shouldStop = true;
@@ -101,6 +119,9 @@ export function post(request) {
 			}
 		} else {
 			sites.forEach((site) => {
+				if (!sitesConfigs[site]) {
+					throw new Error(`No app config for site:${site}!`);
+				}
 				const {
 					archiveName,
 					clientId,
@@ -108,7 +129,7 @@ export function post(request) {
 					properties,
 					url,
 					imports = {}
-				} = sitesConfigs[site];
+				} = sitesConfigs[site] as SiteConfig;
 				//log.debug(`clientId:${toStr(clientId)}`);
 				//log.debug(`clientSecret:${toStr(clientSecret)}`);
 				//log.debug(`url:${toStr(url)}`);
@@ -119,17 +140,20 @@ export function post(request) {
 						: Object.keys(imports);
 				//log.debug(`importNames:${toStr(importNames)}`);
 				importNames.forEach((importName) => {
+					if (!imports[importName]) {
+						throw new Error(`No import config for site:${site} importName:${importName}!`);
+					}
 					const {
 						query,
 						rendition,
 						project,
 						path
-					} = sitesConfigs[site].imports[importName];
+					} = (sitesConfigs[site] as SiteConfig).imports[importName] as Import;
 					//log.debug(`query:${toStr(query)}`);
 					//log.debug(`rendition:${toStr(rendition)}`);
 					//log.debug(`project:${toStr(project)}`);
 					//log.debug(`path:${toStr(path)}`);
-					const createdTaskNode = suConnection.create({
+					const createdTaskNode = suConnection.create<TaskNodeData>({
 						_parentPath: TASKS_FOLDER_PATH,
 						_name: `${site}_${importName}`,
 						_inheritsPermissions: true,

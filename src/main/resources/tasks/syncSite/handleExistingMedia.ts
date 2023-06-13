@@ -9,6 +9,7 @@ import type {
 	RenditionUrl,
 	SiteConfig
 } from '/lib/fotoware';
+import type {Journal} from './index.d';
 
 
 import {toStr} from '@enonic/js-utils';
@@ -60,9 +61,11 @@ export function handleExistingMedia({
 }: {
 	accessToken: AccessToken
 	boolResume: boolean
+	currentAsset: string
 	exisitingMediaContent: MediaContent
 	filename: Filename
 	hostname: Hostname
+	journal: Journal
 	metadata: Metadata
 	project: Project
 	properties: SiteConfig['properties']
@@ -140,6 +143,10 @@ export function handleExistingMedia({
 	} // if !boolResume
 
 	// NOTE Could generate md5sum from possibly modified attachment here.
+
+	if (!md5sumToStore) {
+		throw new Error(`md5sumToStore is null! filename:${filename}`);
+	}
 
 	// Is used to detect if it is neccesary to modiy the content
 	// and to produce a nice diff of which changes will be written.

@@ -31,6 +31,7 @@
 			"/types": ["src/main/resources/lib/fotoware/index.d.ts"],
 			"/types/*": ["src/main/resources/lib/fotoware/types/*"],
 
+			"/lib/xp/admin": ["node_modules/@enonic-types/lib-admin"],
 			"/lib/xp/auth": ["node_modules/@enonic-types/lib-auth"],
 			"/lib/xp/common": ["node_modules/@enonic-types/lib-common"],
 			"/lib/xp/content": ["node_modules/@enonic-types/lib-content"],
@@ -40,7 +41,8 @@
 			"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
 			"/lib/xp/scheduler": ["node_modules/@enonic-types/lib-scheduler"],
 			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"],
-			// "/lib/xp/*": ["src/main/resources/lib/xp/*"],
+			"/lib/xp/*": ["src/main/resources/lib/xp/*"],
+			"/webapp/*": ["src/main/resources/webapp/*"],
 
 			// "/*": ["src/main/resources/lib/*"],
 
@@ -54,14 +56,19 @@
 			"src/main/resources",
 			// "node_modules"
 		],
+		"skipLibCheck": true,
 		"sourceMap": false, // Affect Uncoveraged Lines, but overridden for tests in jest.config.js
 		"strict": true,
 		"strictFunctionTypes": true,
 		"strictNullChecks": true,
 		"target": "ES5", // Affects Uncovered Lines, but seems ok as along as sourceMap: true in jest.config.js
-		// "types": [
-		// 	"@enonic-types/global"
-		// ]
+		// "typeRoots": [
+		// 	"node_modules/@types",
+		// 	"node_modules/@enonic-types"
+		// ],
+		"types": [
+			"@enonic-types/global"
+		],
 		"verbatimModuleSyntax": false,
 	},
 	"exclude": [

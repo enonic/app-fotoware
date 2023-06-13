@@ -5,10 +5,12 @@ import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyInImport} from '/tasks/handleAssetModifiedHook/modifyInImport';
 
 
-export interface HandleAssetModifiedParams {
-	readonly fileNameNew :string
-	readonly fileNameOld :string
-	readonly siteName :string
+export interface HandleAssetModifiedParams
+	extends Record<string, unknown>
+{
+	fileNameNew: string
+	fileNameOld: string
+	siteName: string
 }
 
 
@@ -19,7 +21,7 @@ export function run({
 	fileNameNew,
 	fileNameOld,
 	siteName
-} :HandleAssetModifiedParams) :void {
+}: HandleAssetModifiedParams): void {
 	const {
 		sitesConfigs
 	} = getConfigFromAppCfg();

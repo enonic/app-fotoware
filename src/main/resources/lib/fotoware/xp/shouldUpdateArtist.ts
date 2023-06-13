@@ -44,6 +44,7 @@ export function shouldUpdateArtist({
 
 	if (
 		properties.artist === PROPERTY_IF_CHANGED
+		&& content.data.fotoWare
 		&& content.data.fotoWare.metadata
 		&& content.data.fotoWare.metadata[80]
 		&& artist !== content.data.fotoWare.metadata[80]

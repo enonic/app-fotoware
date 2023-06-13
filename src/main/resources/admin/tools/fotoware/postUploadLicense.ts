@@ -1,8 +1,12 @@
-import {toStr} from '@enonic/js-utils';
+import type { Request } from '/lib/fotoware';
+import type { ByteSource } from '/lib/xp/io';
 
+
+import {toStr} from '@enonic/js-utils';
 import {
 	installLicense,
 	validateLicense
+	// @ts-expect-error TS2307: Cannot find module '/lib/license' or its corresponding type declarations.
 } from '/lib/license';
 import {getToolUrl} from '/lib/xp/admin';
 import {readText} from '/lib/xp/io';
@@ -11,11 +15,11 @@ import {
 	getMultipartStream
 } from '/lib/xp/portal';
 
-export function postUploadLicense(request) {
+export function postUploadLicense(request: Request) {
 	log.info(`request:${toStr(request)}`);
 
 	const licenseStream = getMultipartStream('license');
-	const licenseStr = readText(licenseStream);
+	const licenseStr = readText(licenseStream as ByteSource);
 
 	const licenseDetails = validateLicense({
 		appKey: app.name, // Application key. Optional.

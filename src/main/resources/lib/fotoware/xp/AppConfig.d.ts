@@ -9,7 +9,7 @@ export type RemoteAddress = string // Perhaps ip `${Number}.${Number}.${Number}.
 export type RenditionString = string
 export type SiteName = string
 
-interface Import {
+export interface Import {
 	readonly path: Path
 	readonly project: Project
 	readonly query: Query

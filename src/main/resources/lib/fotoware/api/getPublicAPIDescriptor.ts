@@ -1,10 +1,12 @@
 import {toStr} from '@enonic/js-utils';
-
+// @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
 
 
 export const getPublicAPIDescriptor = ({
 	hostname
+}: {
+	hostname: string
 }) => {
 	const publicAPIDescriptorRequestParams = {
 		contentType: 'application/json',

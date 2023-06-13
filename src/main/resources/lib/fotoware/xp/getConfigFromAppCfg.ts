@@ -1,5 +1,6 @@
 import type {
 	RemoteAddresses,
+	SiteConfig,
 	SitesConfigs
 } from './AppConfig.d';
 
@@ -122,7 +123,7 @@ export function getConfigFromAppCfg(): GetConfigFromAppCfgReturnType {
 			log.error(`Two imports cannot have the same project:${project} and path:${path}!`);
 		} else {
 			projectPaths[project] = path;
-			sitesConfigs[site].imports[importName] = {
+			(sitesConfigs[site] as SiteConfig).imports[importName] = {
 				path,
 				project,
 				query,
