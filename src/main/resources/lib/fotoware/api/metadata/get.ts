@@ -25,7 +25,7 @@ export const getMetadataView = ({
 	shortAbsolutePath
 }: {
 	accessToken?: string
-	fields: Record<string, unknown> // TODO: Can unknown be a more specific type?
+	fields: Record<string, Omit<FieldDescriptionField, 'id'>>
 	hostname: string
 	shortAbsolutePath: string
 }) => {

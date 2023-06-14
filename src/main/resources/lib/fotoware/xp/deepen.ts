@@ -7,7 +7,7 @@ import {AppConfig} from './AppConfig';
 // https://stackoverflow.com/questions/7793811/convert-javascript-dot-notation-object-to-nested-object
 // NOTE: This is risky if you have a same-name top level property. Wrap from t=oo; to t[key] = o[k] in if (k.indexOf('.') !== -1) ... – brandonscript Apr 14 '14 at 19:14
 // NOTE: It also doesn't work if you have more than one top-level key. – brandonscript Apr 14 '14 at 19:15
-export function deepen(o: AppConfigObject): AppConfig {
+export function deepen(o: typeof app.config): AppConfig {
 	const oo: NestedRecord = {};
 	Object.keys(o).forEach((k) => {
 		//log.debug(`k:${toStr(k)}`);

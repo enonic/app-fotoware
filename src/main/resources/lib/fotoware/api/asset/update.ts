@@ -1,6 +1,11 @@
-import {toStr} from '@enonic/js-utils';
+// Note this file was used in handleNewMedia, but that code is commented out now.
 
-import {request} from '/lib/http-client';
+import type { Metadata } from '/lib/fotoware';
+
+
+import { toStr } from '@enonic/js-utils';
+// @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations
+import { request } from '/lib/http-client';
 
 /*
 
@@ -20,12 +25,17 @@ export function assetUpdate({
 	accessToken,
 	fullAssetUrl,
 	metadata
+}: {
+	accessToken: string
+	fullAssetUrl: string
+	metadata: Record<string, string | string[]> // TODO: Uncertain on this type.
 }) {
+	log.debug('assetUpdate() metadata:%s', toStr(metadata));
 	// Enonic:   { 5:          'The Beatles'  , 90:          'London' }
 	// FotoWare: { 5: { value: 'The Beatles' }, 90: { value: 'London' } }
-	const metadataWithValue = {}
+	const metadataWithValue: Metadata = {}
 	Object.keys(metadata).forEach((k) => {
-		const value = metadata[k];
+		const value = metadata[k] as string | string[];
 		metadataWithValue[k] = { value };
 	});
 

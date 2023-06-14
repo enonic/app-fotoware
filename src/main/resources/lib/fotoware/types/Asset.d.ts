@@ -4,9 +4,12 @@ import type { Paging } from './Paging';
 // NOTE: Since I don't know what data could potentially come in the future,
 // using OneOrMore is the safest.
 
-export type Metadata = Record<PropertyKey, {
+export interface MetadataItemWithValue {
 	value: string|string[]
-}>
+}
+
+export type Metadata = Record<PropertyKey, MetadataItemWithValue>
+
 // export type Metadata = {
 // 	5?: { // title used as displayName
 // 		value: string|string[]

@@ -1,4 +1,9 @@
-import type { Response } from '/lib/fotoware';
+import type {
+	MediaContent,
+	Metadata,
+	Response,
+	SiteConfigProperties
+} from '/lib/fotoware';
 import type { ByteSource } from '/lib/xp/io';
 
 
@@ -9,10 +14,10 @@ import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 interface HandleMissingMediaContent {
 	readonly downloadRenditionResponse: Response
 	readonly fileNameNew: string
-	readonly metadata: unknown
+	readonly metadata: Metadata
 	readonly md5sumOfDownload: string
 	readonly path: string
-	readonly properties: unknown
+	readonly properties: SiteConfigProperties
 }
 
 
@@ -29,7 +34,7 @@ export function handleMissingMediaContent({
 		parentPath,
 		name: fileNameNew,
 		data: downloadRenditionResponse.bodyStream as ByteSource
-	});
+	}) as MediaContent;
 	if (!createMediaResult) {
 		const errMsg = `Something went wrong when creating parentPath:${parentPath} fileNameNew:${fileNameNew}!`;
 		log.error(errMsg);

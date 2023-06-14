@@ -1,5 +1,6 @@
-//import {toStr} from '@enonic/js-utils';
+import type { Asset } from '/lib/fotoware';
 
+//import {toStr} from '@enonic/js-utils';
 //import {getAssetList} from './get';
 import {getAssetList} from '/lib/fotoware/api/assetList/get';
 
@@ -14,7 +15,7 @@ export const getAndPaginateAssetList = ({
 	accessToken: string
 	hostname: string
 	shortAbsolutePath: string
-	//fnHandleAssets: (assets: Asset[]) => void // TODO
+	fnHandleAssets: (_assets: Asset[]) => void
 	doPaginate?: boolean
 }) => {
 	let assetList = getAssetList({

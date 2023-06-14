@@ -2,16 +2,16 @@ import type {
 	AccessToken,
 	Cookies,
 	Hostname,
+	HttpClient,
 	RenditionRequest,
 	RenditionUrl,
 	RenditionServiceResponseBodyParsed,
-	Request,
 	Response
 } from '/lib/fotoware';
 
 
 import {toStr} from '@enonic/js-utils';
-//@ts-ignore
+// @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations
 import {request} from '/lib/http-client';
 
 
@@ -31,7 +31,7 @@ export const requestRendition = ({
 	cookies?: Cookies
 }) => {
 	//log.info(`renditionUrl:${renditionUrl}`);
-	const renditionServiceRequestParams: Request = {
+	const renditionServiceRequestParams: HttpClient.Request = {
 		/*body: {
 			href: renditionUrl
 		},*/
@@ -75,7 +75,7 @@ export const requestRendition = ({
 		url: `${hostname}${renditionServiceShortAbsolutePath}`
 	};
 	if (accessToken) {
-		renditionServiceRequestParams.headers.Authorization = `bearer ${accessToken}`;
+		(renditionServiceRequestParams.headers as Record<string,string>)['Authorization'] = `bearer ${accessToken}`;
 
 		// Becomes 403 FORBIDDEN without this
 		/*renditionServiceRequestParams.params = {
@@ -91,7 +91,7 @@ export const requestRendition = ({
 	}
 	if (cookies) {
 		//log.debug(`cookies:${toStr(cookies)}`);
-		renditionServiceRequestParams.headers.Cookie = cookies.map(({name, value}) => `${name}=${value}`).join('; ');
+		(renditionServiceRequestParams.headers as Record<string,string>)['Cookie'] = cookies.map(({name, value}) => `${name}=${value}`).join('; ');
 	}
 	//log.info(`renditionServiceRequestParams:${toStr(renditionServiceRequestParams)}`);
 	const renditionServiceResponse = request(renditionServiceRequestParams) as Response;
@@ -102,6 +102,10 @@ export const requestRendition = ({
 		log.error(`Something went wrong when trying to get rendition url renditionServiceRequestParams:${toStr(renditionServiceRequestParams)} renditionServiceResponse:${toStr(renditionServiceResponse)}`);
 		//}
 		throw new Error(`Something went wrong when trying to get rendition url renditionUrl:${renditionUrl}`);
+	}
+
+	if (!renditionServiceResponse.body) {
+		throw new Error(`renditionServiceResponse without body renditionServiceResponse:${toStr(renditionServiceResponse)}`);
 	}
 
 	//if (renditionServiceResponse.status === 202) {
@@ -119,7 +123,7 @@ export const requestRendition = ({
 	const renditionRequestUrl = `${hostname}${href}`;
 	//log.debug(`renditionRequestUrl:${toStr(renditionRequestUrl)}`);
 
-	const pollAndDownloadRenditionRequestParams: Request = {
+	const pollAndDownloadRenditionRequestParams: HttpClient.Request = {
 		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
 		method: 'GET',
 		url: renditionRequestUrl

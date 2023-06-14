@@ -39,6 +39,7 @@
 			"/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
 			"/lib/xp/portal": ["node_modules/@enonic-types/lib-portal"],
 			"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
+			"/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
 			"/lib/xp/scheduler": ["node_modules/@enonic-types/lib-scheduler"],
 			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"],
 			"/lib/xp/*": ["src/main/resources/lib/xp/*"],

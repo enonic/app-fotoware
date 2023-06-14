@@ -1,6 +1,7 @@
 import type {
 	AccessToken,
 	ArchiveName,
+	Asset,
 	Filename,
 	Hostname,
 	MediaContent,
@@ -14,13 +15,15 @@ import type {
 } from '/lib/fotoware';
 
 
+import { toStr } from '@enonic/js-utils';
+
 // Enonic modules
 import {get as getContentByKey} from '/lib/xp/content';
 import {run as runInContext} from '/lib/xp/context';
 import {executeFunction} from '/lib/xp/task';
 
 // FotoWare modules
-import {query as doQuery} from '/lib/fotoware/api/query';
+import {CollectionObj, query as doQuery} from '/lib/fotoware/api/query';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 import {handleAsset} from '/tasks/handleAssetModifiedHook/handleAsset'
 
@@ -54,7 +57,7 @@ export function modifyInImport({
 	rendition,
 	renditionRequest,
 	searchURL
-} :ModifyInImportParams) :void {
+}: ModifyInImportParams): void {
 	runInContext({
 		repository: `com.enonic.cms.${project}`,
 		branch: 'draft',
@@ -109,9 +112,17 @@ export function modifyInImport({
 				return;
 			}
 
+			if (!queryResult.collections.length) {
+				throw new Error(`Querying for fileNameNew:${fileNameNew} returned no collections!`);
+			}
+
+			if (!(queryResult.collections[0] as CollectionObj).assets.length) {
+				throw new Error(`Querying for fileNameNew:${fileNameNew} returned no assets in collection[0]:${toStr(queryResult.collections[0])} !`);
+			}
+
 			handleAsset({
 				accessToken,
-				asset: queryResult.collections[0].assets[0],
+				asset: (queryResult.collections[0] as CollectionObj).assets[0] as Asset,
 				exisitingMediaContent,
 				fileNameNew,
 				fileNameOld,
