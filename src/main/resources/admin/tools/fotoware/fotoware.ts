@@ -42,6 +42,8 @@ const router = Router();
 export const all = (r: Request) => router.dispatch(r);
 
 router.post('/', (r: Request) => post(r));
+router.post('', (r: Request) => post(r));
+
 router.get('/uploadLicense', (/*r: Request*/) => getUploadLicenseForm(/*r*/));
 router.post('/uploadLicense', (r: Request) => postUploadLicense(r));
 
@@ -193,3 +195,5 @@ router.get('/doc', () => ({
 	body: getResource(resolve('./doc.html')).getStream(),
 	contentType: 'text/html; charset=utf-8'
 }));
+
+router.get('', (/*r: Request*/) => get(/*r*/));

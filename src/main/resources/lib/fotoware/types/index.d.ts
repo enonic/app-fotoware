@@ -13,6 +13,9 @@ export type {
 	HttpClient
 } from './HttpClient.d';
 export type {
+	Journal
+} from './Journal.d';
+export type {
 	BuiltinFieldsKeys,
 	FieldDescription,
 	FieldDescriptionField,

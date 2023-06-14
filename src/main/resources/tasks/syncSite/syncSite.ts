@@ -1,9 +1,14 @@
-import type { SiteConfigPropertyValue } from '/lib/fotoware';
+import type {
+	Journal,
+	MediaContent,
+	TaskNodeData,
+	SiteConfigPropertyValue
+} from '/lib/fotoware';
 import type { Content } from '/lib/xp/portal';
-import type { Journal } from './index.d';
 
 
 import {toStr} from '@enonic/js-utils';
+import is from '@sindresorhus/is';
 import {getAccessToken} from '/lib/fotoware/api/getAccessToken';
 import {getPrivateFullAPIDescriptor} from '/lib/fotoware/api/getPrivateFullAPIDescriptor';
 import {query as doQuery} from '/lib/fotoware/api/query';
@@ -276,8 +281,12 @@ export function run(params: {
 							repoId: REPO_ID,
 							branch: REPO_BRANCH
 						});
-						const taskNode = suConnection.get(taskNodeId);
+						const taskNode = suConnection.get<TaskNodeData>(taskNodeId);
 						//log.debug(`taskNode:${toStr(taskNode)}`);
+						if (!taskNode) {
+							log.error(`Unable to find task node with id:${taskNodeId}`);
+							throw new Error('Unable to find task node! See server log for node _id')
+						}
 						const {
 							data: {
 								shouldStop
@@ -321,10 +330,10 @@ export function run(params: {
 						});
 						//log.debug(`contentQueryResult:${toStr(contentQueryResult)}`);
 
-						let exisitingMediaContent;
+						let exisitingMediaContent: MediaContent | -1 | null | undefined;
 						if (contentQueryResult.total === 0) {
 							// Even though no media has been found tagged with filename, older versions of the integration might have synced the file already...
-							exisitingMediaContent = getContentByKey({key: `/${path}/${filename}`});
+							exisitingMediaContent = getContentByKey<MediaContent>({key: `/${path}/${filename}`});
 						} else if (contentQueryResult.total === 1) {
 							exisitingMediaContent = contentQueryResult.hits[0];
 						} else if (contentQueryResult.total > 1) {
@@ -332,7 +341,7 @@ export function run(params: {
 							exisitingMediaContent = -1;
 						}
 
-						const renditionsObj = {};
+						const renditionsObj: Record<string,string> = {};
 						renditions.forEach(({
 							//default,
 							//description,
@@ -350,6 +359,10 @@ export function run(params: {
 						//log.debug(`renditionsObj:${toStr(renditionsObj)}`);
 
 						const renditionUrl = renditionsObj[rendition] || renditionsObj['Original File'];
+						if (!renditionUrl) {
+							log.error(`Unable to determine renditionUrl from rendition:${rendition} in renditionsObj${toStr(renditionsObj)}!`);
+							throw new Error(`Unable to determine renditionUrl from rendition:${rendition}!`);
+						}
 
 						// 1. !exist (resume or not doesn't matter) download and create
 						// 2. exist resume check metadata modify if changes
@@ -392,15 +405,16 @@ export function run(params: {
 			//progress.finishItem(`Finished processing collections`);//.report();
 			progress.setInfo(`Finished syncing site ${site} ${importName}`).report();
 			journal.currentAsset = '';
-		} catch (e) {
+		} catch (e: unknown) {
 			//log.error('e', e);
 			//log.error('e.message', e.message);
 			//log.error('e.class.name', e.class.name);
-			log.error(`Something went wrong during sync`, e);
-			journal.error = {
-				//className: e.class.name,
-				message: e.message
-			};
+			log.error('Something went wrong during sync', e);
+			if (
+				is.error(e)
+			) {
+				journal.errors.push(e.message);
+			}
 			throw e; // Finally should run before this re-throw ends the task.
 		} finally {
 			runInContext({
@@ -417,7 +431,7 @@ export function run(params: {
 					branch: REPO_BRANCH
 				});
 				//const modifyTaskNodeRes =
-				suConnection.modify({
+				suConnection.modify<TaskNodeData>({
 					key: taskNodeId,
 					editor: (node) => {
 						//log.debug(`journal:${toStr(journal)}`);
