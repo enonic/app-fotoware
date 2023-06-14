@@ -49,6 +49,10 @@ module.exports = {
 
 	}, //globals
 
+	ignorePatterns: [
+		'build/'
+	],
+
 	//parser: 'babel-eslint',
 
 	parserOptions: {
