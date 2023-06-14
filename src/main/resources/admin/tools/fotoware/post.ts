@@ -6,7 +6,7 @@ import type {
 } from '/lib/fotoware';
 
 
-//import {toStr} from '@enonic/js-utils';
+// import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/license' or its corresponding type declarations.
 import {validateLicense} from '/lib/license';
 import {
@@ -29,7 +29,7 @@ export function post(request: Request<{
 	stop?: string
 	taskNodeId?: string
 }>) {
-	//log.debug(`request:${toStr(request)}`);
+	// log.debug('request:%s', toStr(request));
 	const assetsUrl = getAssetUrl({path: ''});
 
 	const licenseDetails = validateLicense({appKey: app.name});

@@ -1,8 +1,8 @@
 // import type {SiteConfig} from '/lib/fotoware/xp/AppConfig';
-import type {MediaContent} from '/lib/fotoware/xp/MediaContent';
-import type {Request} from '/lib/fotoware';
+import type { MediaContent } from '/lib/fotoware/xp/MediaContent';
+import type { Request } from '/lib/fotoware';
 import type { ByteSource } from '/lib/xp/io';
-import type {Asset} from '/types';
+import type { Asset } from '/types';
 
 
 // Node modules
@@ -11,7 +11,6 @@ import {
 	toStr
 } from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
-
 import deepEqual from 'fast-deep-equal';
 
 

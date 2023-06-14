@@ -1,3 +1,6 @@
+import type { TaskNodeData } from '/lib/fotoware';
+
+
 import {
 	CHILD_ORDER,
 	REPO_BRANCH,
@@ -8,7 +11,7 @@ import {connect} from '/lib/xp/node';
 
 
 export function get() {
-	const stoppableTasks = {};
+	const stoppableTasks: Record<string, Record<string,string>> = {};
 	runInContext({
 		repository: REPO_ID,
 		branch: REPO_BRANCH,
@@ -39,14 +42,18 @@ export function get() {
 				}
 			},
 			sort: CHILD_ORDER,
-			aggregations: '',
+			aggregations: {},
 			explain: false
 		};
 		//log.debug(`queryParams:${toStr(queryParams)}`);
 		const queryRes = suConnection.query(queryParams);
 		//log.debug(`queryRes:${toStr(queryRes)}`);
 		queryRes.hits.forEach(({id}) => {
-			const aTaskNode = suConnection.get(id);
+			const aTaskNode = suConnection.get<TaskNodeData>(id);
+			if (!aTaskNode) {
+				log.error(`Unable to find task node with id:${id}`);
+				throw new Error('Unable to find task node! See server log for node _id')
+			}
 			const {
 				data: {
 					importName,
@@ -56,7 +63,7 @@ export function get() {
 			if (!stoppableTasks[site]) {
 				stoppableTasks[site] = {}
 			}
-			stoppableTasks[site][importName] = id;
+			(stoppableTasks[site] as Record<string,string>)[importName] = id;
 		});
 	}); // runInFotoWareRepoContext
 	return {

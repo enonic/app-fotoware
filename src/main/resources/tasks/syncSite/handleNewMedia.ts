@@ -1,9 +1,15 @@
+import type {
+	Journal,
+	Metadata,
+	SiteConfig
+} from '/lib/fotoware';
+
 //import {toStr} from '@enonic/js-utils';
 
 //import {assetUpdate} from '/lib/fotoware/api/asset/update';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
-
+// @ts-expect-error TS2307: Cannot find module '/lib/text-encoding' or its corresponding type declarations.
 import {md5} from '/lib/text-encoding';
 import {createMedia} from '/lib/xp/content';
 import {readText} from '/lib/xp/io';
@@ -20,6 +26,17 @@ export function handleNewMedia({
 	properties,
 	renditionRequest,
 	renditionUrl
+}: {
+	accessToken: string
+	currentAsset: string
+	filename: string
+	hostname: string
+	journal: Journal
+	metadata: Metadata
+	path: string
+	properties: SiteConfig['properties']
+	renditionRequest: string
+	renditionUrl: string
 }) {
 	//log.debug(`handleNewMedia properties:${toStr(properties)}`);
 	//log.debug(`renditions:${toStr(renditions)}`);
@@ -36,6 +53,10 @@ export function handleNewMedia({
 	}
 
 	if (downloadRenditionResponse) {
+		if (downloadRenditionResponse.bodyStream == null) {
+			log.error('downloadRenditionResponse.bodyStream is null! filename:%s', filename);
+			throw new Error(`downloadRenditionResponse.bodyStream is null! filename:${filename}`);
+		}
 		const createMediaResult = createMedia({
 			parentPath: `/${path}`,
 			name: filename,

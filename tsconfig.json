@@ -61,7 +61,10 @@
 		"strict": true,
 		"strictFunctionTypes": true,
 		"strictNullChecks": true,
-		"target": "ES5", // Affects Uncovered Lines, but seems ok as along as sourceMap: true in jest.config.js
+
+		// We set target in tsup.config.ts instead
+		// "target": "ES5", // Affects Uncovered Lines, but seems ok as along as sourceMap: true in jest.config.js
+
 		// "typeRoots": [
 		// 	"node_modules/@types",
 		// 	"node_modules/@enonic-types"
@@ -73,11 +76,12 @@
 	},
 	"exclude": [
 		"node_modules",
-		// "src/main/resources/**/*.d.ts" // Nope this destroys the globalThis.app
+		// "**/*.d.ts",
+		"./src/main/resources/**/*.d.ts" // Nope this destroys the globalThis.app
 	],
-	"files": [
-		"./src/main/resources/services/sitesConfigs/sitesConfigs.ts"
-	],
+	// "files": [
+	// 	"./src/main/resources/services/sitesConfigs/sitesConfigs.ts"
+	// ],
 	"include": [
 		"src/main/resources/**/*.ts"
 	]

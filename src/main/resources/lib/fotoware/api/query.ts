@@ -7,7 +7,11 @@ import type {
 
 
 import {toStr} from '@enonic/js-utils';
-import urlencode from 'urlencode';
+
+// import urlencode from 'urlencode'; // requires 'stream' Node.js module
+// @ts-expect-error TS7016: Could not find a declaration file for module 'encodeuricomponent-tag'
+import uri from 'encodeuricomponent-tag';
+
 //import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
 import {getMetadataView} from '/lib/fotoware/api/metadata/get';
@@ -39,7 +43,11 @@ export function query(params: {
 
 	const url = `${hostname}${
 		searchURL
-			.replace('{?q}', `?q=${urlencode(q)}`)
+			.replace(
+				'{?q}',
+				// `?q=${urlencode(q)}`
+				uri`?q=${q}`
+			)
 	}`;
 	// log.debug('url:%s', url);
 

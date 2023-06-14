@@ -1,13 +1,16 @@
 import type {SiteConfigProperties} from '/lib/fotoware/xp/AppConfig.d';
 import type {Metadata} from '/types/Asset.d';
 import type {MediaContent} from '/lib/fotoware/xp/MediaContent.d';
+
+
+
+import 'core-js/stable/object/entries';
 import {
 	deleteIn,
 	forceArray,
 	isString,
 	toStr
 } from '@enonic/js-utils';
-
 import {detailedDiff} from 'deep-object-diff';
 //import HumanDiff from 'human-object-diff';
 import deepEqual from 'fast-deep-equal';

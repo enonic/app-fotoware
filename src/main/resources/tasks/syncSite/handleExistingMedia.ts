@@ -2,6 +2,7 @@ import type {
 	AccessToken,
 	Filename,
 	Hostname,
+	Journal,
 	MediaContent,
 	Metadata,
 	Project,
@@ -9,7 +10,6 @@ import type {
 	RenditionUrl,
 	SiteConfig
 } from '/lib/fotoware';
-import type {Journal} from './index.d';
 
 
 import {toStr} from '@enonic/js-utils';
