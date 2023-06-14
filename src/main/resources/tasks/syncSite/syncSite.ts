@@ -310,6 +310,19 @@ export function run(params: {
 					//log.debug(`metadata:${toStr(metadata)}`);
 					//log.debug(`metadataObj:${toStr(metadataObj)}`); // Undefined on Enonic Test Server
 
+					if (!filename) {
+						throw new Error(`asset missing filename! asset:${toStr(asset)}`);
+					}
+
+					if (!metadata) {
+						throw new Error(`asset missing metadata! asset:${toStr(asset)}`);
+					}
+
+					if (!renditions) {
+						throw new Error(`asset missing renditions! asset:${toStr(asset)}`);
+					}
+
+
 					const currentAsset = `${url}${assetHref}`;
 					journal.currentAsset = currentAsset;
 

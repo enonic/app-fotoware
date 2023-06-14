@@ -1,5 +1,8 @@
-//import {toStr} from '@enonic/js-utils';
+// NOTE: I don't think this file is in use?
 
+import type {Collection} from '/lib/fotoware'
+
+//import {toStr} from '@enonic/js-utils';
 //import {getCollectionList} from './get';
 import {getCollectionList} from '/lib/fotoware/api/collectionList/get';
 
@@ -13,7 +16,7 @@ export const getAndPaginateCollectionList = ({
 	accessToken: string
 	hostname: string
 	shortAbsolutePath: string
-	// fnHandleCollections: (collections: Collection[]) => void // TODO
+	fnHandleCollections: (_collections: Collection[]) => void
 }) => {
 	//log.debug(`shortAbsolutePath:${toStr(shortAbsolutePath)}`);
 	let collectionList = getCollectionList({

@@ -30,7 +30,9 @@ runInContext({
 		const repoList = listRepos();
 		//log.debug(`repoList:${toStr(repoList)}`);
 
-		const reposObj = {};
+		const reposObj: Record<string, {
+			branches: string[]
+		}> = {};
 		repoList.forEach(({id, branches}) => {
 			reposObj[id] = {branches};
 		});

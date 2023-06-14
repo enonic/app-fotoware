@@ -1,5 +1,11 @@
-//import {toStr} from '@enonic/js-utils';
+// NOTE: This file is not references by any other file in this project. Probably some cool feature I removed or never finished.
 
+import type {
+	Collection,
+	CollectionList
+} from '/lib/fotoware';
+
+import {toStr} from '@enonic/js-utils';
 //import {getCollectionList} from './get';
 import {getCollectionList} from '/lib/fotoware/api/collectionList/get';
 
@@ -12,11 +18,15 @@ export const paginateCollectionList = ({
 }: {
 	accessToken: string
 	hostname: string
-	// collectionList: CollectionList // TODO
-	// fnHandleCollections: (collections: Collection[]) => void // TODO
+	collectionList: CollectionList
+	fnHandleCollections: (_collections: Collection[]) => void
 }) => {
-	//log.debug(`collectionList:${toStr(collectionList)}`);
-	fnHandleCollections(collectionList.collections);
+	log.debug('collectionList:%s', toStr(collectionList));
+
+	// was .collections but documentation says it should be .data, so I'm going with the doc.
+	// https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview/Collection_List_representation
+	fnHandleCollections(collectionList.data);
+
 	if (collectionList.paging) {
 		//log.debug(`paging:${toStr(collectionList.paging)}`);
 		//prev, // URL of previous page. If null, then there is no previous page, and the current representation is the first page.

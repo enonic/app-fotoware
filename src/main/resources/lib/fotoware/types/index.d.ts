@@ -3,10 +3,12 @@ export type {
 	AssetList,
 	AssetModified,
 	Metadata,
+	MetadataItemWithValue,
 	Rendition,
 	RenditionUrl
 } from './Asset.d';
 export type {
+	Collection,
 	CollectionList
 } from './Collection.d';
 export type {

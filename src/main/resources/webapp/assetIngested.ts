@@ -3,6 +3,7 @@ import type { MediaContent } from '/lib/fotoware/xp/MediaContent';
 import type { Request } from '/lib/fotoware';
 import type { ByteSource } from '/lib/xp/io';
 import type { Asset } from '/types';
+import type { CollectionObj } from '/lib/fotoware/api/query';
 
 
 // Node modules
@@ -273,6 +274,9 @@ export const assetIngested = (request: Request) => {
 					} else if (assetCountTotal > 1) {
 						log.error(`Querying for filename:${filename} returned more than one asset!`);
 					} else {
+						if (!collections.length) {
+							throw new Error(`No collections found when querying for filename:${filename}!`);
+						}
 						const {
 							filename: filenameFromQuery, // Should match or query is weird
 							//filesize,
@@ -281,7 +285,7 @@ export const assetIngested = (request: Request) => {
 							//metadataObj,
 							//renditionHref
 							renditions
-						} = collections[0].assets[0] as Asset;
+						} = (collections[0] as CollectionObj).assets[0] as Asset;
 						if (filename !== filenameFromQuery) {
 							throw new Error(`filename:${filename} from assetIngested does not match filename:${filenameFromQuery} from query result`);
 						}

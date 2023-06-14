@@ -72,6 +72,7 @@
     "@enonic-types/lib-io": "^7.13.0-B1",
     "@enonic-types/lib-node": "^7.13.0-B1",
     "@enonic-types/lib-portal": "^7.13.0-B1",
+    "@enonic-types/lib-repo": "^7.13.0-B1",
     "@enonic-types/lib-scheduler": "^7.13.0-B1",
     "@enonic-types/lib-task": "^7.13.0-B1",
     "@enonic/mock-xp": "^0.4.0",

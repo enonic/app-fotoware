@@ -2,7 +2,9 @@ import type {
 	AllowOrDenyCollectionsRecord,
 	Asset,
 	AssetList,
-	CollectionList
+	CollectionList,
+	FieldDescriptionField,
+	MetadataItemWithValue
 } from '/lib/fotoware';
 
 
@@ -17,8 +19,15 @@ import uri from 'encodeuricomponent-tag';
 import {getMetadataView} from '/lib/fotoware/api/metadata/get';
 import {paginate} from '/lib/fotoware/api/paginate';
 import {camelize} from '/lib/fotoware/xp/camelize';
-//@ts-ignore
+// @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
+
+
+export interface CollectionObj {
+	assetCount: number
+	assets: Partial<Asset>[]
+	collectionId: string
+}
 
 
 export function query(params: {
@@ -91,9 +100,9 @@ export function query(params: {
 	}
 
 	let assetCountTotal = 0;
-	const fields = {};
-	const unknownFields = {};
-	const metadataHrefs = {} as Record<string, boolean>;
+	const fields: Record<string, Omit<FieldDescriptionField, 'id'>> = {};
+	const unknownFields: Record<string, boolean> = {};
+	const metadataHrefs: Record<string, boolean> = {};
 
 	const collections = collectionList.data.map(({
 		assetCount,
@@ -152,11 +161,6 @@ export function query(params: {
 		// Skipping filter 17.3
 		// Skipping previous metadataHrefs 2.74 // I'm happy with this result
 		//const metaDataViews = {};
-		interface CollectionObj {
-			assetCount: number
-			assets: Asset[]
-			collectionId: string
-		}
 		const collectionObj: CollectionObj = {
 			collectionId,
 			assetCount,
@@ -193,10 +197,13 @@ export function query(params: {
 							shortAbsolutePath: assetMetadataHref
 						});
 					}
-					const metadataObj = {};
+					const metadataObj: Record<string, MetadataItemWithValue['value']> = {};
 					Object.keys(metadata).forEach((k) => {
+						if(!metadata[k]) {
+							throw new Error(`Malformed metadata key:${k} metadata:${toStr(metadata)}`);
+						}
 						if (fields[k]) {
-							metadataObj[camelize(fields[k].label.toLowerCase())] = metadata[k].value;
+							metadataObj[camelize((fields[k] as Omit<FieldDescriptionField, 'id'>).label.toLowerCase())] = (metadata[k] as MetadataItemWithValue).value;
 						} else {
 							if (!unknownFields[k]) {
 								unknownFields[k] = true;

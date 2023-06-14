@@ -1,3 +1,6 @@
+import type { Permission } from '/lib/xp/repo';
+
+
 import {sanitize} from '/lib/xp/common';
 
 export const REPO_ID = app.name;
@@ -13,11 +16,11 @@ export const PERMISSIONS = [{
 		'PUBLISH',
 		'READ_PERMISSIONS',
 		'WRITE_PERMISSIONS'
-	],
-	deny: []
+	] as Permission[],
+	deny: [] as Permission[]
 }, {
 	principal: 'role:system.everyone',
-	allow: [],
+	allow: [] as Permission[],
 	deny: [
 		'READ',
 		'CREATE',
@@ -26,7 +29,7 @@ export const PERMISSIONS = [{
 		'PUBLISH',
 		'READ_PERMISSIONS',
 		'WRITE_PERMISSIONS'
-	]
+	] as Permission[]
 }];
 
 export const CHILD_ORDER = '_ts DESC';
