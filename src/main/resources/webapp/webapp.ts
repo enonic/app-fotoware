@@ -3,7 +3,7 @@ import type {Request} from '/lib/xp/Request';
 
 //import '@enonic/global-polyfill'; // Required by reflect-metadata
 //import 'reflect-metadata'; // Required by set-value
-//import {toStr} from '@enonic/js-utils';
+// import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/router' or its corresponding type declarations.
 import Router from '/lib/router';
 //import {assetUrl} from '/lib/xp/portal';
@@ -24,9 +24,19 @@ router.post('/asset/modified', (r: Request) => assetModified(r));
 router.post('/asset/deleted', (r: Request) => assetDeleted(r));
 router.post('/export/published', (r: Request) => exportPublished(r));
 router.post('/export/revoked', (r: Request) => exportRevoked(r));
-router.all('', (/*r*/) => {
-	//log.debug(`request:${toStr(r)}`);
+// Just in case:
+router.post('/asset/ingested/', (r: Request) => assetIngested(r));
+router.post('/asset/modified/', (r: Request) => assetModified(r));
+router.post('/asset/deleted/', (r: Request) => assetDeleted(r));
+router.post('/export/published/', (r: Request) => exportPublished(r));
+router.post('/export/revoked/', (r: Request) => exportRevoked(r));
+
+function respond(_r: Request) {
+	// log.debug('request:%s', toStr(r));
 	return {
 		body: getResource(resolve('../application.svg')).getStream()
 	};
-});
+}
+
+router.all('', (r: Request) => respond(r));
+router.all('/', (r: Request) => respond(r));

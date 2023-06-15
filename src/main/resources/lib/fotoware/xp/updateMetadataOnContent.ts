@@ -3,8 +3,6 @@ import type {Metadata} from '/types/Asset.d';
 import type {MediaContent} from '/lib/fotoware/xp/MediaContent.d';
 
 
-
-import 'core-js/stable/object/entries';
 import {
 	deleteIn,
 	forceArray,

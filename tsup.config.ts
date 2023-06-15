@@ -46,9 +46,10 @@ export default defineConfig((options: Options) => {
 				// };
 
 				// Some node modules might need globalThis
-				// options.banner = {
-				// 	js: `const globalThis = (1, eval)('this');` // buffer polyfill needs this
-				// };
+				// Needed by core-js/internals/global.js
+				options.banner = {
+					js: `const globalThis = (1, eval)('this');` // buffer polyfill needs this
+				};
 
 				// If you have libs with chunks, use this to avoid collisions
 				options.chunkNames = '_chunks/[name]-[hash]';
@@ -175,11 +176,11 @@ export default defineConfig((options: Options) => {
 
 				// Here are some things Nashorn doesn't support, comment them in to inject them:
 				// 'node_modules/core-js/stable/array/flat.js',        // 69K (18K) minified
-				// 'node_modules/core-js/stable/array/includes.js',    // 60K (15K)
+				'node_modules/core-js/stable/array/includes.js',    // 60K (15K) // Needed by @sindresorhus/is
 				// 'node_modules/core-js/stable/math/trunc.js',        // 53K (14K)
 				// 'node_modules/core-js/stable/number/is-finite.js',  // 54K (14K)
 				// 'node_modules/core-js/stable/number/is-integer.js', // 54K (14K)
-				// 'node_modules/core-js/stable/object/entries.js', // Didn't work?
+				'node_modules/core-js/stable/object/entries.js',
 				// 'node_modules/core-js/stable/parse-float.js',       // 59K (15K)
 				// 'node_modules/core-js/stable/reflect/index.js',     // 88K (22K)
 				// 'node_modules/core-js/stable/string/pad-start.js',
