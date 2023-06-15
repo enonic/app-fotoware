@@ -24,6 +24,7 @@ module.exports = {
 			'ts-jest',
 			{
 				tsconfig: { // actually compilerOptions
+					allowJs: true,
 					sourceMap: true, // Needed to get correct Uncovered Line numbers
 					// target: 'ES5', // Changes Uncovered Line numbers
 
@@ -43,4 +44,8 @@ module.exports = {
 			}
 		]
 	},
+
+	transformIgnorePatterns: [
+		'/node_modules/(?!@sindresorhus/)'
+	]
 };
