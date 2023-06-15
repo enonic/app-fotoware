@@ -61,7 +61,7 @@ global.app.config = {
 
 // @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
-	loglevel: 'warn'
+	loglevel: 'silent'
 });
 
 jest.mock('/lib/xp/common', () => ({

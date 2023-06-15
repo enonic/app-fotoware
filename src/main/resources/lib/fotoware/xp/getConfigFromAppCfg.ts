@@ -31,17 +31,22 @@ export function getConfigFromAppCfg(): GetConfigFromAppCfgReturnType {
 		sites = {},
 		imports = {}
 	} = config;
-	//log.debug(`sites:${toStr(sites)}`);
-	//log.debug(`imports:${toStr(imports)}`);
+	// log.debug('sites:%s', toStr(sites));
+	// log.debug(`imports:${toStr(imports)}`);
 
-	const sitesConfigs :SitesConfigs = {};
+	const sitesConfigs: SitesConfigs = {};
 
 	Object.keys(sites).forEach((siteName) => {
+		// log.debug('siteName:%s', siteName);
+
 		const siteConfig = sites[siteName];
+		// log.debug('siteConfig:%s', toStr(siteConfig));
+
 		if (!siteConfig) {
 			throw new Error(`Unable to find site with name:${siteName}!`);
 		}
 		//log.debug(`site:${toStr(site)}`);
+
 		const {
 			//archiveName = '5000-Archive',
 			archiveName = '5000-All-files',
