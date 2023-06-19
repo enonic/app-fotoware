@@ -3,6 +3,7 @@
 /bin/
 /build/
 /coverage/
+/docs/updateMetadataOnContent.webp
 /node_modules/
 /.enonic
 /yarn-error.log
