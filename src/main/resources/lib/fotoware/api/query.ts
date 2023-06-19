@@ -124,15 +124,18 @@ export function query(params: {
 		//rest
 	}) => { // False gets removed
 		//log.debug(`rest:${toStr(rest)}`);
+		// log.debug('assetCount:%s', toStr(assetCount));
 		if (!assetCount) {
 			//log.debug(`No hits collectionId:${toStr(collectionId)}`);
 			return false;
 		}
+		// log.debug('whitelistedCollections:%s', toStr(whitelistedCollections));
 		if (Object.keys(whitelistedCollections).length) {
 			const whiteListed = whitelistedCollections[collectionId];
 			//log.debug(`collectionId:${toStr(collectionId)} whiteListed:${toStr(whiteListed)}`);
 			return whiteListed;
 		}
+		// log.debug('blacklistedCollections:%s', toStr(blacklistedCollections));
 		if (Object.keys(blacklistedCollections).length && blacklistedCollections[collectionId]) {
 			//log.debug(`Blacklisted collectionId:${toStr(collectionId)}`);
 			return false;
@@ -146,6 +149,7 @@ export function query(params: {
 	}) => {
 		//log.debug(`href:${toStr(href)}`); // /fotoweb/archives/5000-Archive/?q=
 		assetCountTotal += assetCount;
+		// log.debug('metadataHrefs:%s', toStr(metadataHrefs));
 		if (!metadataHrefs[collectionMetadataHref]) {
 			//log.debug(`New metadataEditor in collection ${collectionId} href:${collectionMetadataHref}`);
 			metadataHrefs[collectionMetadataHref] = true;
