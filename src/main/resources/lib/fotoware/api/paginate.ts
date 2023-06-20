@@ -8,6 +8,7 @@ import type {
 import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request as send} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export function paginate<
@@ -23,10 +24,10 @@ export function paginate<
 	hostname: string
 	request: HttpClient.Request
 }) {
-	//log.debug(`request:${toStr(request)}`);
+	DEBUG_REQUESTS && log.debug('paginate request:%s', toStr(request));
 
 	let response = send(request) as HttpClient.Response;
-	//log.debug(`response:${toStr(response)}`);
+	DEBUG_REQUESTS && log.debug('paginate response:%s', toStr(response));
 
 	if (!response.body) {
 		log.error('response.body is empty request:%s response:%s', toStr(request), toStr(response));

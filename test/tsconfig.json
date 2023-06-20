@@ -5,8 +5,9 @@
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"paths": {
-			"/lib/*": ["../src/main/resources/lib/*"],
-			"/webapp/*": ["../src/main/resources/webapp/*"],
+			// "/lib/*": ["../src/main/resources/lib/*"],
+			// "/webapp/*": ["../src/main/resources/webapp/*"],
+			"/*": ["../src/main/resources/*"],
 		},
 		"target": "ES5"
 	}

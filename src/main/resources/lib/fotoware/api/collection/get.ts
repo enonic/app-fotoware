@@ -4,6 +4,7 @@ import type { HttpClient } from '/lib/fotoware';
 import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export const getCollection = ({
@@ -30,9 +31,9 @@ export const getCollection = ({
 			access_token: accessToken
 		};
 	}
-	//log.debug(`collectionRequestParams:${toStr(collectionRequestParams)}`);
+	DEBUG_REQUESTS && log.debug('collectionRequestParams:%s', toStr(collectionRequestParams));
 	const collectionResponse = request(collectionRequestParams);
-	//log.debug(`collectionResponse:${toStr(collectionResponse)}`);
+	DEBUG_REQUESTS && log.debug('collectionResponse:%s', toStr(collectionResponse));
 
 	let collectionResponseBodyObj;
 	try {

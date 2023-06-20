@@ -13,6 +13,7 @@ import type {
 import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export const requestRendition = ({
@@ -93,9 +94,9 @@ export const requestRendition = ({
 		//log.debug(`cookies:${toStr(cookies)}`);
 		(renditionServiceRequestParams.headers as Record<string,string>)['Cookie'] = cookies.map(({name, value}) => `${name}=${value}`).join('; ');
 	}
-	//log.info(`renditionServiceRequestParams:${toStr(renditionServiceRequestParams)}`);
+	DEBUG_REQUESTS && log.info('renditionServiceRequestParams:%s', toStr(renditionServiceRequestParams));
 	const renditionServiceResponse = request(renditionServiceRequestParams) as Response;
-	//log.debug(`renditionServiceResponse:${toStr(renditionServiceResponse)}`);
+	DEBUG_REQUESTS && log.debug('renditionServiceResponse:%s', toStr(renditionServiceResponse));
 
 	if (renditionServiceResponse.status !== 202) {
 		//if (renditionServiceResponse.status !== 415) {

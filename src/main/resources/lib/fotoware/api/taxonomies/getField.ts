@@ -1,6 +1,7 @@
 import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export function getTaxonomyField({
@@ -27,10 +28,10 @@ export function getTaxonomyField({
 		},
 		url: `${hostname}/taxonomies/${fieldId}/`
 	};
-	//log.debug(`getTaxonomiesFieldRequest:${toStr(getTaxonomiesFieldRequest)}`);
+	DEBUG_REQUESTS && log.debug('getTaxonomiesFieldRequest:%s', toStr(getTaxonomiesFieldRequest));
 
 	const getTaxonomiesFieldResponse = request(getTaxonomiesFieldRequest);
-	//log.debug(`getTaxonomiesFieldResponse:${toStr(getTaxonomiesFieldResponse)}`);
+	DEBUG_REQUESTS && log.debug('getTaxonomiesFieldResponse:%s', toStr(getTaxonomiesFieldResponse));
 
 	if (getTaxonomiesFieldResponse.status === 404) {
 		return {};

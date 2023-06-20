@@ -6,6 +6,7 @@ import type { Metadata } from '/lib/fotoware';
 import { toStr } from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations
 import { request } from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 /*
 
@@ -59,10 +60,10 @@ export function assetUpdate({
 		//url: `${fullAssetUrl}.metadata` // 404 FolderNotFound
 		//url: `${fullAssetUrl}.meta`
 	};
-	log.debug(`assetUpdateRequestParams:${toStr(assetUpdateRequestParams)}`);
+	DEBUG_REQUESTS && log.debug('assetUpdateRequestParams:%s', toStr(assetUpdateRequestParams));
 
 	const assetUpdateResponse = request(assetUpdateRequestParams);
-	log.debug(`assetUpdateResponse:${toStr(assetUpdateResponse)}`);
+	DEBUG_REQUESTS && log.debug('assetUpdateResponse:%s', toStr(assetUpdateResponse));
 
 	// 405 Method Not Allowed
 

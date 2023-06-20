@@ -4,6 +4,7 @@ import type { HttpClient } from '/lib/fotoware';
 import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export const getAssetList = ({
@@ -27,9 +28,9 @@ export const getAssetList = ({
 			access_token: accessToken
 		};
 	}
-	//log.debug(`assetListRequestParams:${toStr(assetListRequestParams)}`);
+	DEBUG_REQUESTS && log.debug('assetListRequestParams:%s', toStr(assetListRequestParams));
 	const assetListResponse = request(assetListRequestParams);
-	//log.debug(`assetListResponse:${toStr(assetListResponse)}`);
+	DEBUG_REQUESTS && log.debug('assetListResponse:%s', toStr(assetListResponse));
 
 	if (assetListResponse.status !== 200) {
 		throw new Error(`Something went wrong when trying to get assetList assetListRequestParams:${toStr(assetListRequestParams)} assetListListResponse:${toStr(assetListResponse)}`);

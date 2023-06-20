@@ -55,10 +55,11 @@ import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
+import {DEBUG_INCOMING_REQUESTS} from '/constants';
 
 
 export const assetDeleted = (request: Request) => {
-	//log.info(`request:${toStr(request)}`);
+	DEBUG_INCOMING_REQUESTS && log.debug('assetDeleted request:%s', toStr(request));
 
 	const licenseDetails = validateLicense({appKey: app.name});
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);

@@ -9,6 +9,7 @@ import type {
 import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 /*import {
 	//base64Encode,
 	base64UrlDecode
@@ -57,9 +58,9 @@ export const getAccessToken = ({
 		},
 		url: `${hostname}/fotoweb/oauth2/token`
 	};
-	//log.debug(`tokenRequestParams:${toStr(tokenRequestParams)}`);
+	DEBUG_REQUESTS && log.debug('tokenRequestParams:%s', toStr(tokenRequestParams));
 	const tokenResponse = request(tokenRequestParams);
-	//log.debug(`tokenResponse:${toStr(tokenResponse)}`);
+	DEBUG_REQUESTS && log.debug('tokenResponse:%s', toStr(tokenResponse));
 	const {
 		//cookies,
 		//contentType, // application/json
