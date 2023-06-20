@@ -47,6 +47,7 @@ import {JavaBridge} from '@enonic/mock-xp';
 //──────────────────────────────────────────────────────────────────────────────
 // Constants
 //──────────────────────────────────────────────────────────────────────────────
+const MD5SUM = 'md5Sum';
 const remoteAddressLegal1 = '192.168.1.1';
 const remoteAddressLegal2 = '172.16.0.0';
 // const remoteAddressIllegal = '10.0.0.1';
@@ -72,8 +73,8 @@ global.app.config = {
 
 // @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
-	loglevel: 'debug'
-	// loglevel: 'info'
+	// loglevel: 'debug'
+	loglevel: 'info'
 	// loglevel: 'warn'
 	// loglevel: 'error'
 	// loglevel: 'silent'
@@ -128,7 +129,7 @@ function mockLicense({expired}: {expired: boolean}) {
 
 
 jest.mock('/lib/text-encoding', () => ({
-	md5: jest.fn().mockReturnValue('md5Sum')
+	md5: jest.fn().mockReturnValue(MD5SUM)
 }), { virtual: true });
 
 
@@ -2335,7 +2336,50 @@ jest.mock('/lib/http-client', () => ({
 							"filesize": 104448,
 							"href": "/fotoweb/archives/5000-All-files/Folder%2019/Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp.info",
 							"linkstance": "/fotoweb/archives/5000-All-files/Folder%2019/Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp.info",
-							"metadata": {},
+							"metadata": {
+								"110": {
+									"value": "Credit"
+								},
+								"115": {
+									"value": "Source"
+								},
+								"116": {
+									"value": "Copyright"
+								},
+								"120": {
+									"value": "Description"
+								},
+								"25": {
+									"value": [
+										"Tag1",
+										"Tag2"
+									]
+								},
+								"254": {
+									"value": "User defined 254"
+								},
+								"40": {
+									"value": "Special Instructions"
+								},
+								"5": {
+									"value": "Title"
+								},
+								"80": {
+									"value": [
+										"Author",
+										"Author2"
+									]
+								},
+								"819": {
+									"value": "Consent status"
+								},
+								"820": {
+									"value": [
+										"Person1",
+										"Person2"
+									]
+								}
+							},
 							"metadataeditcount": 0,
 							"metadataEditor": {
 								"href": "/fotoweb/editors/260ef215-1a1c-4218-b5fb-3837eeafa1a0",
@@ -2680,6 +2724,96 @@ describe('webapp', () => {
 					contentType: 'application/json;charset=utf-8',
 					status: 200
 				});
+				const id = xpPathToId['/content/EnonicWare/Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp'];
+				expect(id).toBeDefined();
+				if (id) {
+					const node = connection.get(id);
+					expect(node).toStrictEqual({
+						_id: id,
+						// @ts-ignore
+						_indexConfig: node['_indexConfig'],
+						_childOrder: 'modifiedtime DESC',
+						//_indexConfig // Not important for this test
+						_inheritsPermissions: true,
+						_name: 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
+						_path: '/content/EnonicWare/Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
+						// _permissions // Not important for this test
+						_nodeType: 'content',
+						_state: 'DEFAULT',
+						// @ts-ignore
+						_ts: node['_ts'],
+						// @ts-ignore
+						_versionKey: node['_versionKey'],
+						attachment: {
+							binary: 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
+							label: 'source',
+							mimeType: 'image/webp',
+							name: 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
+							size: 103506,
+							sha512: 'sha512'
+						},
+						creator: 'user:system:cwe',
+						createdTime: '2023-05-26T12:40:03.693253Z',
+						data: {
+							artist: [
+								'Author',
+								'Author2',
+							],
+							caption: '',
+							copyright: 'Copyright',
+							fotoWare: {
+								md5sum: MD5SUM,
+								metadata: {
+									110: 'Credit',
+									115: 'Source',
+									116: 'Copyright',
+									120: 'Description',
+									25: [
+										'Tag1',
+										'Tag2'
+									],
+									254: 'User defined 254',
+									40: 'Special Instructions',
+									5: 'Title',
+									80: [
+										'Author',
+										'Author2'
+									],
+									819: 'Consent status'
+								}
+							},
+							media: {
+								attachment: 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
+								focalPoint: {
+									x: 0.5,
+									y: 0.5
+								}
+							},
+							tags: [
+								'Tag1',
+								'Tag2'
+							]
+						},
+						displayName: 'Title',
+						modifier: 'user:system:cwe',
+						modifiedTime: '2023-05-26T12:40:03.693253Z',
+						owner: 'user:system:cwe',
+						type: 'media:image',
+						valid: true,
+						x: {
+							media: {
+								imageInfo: {
+									byteSize: 103506,
+									contentType: 'image/webp',
+									description: 'Description',
+									imageHeight: 600,
+									imageWidth: 480,
+									pixelSize: 288000,
+								}
+							}
+						}
+					});
+				}
 			});
 		});
 
