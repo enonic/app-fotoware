@@ -55,7 +55,10 @@ import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
-import {DEBUG_INCOMING_REQUESTS} from '/constants';
+import {
+	CHECK_REMOTE_ADDRESS,
+	DEBUG_INCOMING_REQUESTS
+} from '/constants';
 
 
 export const assetDeleted = (request: Request) => {
@@ -157,7 +160,7 @@ export const assetDeleted = (request: Request) => {
 	//log.debug(`clientId:${toStr(clientId)}`);
 	//log.debug(`clientSecret:${toStr(clientSecret)}`);
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
-	if (!Object.keys(remoteAddresses).includes(remoteAddress)) {
+	if (CHECK_REMOTE_ADDRESS && !Object.keys(remoteAddresses).includes(remoteAddress)) {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}

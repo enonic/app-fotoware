@@ -51,7 +51,10 @@ import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
-import {DEBUG_INCOMING_REQUESTS} from '/constants';
+import {
+	CHECK_REMOTE_ADDRESS,
+	DEBUG_INCOMING_REQUESTS
+} from '/constants';
 
 
 //const CRON_DELAY = 1000 * 60; // A minute in milliseconds
@@ -155,7 +158,7 @@ export const assetIngested = (request: Request) => {
 	//log.debug(`clientId:${toStr(clientId)}`);
 	//log.debug(`clientSecret:${toStr(clientSecret)}`);
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
-	if (!arrayIncludes(Object.keys(remoteAddresses), remoteAddress)) {
+	if (CHECK_REMOTE_ADDRESS && !arrayIncludes(Object.keys(remoteAddresses), remoteAddress)) {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}
