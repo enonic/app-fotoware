@@ -31,14 +31,15 @@ import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 // FotoWare modules
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {buildLicensedTo} from '/lib/fotoware/xp/buildLicensedTo';
-import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid'
+import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid';
+import {DEBUG_INCOMING_REQUESTS} from '/constants';
 
 
 const A_MINUTE_IN_MS = 60 * 1000;
 
 
 export const assetModified = (request: Request) => {
-	//log.debug(`request:${toStr(request)}`);
+	DEBUG_INCOMING_REQUESTS && log.debug('assetModified request:%s', toStr(request));
 
 	const licenseDetails = validateLicense({appKey: app.name});
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);

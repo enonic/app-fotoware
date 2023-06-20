@@ -1,6 +1,7 @@
 import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export const getPublicAPIDescriptor = ({
@@ -18,10 +19,10 @@ export const getPublicAPIDescriptor = ({
 		},
 		url: `${hostname}/fotoweb/`
 	};
-	//log.debug(`publicAPIDescriptorRequestParams:${toStr(publicAPIDescriptorRequestParams)}`);
+	DEBUG_REQUESTS && log.debug('publicAPIDescriptorRequestParams:%s', toStr(publicAPIDescriptorRequestParams));
 
 	const publicAPIDescriptorResponse = request(publicAPIDescriptorRequestParams);
-	//log.debug(`publicAPIDescriptorResponse:${toStr(publicAPIDescriptorResponse)}`);
+	DEBUG_REQUESTS && log.debug('publicAPIDescriptorResponse:%s', toStr(publicAPIDescriptorResponse));
 
 	let publicAPIDescriptorResponseBodyObj;
 	try {

@@ -51,13 +51,14 @@ import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
+import {DEBUG_INCOMING_REQUESTS} from '/constants';
 
 
 //const CRON_DELAY = 1000 * 60; // A minute in milliseconds
 
 
 export const assetIngested = (request: Request) => {
-	log.info(`request:${toStr(request)}`);
+	DEBUG_INCOMING_REQUESTS && log.info('assetIngested request:%s', toStr(request));
 
 	const licenseDetails = validateLicense({appKey: app.name});
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);

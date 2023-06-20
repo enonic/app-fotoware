@@ -16,6 +16,7 @@ import {
 import deepEqual from 'fast-deep-equal';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export const getMetadataView = ({
@@ -43,9 +44,9 @@ export const getMetadataView = ({
 			access_token: accessToken
 		};
 	}
-	//log.debug(`metadataViewRequestParams:${toStr(metadataViewRequestParams)}`);
+	DEBUG_REQUESTS && log.debug('metadataViewRequestParams:%s', toStr(metadataViewRequestParams));
 	const metadataViewResponse = request(metadataViewRequestParams);
-	//log.debug(`metadataViewResponse:${toStr(metadataViewResponse)}`);
+	DEBUG_REQUESTS && log.debug('metadataViewResponse:%s', toStr(metadataViewResponse));
 
 	let metadataViewResponseBodyObj: MetadataView;
 	try {

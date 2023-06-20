@@ -8,6 +8,7 @@ import type {
 import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export const getPrivateFullAPIDescriptor = ({
@@ -31,10 +32,10 @@ export const getPrivateFullAPIDescriptor = ({
 		},
 		url: `${hostname}/fotoweb/me/`
 	};
-	//log.debug(`privateFullAPIDescriptorRequestParams:${toStr(privateFullAPIDescriptorRequestParams)}`);
+	DEBUG_REQUESTS && log.debug('privateFullAPIDescriptorRequestParams:%s', toStr(privateFullAPIDescriptorRequestParams));
 
 	const privateFullAPIDescriptorResponse = request(privateFullAPIDescriptorRequestParams);
-	//log.debug(`privateFullAPIDescriptorResponse:${toStr(privateFullAPIDescriptorResponse)}`);
+	DEBUG_REQUESTS && log.debug('privateFullAPIDescriptorResponse:%s', toStr(privateFullAPIDescriptorResponse));
 
 	let privateFullAPIDescriptorResponseBodyObj;
 	try {
@@ -42,7 +43,7 @@ export const getPrivateFullAPIDescriptor = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! privateFullAPIDescriptorResponse:${toStr(privateFullAPIDescriptorResponse)}`);
 	}
-	//log.debug(`privateFullAPIDescriptorResponseBodyObj:${toStr(privateFullAPIDescriptorResponseBodyObj)}`);
+	// log.debug('privateFullAPIDescriptorResponseBodyObj:%s', toStr(privateFullAPIDescriptorResponseBodyObj));
 
 	const {
 		archives: archivesPath,

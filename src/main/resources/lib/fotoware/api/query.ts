@@ -21,6 +21,7 @@ import {paginate} from '/lib/fotoware/api/paginate';
 import {camelize} from '/lib/fotoware/xp/camelize';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
+import {DEBUG_REQUESTS} from '/constants';
 
 
 export interface CollectionObj {
@@ -77,10 +78,10 @@ export function query(params: {
 		},*/
 		url
 	}
-	//log.debug(`queryRequest:${toStr(queryRequest)}`);
+	DEBUG_REQUESTS && log.debug('queryRequest:%s', toStr(queryRequest));
 
 	const queryRequestResponse = request(queryRequest);
-	//log.debug(`queryRequestResponse:${toStr(queryRequestResponse)}`);
+	DEBUG_REQUESTS && log.debug('queryRequestResponse:%s', toStr(queryRequestResponse));
 
 	if (queryRequestResponse.status !== 200) {
 		log.error(`Something went wrong when querying:${q} response:${toStr(queryRequestResponse)}`);
