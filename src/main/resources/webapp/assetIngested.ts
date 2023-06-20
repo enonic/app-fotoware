@@ -150,6 +150,9 @@ export const assetIngested = (request: Request) => {
 		archiveName,
 		clientId,
 		clientSecret,
+		metadata: {
+			mappings
+		},
 		properties,
 		remoteAddresses,
 		url: hostname,
@@ -339,6 +342,7 @@ export const assetIngested = (request: Request) => {
 							modifyMediaContent({
 								//exisitingMediaContent: createMediaResult, // No, keep in create mode
 								key: createMediaResult._path,
+								mappings,
 								md5sum: md5sumOfDownload,
 								metadata,
 								properties
@@ -388,6 +392,7 @@ export const assetIngested = (request: Request) => {
 
 							const maybeModifiedMediaContent = updateMetadataOnContent({
 								content: JSON.parse(JSON.stringify(exisitingMediaContent)), // deref so exisitingMediaContent can't be modified
+								mappings,
 								md5sum: md5sumOfDownload,
 								metadata,
 								modify: true, // TODO shouldn't this be false, since ingest is create and not modify???
@@ -400,6 +405,7 @@ export const assetIngested = (request: Request) => {
 								modifyMediaContent({
 									exisitingMediaContent,
 									key: exisitingMediaContent._path,
+									mappings,
 									md5sum: md5sumOfDownload,
 									metadata,
 									properties

@@ -1,4 +1,5 @@
 import type {
+	Mappings,
 	MediaContent,
 	Metadata,
 	Response,
@@ -14,6 +15,7 @@ import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 interface HandleMissingMediaContent {
 	readonly downloadRenditionResponse: Response
 	readonly fileNameNew: string
+	mappings: Mappings
 	readonly metadata: Metadata
 	readonly md5sumOfDownload: string
 	readonly path: string
@@ -24,6 +26,7 @@ interface HandleMissingMediaContent {
 export function handleMissingMediaContent({
 	downloadRenditionResponse,
 	fileNameNew,
+	mappings,
 	metadata,
 	md5sumOfDownload,
 	path,
@@ -43,6 +46,7 @@ export function handleMissingMediaContent({
 	modifyMediaContent({
 		exisitingMediaContent: createMediaResult,
 		key: createMediaResult._path,
+		mappings,
 		md5sum: md5sumOfDownload,
 		metadata,
 		properties

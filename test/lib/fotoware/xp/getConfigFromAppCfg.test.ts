@@ -13,6 +13,7 @@ import { getConfigFromAppCfg } from '/lib/fotoware/xp/getConfigFromAppCfg';
 
 // @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
+	// loglevel: 'debug'
 	loglevel: 'silent'
 });
 
@@ -46,7 +47,12 @@ describe('lib', () => {
 						'sites.enonic.clientId': 'clientId',
 						'sites.enonic.clientSecret': 'clientSecret',
 						'sites.enonic.allowWebhookFromIp': '13.95.161.205,127.0.0.1',
-						'sites.enonic.url': 'https://enonic.fotoware.cloud'
+						'sites.enonic.url': 'https://enonic.fotoware.cloud',
+						'sites.enonic.metadata.mappings.5': 'displayName',
+						'sites.enonic.metadata.mappings.25': 'data.tags',
+						'sites.enonic.metadata.mappings.80': 'data.artist',
+						'sites.enonic.metadata.mappings.116': 'data.copyright',
+						'sites.enonic.metadata.mappings.120': 'x.media.imageInfo.description,data.altText',
 					};
 					expect(getConfigFromAppCfg()).toStrictEqual({
 						sitesConfigs:{
@@ -61,6 +67,18 @@ describe('lib', () => {
 										query: '(fn:.gif|fn:.jpg|fn:.jpeg|fn:.png|fn:*.svg)AND NOT(25:notforweb)',
 										rendition: 'Original File',
 									},
+								},
+								metadata: {
+									mappings: {
+										5: 'displayName',
+										25: 'data.tags',
+										80: 'data.artist',
+										116: 'data.copyright',
+										120: [
+											'x.media.imageInfo.description',
+											'data.altText',
+										]
+									}
 								},
 								properties: {
 									artist: 'ifChanged',

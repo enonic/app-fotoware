@@ -39,6 +39,9 @@ export function run({
 		archiveName,
 		clientId,
 		clientSecret,
+		metadata: {
+			mappings
+		},
 		properties,
 		url: hostname,
 		imports
@@ -80,6 +83,7 @@ export function run({
 			fileNameNew,
 			fileNameOld,
 			hostname,
+			mappings,
 			path,
 			project,
 			properties,

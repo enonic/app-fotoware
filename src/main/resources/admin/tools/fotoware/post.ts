@@ -126,6 +126,7 @@ export function post(request: Request<{
 					archiveName,
 					clientId,
 					clientSecret,
+					metadata,
 					properties,
 					url,
 					imports = {}
@@ -187,6 +188,9 @@ export function post(request: Request<{
 							clientId,
 							clientSecret,
 							importName,
+							json: JSON.stringify({
+								metadata
+							}),
 							path,
 							project,
 							propertyArtist: properties.artist,

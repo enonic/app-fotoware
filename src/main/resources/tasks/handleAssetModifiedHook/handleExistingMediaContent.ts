@@ -1,5 +1,6 @@
 import type {
 	Filename,
+	Mappings,
 	MediaContent,
 	Metadata,
 	Project,
@@ -50,6 +51,7 @@ interface HandleExistingMediaContent {
 	downloadRenditionResponse: Response
 	fileNameNew: Filename
 	fileNameOld: Filename
+	mappings: Mappings
 	md5sumOfDownload: string
 	metadata: Metadata
 	project: Project
@@ -62,6 +64,7 @@ export function handleExistingMediaContent({
 	downloadRenditionResponse,
 	fileNameNew,
 	fileNameOld,
+	mappings,
 	md5sumOfDownload,
 	metadata,
 	project,
@@ -180,6 +183,7 @@ export function handleExistingMediaContent({
 
 	const maybeModifiedMediaContent = updateMetadataOnContent({
 		content: JSON.parse(JSON.stringify(exisitingMediaContent)), // deref so exisitingMediaContent can't be modified
+		mappings,
 		md5sum: md5sumOfDownload,
 		metadata,
 		modify: true,
@@ -193,6 +197,7 @@ export function handleExistingMediaContent({
 		modifyMediaContent({
 			exisitingMediaContent,
 			key: exisitingMediaContent._path,
+			mappings,
 			md5sum: md5sumOfDownload,
 			metadata,
 			properties

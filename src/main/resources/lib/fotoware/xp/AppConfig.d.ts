@@ -32,6 +32,13 @@ export interface SiteConfigProperties {
 	readonly description: SiteConfigPropertyValue
 	readonly displayName: SiteConfigPropertyValue
 	readonly tags: SiteConfigPropertyValue
+	[xpPath: string]: SiteConfigPropertyValue
+}
+
+export type Mappings = Record<number|string,string|string[]>
+
+export interface Metadata {
+	mappings: Mappings
 }
 
 export interface SiteConfig {
@@ -40,6 +47,7 @@ export interface SiteConfig {
 	readonly clientId: ClientId
 	readonly clientSecret: ClientSecret
 	imports: Imports // Not readonly
+	metadata: Metadata
 	readonly properties: SiteConfigProperties
 	readonly remoteAddresses: RemoteAddresses
 	readonly url: string

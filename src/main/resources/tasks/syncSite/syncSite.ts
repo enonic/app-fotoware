@@ -1,5 +1,6 @@
 import type {
 	Journal,
+	Mappings,
 	MediaContent,
 	TaskNodeData,
 	SiteConfigPropertyValue
@@ -85,6 +86,7 @@ export function run(params: {
 	clientId: string
 	clientSecret: string
 	importName: string
+	json: string
 	path: string
 	project: string
 	propertyArtist: SiteConfigPropertyValue
@@ -106,6 +108,7 @@ export function run(params: {
 		clientId,
 		clientSecret,
 		importName,
+		json,
 		path,
 		project,
 		propertyArtist,// = PROPERTY_IF_CHANGED,
@@ -119,6 +122,25 @@ export function run(params: {
 		taskNodeId,
 		url
 	} = params;
+
+	let obj: {
+		metadata: {
+			mappings: Mappings
+		}
+	};
+	try {
+		obj = JSON.parse(json);
+	} catch(e) {
+		log.error(`Failed to parse json:${json}`, e)
+		throw new Error('Failed to parse json');
+	}
+
+	const {
+		metadata: {
+			mappings
+		}
+	} = obj;
+
 	//log.debug(`propertyArtist:${propertyArtist}`);
 	//log.debug(`propertyCopyright:${propertyCopyright}`);
 	//log.debug(`propertyDescription:${propertyDescription}`);
@@ -389,6 +411,7 @@ export function run(params: {
 								filename,
 								hostname: url,
 								journal,
+								mappings,
 								metadata,
 								path,
 								properties,
@@ -404,6 +427,7 @@ export function run(params: {
 								filename,
 								hostname: url,
 								journal,
+								mappings,
 								metadata,
 								project,
 								properties,

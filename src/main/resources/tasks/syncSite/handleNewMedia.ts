@@ -1,4 +1,5 @@
 import type {
+	Mappings,
 	Journal,
 	Metadata,
 	SiteConfig
@@ -21,6 +22,7 @@ export function handleNewMedia({
 	filename,
 	hostname,
 	journal,
+	mappings,
 	metadata,
 	path,
 	properties,
@@ -32,6 +34,7 @@ export function handleNewMedia({
 	filename: string
 	hostname: string
 	journal: Journal
+	mappings: Mappings
 	metadata: Metadata
 	path: string
 	properties: SiteConfig['properties']
@@ -82,6 +85,7 @@ export function handleNewMedia({
 		const md5sum = md5(readText(downloadRenditionResponse.bodyStream));
 		modifyMediaContent({
 			key: createMediaResult._id,
+			mappings,
 			md5sum,
 			metadata,
 			properties

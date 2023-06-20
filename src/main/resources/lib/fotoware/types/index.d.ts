@@ -32,6 +32,7 @@ export type {
 	ClientId,
 	ClientSecret,
 	Import,
+	Mappings,
 	Path,
 	Project,
 	Query,

@@ -1,4 +1,5 @@
 import type {
+	Mappings,
 	MediaContent,
 	Metadata,
 	SiteConfigProperties
@@ -29,11 +30,13 @@ export const modifyMediaContent = ({
 	exisitingMediaContent, // is undefined when creating
 	key,
 	md5sum,
+	mappings,
 	metadata,
 	properties
 }: {
 	exisitingMediaContent?: Partial<MediaContent>
 	key: string
+	mappings: Mappings
 	md5sum: string
 	metadata: Metadata
 	properties: SiteConfigProperties
@@ -44,6 +47,7 @@ export const modifyMediaContent = ({
 			key,
 			editor: (content) => updateMetadataOnContent({
 				content,
+				mappings,
 				md5sum,
 				metadata,
 				modify: !!exisitingMediaContent,

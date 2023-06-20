@@ -1,10 +1,21 @@
-import type { PageComponent } from '@enonic-types/core';
-import type {MediaContent} from '/lib/fotoware/xp/MediaContent.d';
+import type {
+	NestedRecord,
+	PageComponent
+} from '@enonic-types/core';
+import type {
+	Mappings,
+	MediaContent,
+	SiteConfigProperties
+} from '/lib/fotoware';
 import type {sanitize} from '@enonic-types/lib-common';
 
 
 import Log from '@enonic/mock-xp/dist/Log';
-import {hasOwnProperty} from '@enonic/js-utils';
+import {
+	deleteIn,
+	hasOwnProperty,
+	setIn
+} from '@enonic/js-utils';
 import {
 	describe,
 	expect,
@@ -20,23 +31,22 @@ import {
 	X_APP_NAME
 } from '/lib/fotoware/xp/constants';
 import { updateMetadataOnContent } from '/lib/fotoware/xp/updateMetadataOnContent';
-import { SiteConfigProperties } from '/lib/fotoware/xp/AppConfig';
 
 
-declare global {
-	interface XpXData {
-		media?: {
-			imageInfo?: {
-				byteSize?: number
-				contentType?: string
-				description?: string
-				imageHeight?: number
-				imageWidth?: number
-				pixelSize?: number
-			}
-		}
-	}
-}
+// declare global {
+// 	interface XpXData {
+// 		media?: {
+// 			imageInfo?: {
+// 				byteSize?: number
+// 				contentType?: string
+// 				description?: string
+// 				imageHeight?: number
+// 				imageWidth?: number
+// 				pixelSize?: number
+// 			}
+// 		}
+// 	}
+// }
 
 
 function deref<T>(obj: T): T {
@@ -61,6 +71,8 @@ global.app.config = {
 
 // @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
+	// loglevel: 'debug'
+	// loglevel: 'info'
 	loglevel: 'silent'
 });
 
@@ -68,14 +80,48 @@ jest.mock('/lib/xp/common', () => ({
 	sanitize: jest.fn<typeof sanitize>((text) => text)
 }), { virtual: true });
 
+const MAPPINGS: Mappings = {
+	5: 'displayName',
+	25: 'data.tags',
+	80: 'data.artist',
+	116: 'data.copyright',
+	120: [
+		'x.media.imageInfo.description',
+		'data.altText',
+	]
+};
+
 
 const PROPERTY_POLICY: SiteConfigProperties = {
 	displayName: PROPERTY_ON_CREATE,
+	//altText: PROPERTY_IF_CHANGED,
 	artist: PROPERTY_IF_CHANGED,
 	copyright: PROPERTY_OVERWRITE,
 	tags: PROPERTY_IF_CHANGED,
 	description: PROPERTY_IF_CHANGED
 };
+
+
+const METADATA_VALUE_5_ORIG_FROM_FW = '5 (title displayname) original value from FotoWare';
+const METADATA_VALUE_25_ORIG_FROM_FW = '25 (tags) original value from FotoWare';
+const METADATA_VALUE_80_ORIG_FROM_FW = '80 (author artist) original value from FotoWare';
+const METADATA_VALUE_116_ORIG_FROM_FW = '116 (copyright) original value from FotoWare';
+const METADATA_VALUE_120_ORIG_FROM_FW = '120 (description) original value from FotoWare';
+
+const METADATA_VALUE_5_CHANGED_FROM_FW = '5 (title displayname) changed value from FotoWare';
+// const METADATA_VALUE_25_CHANGED_FROM_FW = '25 (tags) changed value from FotoWare';
+// const METADATA_VALUE_80_CHANGED_FROM_FW = '80 (author artist) changed value from FotoWare';
+// const METADATA_VALUE_116_CHANGED_FROM_FW = '116 (copyright) changed value from FotoWare';
+// const METADATA_VALUE_120_CHANGED_FROM_FW = '120 (description) changed value from FotoWare';
+
+
+const VALUE_DISPLAYNAME_5_CHANGED_IN_XP = '5 (title displayname) changed value in Enonic XP';
+const VALUE_TAGS_25_CHANGED_IN_XP = '25 (tags) original changed in Enonic XP';
+const VALUE_ARTIST_80_CHANGED_IN_XP = '80 (author artist) changed value in Enonic XP';
+const VALUE_COPYRIGHT_116_CHANGED_IN_XP = '116 (copyright) changed value in Enonic XP';
+const VALUE_DESCRIPTION_120_CHANGED_IN_XP = '120 (description) changed value in Enonic XP';
+const VALUE_ALTTEXT_120_CHANGED_IN_XP = '120 (alttext description) changed value in Enonic XP';
+
 
 
 const MEDIA_CONTENT_WITHOUT_METADATA: MediaContent = {
@@ -137,26 +183,27 @@ const NEW_MEDIA_CONTENT: MediaContent = {
 	...deref(MEDIA_CONTENT_WITHOUT_METADATA),
 	data: {
 		...deref(MEDIA_CONTENT_WITHOUT_METADATA.data),
-		artist: '80 original value from FotoWare',
-		copyright: '116 original value from FotoWare',
+		altText: METADATA_VALUE_120_ORIG_FROM_FW,
+		artist: METADATA_VALUE_80_ORIG_FROM_FW,
+		copyright: METADATA_VALUE_116_ORIG_FROM_FW,
 		fotoWare: {
 			md5sum: '1',
 			metadata: {
-				'116': '116 original value from FotoWare',
-				'120': '120 original value from FotoWare',
-				'25': '25 original value from FotoWare',
-				'5': '5 original value from FotoWare',
-				'80': '80 original value from FotoWare'
+				'116': METADATA_VALUE_116_ORIG_FROM_FW,
+				'120': METADATA_VALUE_120_ORIG_FROM_FW,
+				'25': METADATA_VALUE_25_ORIG_FROM_FW,
+				'5': METADATA_VALUE_5_ORIG_FROM_FW,
+				'80': METADATA_VALUE_80_ORIG_FROM_FW
 			}
 		},
-		tags: '25 original value from FotoWare'
+		tags: METADATA_VALUE_25_ORIG_FROM_FW
 	} as MediaContent['data'],
-	displayName: '5 original value from FotoWare',
+	displayName: METADATA_VALUE_5_ORIG_FROM_FW,
 	x: {
 		media: {
 			imageInfo: {
 				...MEDIA_CONTENT_WITHOUT_METADATA.x['media']?.['imageInfo'],
-				description: '120 original value from FotoWare',
+				description: METADATA_VALUE_120_ORIG_FROM_FW,
 			}
 		}
 	} as XpXData
@@ -168,17 +215,18 @@ const MEDIA_CONTENT_CHANGED_IN_XP: MediaContent = {
 	...deref(NEW_MEDIA_CONTENT),
 	data: {
 		...NEW_MEDIA_CONTENT.data,
-		artist: 'artist changed value in Enonic XP',
+		altText: VALUE_ALTTEXT_120_CHANGED_IN_XP,
+		artist: VALUE_ARTIST_80_CHANGED_IN_XP,
 		caption: 'caption added value in Enonic XP',
-		copyright: 'copyright changed value in Enonic XP',
-		tags: 'tags changed value in Enonic XP'
+		copyright: VALUE_COPYRIGHT_116_CHANGED_IN_XP,
+		tags: VALUE_TAGS_25_CHANGED_IN_XP
 	} as MediaContent['data'],
-	displayName: 'displayName changed value in Enonic XP',
+	displayName: VALUE_DISPLAYNAME_5_CHANGED_IN_XP,
 	x: {
 		media: {
 			imageInfo: {
 				...NEW_MEDIA_CONTENT.x['media']?.['imageInfo'],
-				description: 'description changed value in Enonic XP',
+				description: VALUE_DESCRIPTION_120_CHANGED_IN_XP,
 			}
 		}
 	} as XpXData
@@ -194,13 +242,14 @@ describe('lib', () => {
 				test('it adds metadata on new media content', () => {
 					expect(updateMetadataOnContent({
 						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							5: { value: '5 original value from FotoWare' },
-							25: { value: '25 original value from FotoWare' },
-							80: { value: '80 original value from FotoWare' },
-							116: { value: '116 original value from FotoWare' },
-							120: { value: '120 original value from FotoWare' }
+							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
+							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
+							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
 						properties: PROPERTY_POLICY
@@ -212,11 +261,11 @@ describe('lib', () => {
 				// 		content: MEDIA_CONTENT_CHANGED_IN_XP,
 				// 		md5sum: '1',
 				// 		metadata: {
-				// 			5: { value: '5 original value from FotoWare' },
-				// 			25: { value: '25 original value from FotoWare' },
-				// 			80: { value: '80 original value from FotoWare' },
-				// 			116: { value: '116 original value from FotoWare' },
-				// 			120: { value: '120 original value from FotoWare' }
+				// 			5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
+				// 			25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
+				// 			80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
+				// 			116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+				// 			120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 				// 		},
 				// 		// modify: true,
 				// 		properties: PROPERTY_POLICY
@@ -228,13 +277,14 @@ describe('lib', () => {
 						...deref(MEDIA_CONTENT_CHANGED_IN_XP),
 						data: {
 							...deref(MEDIA_CONTENT_CHANGED_IN_XP.data),
+							altText: '120 changed value from FotoWare',
 							artist: '80 changed value from FotoWare',
 							caption: 'caption added value in Enonic XP',
-							copyright: '116 changed value from FotoWare',
+							copyright: '116 (copyright) changed value from FotoWare',
 							fotoWare: {
 								...deref(MEDIA_CONTENT_CHANGED_IN_XP.data.fotoWare),
 								metadata: {
-									'116': '116 changed value from FotoWare',
+									'116': '116 (copyright) changed value from FotoWare',
 									'120': '120 changed value from FotoWare',
 									'25': '25 changed value from FotoWare',
 									'5': '5 changed value from FotoWare',
@@ -243,7 +293,7 @@ describe('lib', () => {
 							},
 							tags: '25 changed value from FotoWare'
 						},
-						// displayName: 'displayName changed value in Enonic XP', // unchanged
+						// displayName: VALUE_DISPLAYNAME_5_CHANGED_IN_XP, // unchanged
 						x: {
 							media: {
 								imageInfo: {
@@ -256,12 +306,13 @@ describe('lib', () => {
 					// print({content_with_changes}, { maxItems: Infinity });
 					expect(updateMetadataOnContent({
 						content: deref(MEDIA_CONTENT_CHANGED_IN_XP),
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
 							5: { value: '5 changed value from FotoWare' },
 							25: { value: '25 changed value from FotoWare' },
 							80: { value: '80 changed value from FotoWare' },
-							116: { value: '116 changed value from FotoWare' },
+							116: { value: '116 (copyright) changed value from FotoWare' },
 							120: { value: '120 changed value from FotoWare' }
 						},
 						modify: true,
@@ -270,34 +321,31 @@ describe('lib', () => {
 				});
 
 				test('it deletes deleted fields', () => {
-					const fw = deref(MEDIA_CONTENT_CHANGED_IN_XP.data.fotoWare);
+					const data = deref(MEDIA_CONTENT_CHANGED_IN_XP.data)
+					delete data.altText;
+					delete data.artist;
+					delete data.copyright;
+					delete data.tags;
+
+					const fw = data.fotoWare;
 					if (fw && hasOwnProperty(fw, 'metadata')) {
 						delete fw.metadata;
 					}
 
+					const x = deref(MEDIA_CONTENT_CHANGED_IN_XP.x) as NestedRecord;
+					deleteIn(x, 'media', 'imageInfo', 'description');
+
 					const contentWithDeletedFields: MediaContent = {
 						...deref(MEDIA_CONTENT_CHANGED_IN_XP),
-						data: {
-							...deref(MEDIA_CONTENT_CHANGED_IN_XP.data),
-							artist: undefined,
-							fotoWare: fw,
-							copyright: '',
-							tags: undefined
-						},
-						// displayName: 'displayName changed value in Enonic XP', // unchanged
-						x: {
-							media: {
-								imageInfo: {
-									...deref(MEDIA_CONTENT_CHANGED_IN_XP.x['media']?.['imageInfo']),
-									description: undefined,
-								}
-							}
-						} as XpXData
+						data,
+						// displayName: VALUE_DISPLAYNAME_5_CHANGED_IN_XP, // unchanged
+						x: x as unknown as XpXData
 					};
 					// print({contentWithDeletedFields}, { maxItems: Infinity });
 
 					expect(updateMetadataOnContent({
 						content: deref(MEDIA_CONTENT_CHANGED_IN_XP),
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {},
 						modify: true,
@@ -321,18 +369,18 @@ describe('lib', () => {
 						// 	fotoWare: {
 						// 		md5sum: '1',
 						// 		metadata: {
-						// 			'116': '116 original value from FotoWare',
-						// 			'120': '120 original value from FotoWare',
-						// 			'25': '25 original value from FotoWare',
-						// 			'5': '5 original value from FotoWare',
-						// 			'80': '80 original value from FotoWare'
+						// 			'116': METADATA_VALUE_116_ORIG_FROM_FW,
+						// 			'120': METADATA_VALUE_120_ORIG_FROM_FW,
+						// 			'25': METADATA_VALUE_25_ORIG_FROM_FW,
+						// 			'5': METADATA_VALUE_5_ORIG_FROM_FW,
+						// 			'80': METADATA_VALUE_80_ORIG_FROM_FW
 						// 		}
 						// 	}
 						// },
 						x: {
 							media: {
 								imageInfo: {
-									description: '120 original value from FotoWare'
+									description: METADATA_VALUE_120_ORIG_FROM_FW
 								}
 							}
 						} as XpXData
@@ -340,13 +388,14 @@ describe('lib', () => {
 					// print({content_with_x_but_only_description}, { maxItems: Infinity });
 					expect(updateMetadataOnContent({
 						content: contentWithoutX,
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							5: { value: '5 original value from FotoWare' },
-							25: { value: '25 original value from FotoWare' },
-							80: { value: '80 original value from FotoWare' },
-							116: { value: '116 original value from FotoWare' },
-							120: { value: '120 original value from FotoWare' }
+							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
+							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
+							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
 						properties: PROPERTY_POLICY
@@ -356,13 +405,14 @@ describe('lib', () => {
 				test('it updates md5sum ', () => {
 					expect(updateMetadataOnContent({
 						content: deref(MEDIA_CONTENT_CHANGED_IN_XP),
+						mappings: MAPPINGS,
 						md5sum: '2',
 						metadata: {
-							5: { value: '5 original value from FotoWare' },
-							25: { value: '25 original value from FotoWare' },
-							80: { value: '80 original value from FotoWare' },
-							116: { value: '116 original value from FotoWare' },
-							120: { value: '120 original value from FotoWare' }
+							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
+							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
+							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						modify: true,
 						properties: PROPERTY_POLICY
@@ -370,7 +420,7 @@ describe('lib', () => {
 						...deref(MEDIA_CONTENT_CHANGED_IN_XP),
 						data: {
 							...deref(MEDIA_CONTENT_CHANGED_IN_XP.data),
-							copyright: '116 original value from FotoWare',
+							copyright: METADATA_VALUE_116_ORIG_FROM_FW,
 							fotoWare: {
 								...deref(MEDIA_CONTENT_CHANGED_IN_XP.data.fotoWare),
 								md5sum: '2',
@@ -382,14 +432,15 @@ describe('lib', () => {
 				test('it handles extra metadata', () => {
 					expect(updateMetadataOnContent({
 						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							5: { value: '5 original value from FotoWare' },
-							25: { value: '25 original value from FotoWare' },
-							80: { value: '80 original value from FotoWare' },
+							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
+							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
+							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
 							115: { value: '115 original value from FotoWare' },
-							116: { value: '116 original value from FotoWare' },
-							120: { value: '120 original value from FotoWare' },
+							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW },
 						},
 						// modify: true,
 						properties: PROPERTY_POLICY
@@ -442,14 +493,15 @@ describe('lib', () => {
 
 					expect(updateMetadataOnContent({
 						content: contentWithExtraMetadata,
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							5: { value: '5 original value from FotoWare' },
-							25: { value: '25 original value from FotoWare' },
-							80: { value: '80 original value from FotoWare' },
+							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
+							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
+							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
 							// No 115 anymore :)
-							116: { value: '116 original value from FotoWare' },
-							120: { value: '120 original value from FotoWare' },
+							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW },
 						},
 						modify: true,
 						properties: PROPERTY_POLICY
@@ -472,6 +524,9 @@ describe('lib', () => {
 							}
 						}
 					};
+					deleteIn(mediaContentWithoutImageInfo as unknown as NestedRecord, 'data', 'artist');
+					deleteIn(mediaContentWithoutImageInfo as unknown as NestedRecord, 'data', 'copyright');
+					deleteIn(mediaContentWithoutImageInfo as unknown as NestedRecord, 'data', 'tags');
 					const mediaContentWithoutXData: MediaContent = {
 						...deref(mediaContentWithoutImageInfo),
 					}
@@ -479,6 +534,7 @@ describe('lib', () => {
 					delete mediaContentWithoutXData.x;
 					expect(updateMetadataOnContent({
 						content: mediaContentWithoutImageInfo,
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {},
 						modify: true,
@@ -500,12 +556,15 @@ describe('lib', () => {
 								fotoWare: {
 									md5sum: '1',
 									metadata: {
-										5: { value: '5 original value from FotoWare' },
+										5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
 									}
 								}
 							}
 						}
 					};
+					deleteIn(mediaContentWithOldXData as unknown as NestedRecord, 'data', 'artist');
+					deleteIn(mediaContentWithOldXData as unknown as NestedRecord, 'data', 'copyright');
+					deleteIn(mediaContentWithOldXData as unknown as NestedRecord, 'data', 'tags');
 					const mediaContentWithoutOldXData: MediaContent = {
 						...deref(mediaContentWithOldXData),
 					}
@@ -513,6 +572,7 @@ describe('lib', () => {
 					delete mediaContentWithoutOldXData.x;
 					expect(updateMetadataOnContent({
 						content: mediaContentWithOldXData,
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {},
 						modify: true,
@@ -541,6 +601,7 @@ describe('lib', () => {
 					// print({mediaContentWithData}, { maxItems: Infinity });
 					expect(updateMetadataOnContent({
 						content: mediaContentWithoutData,
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {},
 						//modify: true,
@@ -553,22 +614,31 @@ describe('lib', () => {
 				//──────────────────────────────────────────────────────────────
 
 				test('it handles displayName: PROPERTY_IF_CHANGED', () => {
+					// print({MEDIA_CONTENT_CHANGED_IN_XP}, { maxItems: Infinity });
+
+					const mediaContentWithChangedDisplayName: MediaContent = deref(MEDIA_CONTENT_CHANGED_IN_XP);
+					setIn(mediaContentWithChangedDisplayName, ['data', 'copyright'], METADATA_VALUE_116_ORIG_FROM_FW);
+					setIn(mediaContentWithChangedDisplayName, ['data', 'fotoWare', 'metadata', 5], METADATA_VALUE_5_CHANGED_FROM_FW);
+					setIn(mediaContentWithChangedDisplayName, 'displayName', METADATA_VALUE_5_CHANGED_FROM_FW);
+					// print({mediaContentWithChangedDisplayName}, { maxItems: Infinity });
+
 					expect(updateMetadataOnContent({
-						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						content: deref(MEDIA_CONTENT_CHANGED_IN_XP),
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							5: { value: '5 original value from FotoWare' },
-							25: { value: '25 original value from FotoWare' },
-							80: { value: '80 original value from FotoWare' },
-							116: { value: '116 original value from FotoWare' },
-							120: { value: '120 original value from FotoWare' }
+							5: { value: METADATA_VALUE_5_CHANGED_FROM_FW },
+							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
+							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
-						// modify: true,
+						modify: true,
 						properties: {
 							...deref(PROPERTY_POLICY),
 							displayName: PROPERTY_IF_CHANGED
 						}
-					})).toStrictEqual(NEW_MEDIA_CONTENT);
+					})).toStrictEqual(mediaContentWithChangedDisplayName);
 				});
 
 				test('it handles artist array', () => {
@@ -583,16 +653,17 @@ describe('lib', () => {
 					];
 					expect(updateMetadataOnContent({
 						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							5: { value: '5 original value from FotoWare'},
-							25: { value: '25 original value from FotoWare' },
+							5: { value: METADATA_VALUE_5_ORIG_FROM_FW},
+							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 							80: { value: [
 								'80 original Artist1 from FotoWare',
 								'80 original Artist2 from FotoWare'
 							] },
-							116: { value: '116 original value from FotoWare' },
-							120: { value: '120 original value from FotoWare' }
+							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
 						properties: PROPERTY_POLICY
@@ -600,18 +671,20 @@ describe('lib', () => {
 				});
 
 				test('it handles copyright PROPERTY_IF_CHANGED', () => {
-					const contentWithChangedCopyright = deref(NEW_MEDIA_CONTENT);
-					contentWithChangedCopyright.data.copyright = ''
-					delete contentWithChangedCopyright.data.fotoWare!.metadata![116]; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+					const contentWithChangedCopyright = deref(NEW_MEDIA_CONTENT) as unknown as NestedRecord;
+					deleteIn(contentWithChangedCopyright, 'data', 'copyright');
+					deleteIn(contentWithChangedCopyright, 'data', 'fotoWare', 'metadata', 116);
+
 					expect(updateMetadataOnContent({
 						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							5: { value: '5 original value from FotoWare' },
-							25: { value: '25 original value from FotoWare' },
-							80: { value: '80 original value from FotoWare' },
-							// 116: { value: '116 original value from FotoWare' }
-							120: { value: '120 original value from FotoWare' }
+							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
+							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
+							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
+							// 116: { value: METADATA_VALUE_116_ORIG_FROM_FW }
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
 						properties: {
@@ -633,20 +706,41 @@ describe('lib', () => {
 					];
 					expect(updateMetadataOnContent({
 						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							5: { value: '5 original value from FotoWare'},
+							5: { value: METADATA_VALUE_5_ORIG_FROM_FW},
 							25: { value: [
 								'25 original Tag1 from FotoWare',
 								'25 original Tag2 from FotoWare'
 							]},
-							80: { value: '80 original value from FotoWare' },
-							116: { value: '116 original value from FotoWare' },
-							120: { value: '120 original value from FotoWare' }
+							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
 						properties: PROPERTY_POLICY
 					})).toStrictEqual(contentWithTwoTags);
+				});
+
+				test('it handles falsy metadata', () => {
+					const contentWithNoMetadata = deref(MEDIA_CONTENT_WITHOUT_METADATA) as unknown as NestedRecord;
+					deleteIn(contentWithNoMetadata, 'data', 'artist');
+					deleteIn(contentWithNoMetadata, 'data', 'copyright');
+					deleteIn(contentWithNoMetadata, 'data', 'tags');
+					setIn(contentWithNoMetadata, 'data.fotoWare.md5sum', '1');
+
+					expect(updateMetadataOnContent({
+						content: deref(MEDIA_CONTENT_WITHOUT_METADATA),
+						mappings: MAPPINGS,
+						md5sum: '1',
+						metadata: {
+							// @ts-ignore
+							5: undefined,
+						},
+						// modify: true,
+						properties: PROPERTY_POLICY
+					})).toStrictEqual(contentWithNoMetadata);
 				});
 
 			}); // updateMetadataOnContent

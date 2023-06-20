@@ -5,7 +5,10 @@ import type {
 } from './AppConfig.d';
 
 
-// import {toStr} from '@enonic/js-utils';
+import {
+	stringIncludes,
+	// toStr
+} from '@enonic/js-utils';
 import {deepen} from '/lib/fotoware/xp/deepen';
 //import {deepen} from './deepen';
 //import {capitalize} from '/lib/fotoware/xp/capitalize';
@@ -54,6 +57,9 @@ export function getConfigFromAppCfg(): GetConfigFromAppCfgReturnType {
 			allowWebhookFromIp = 'localhost',
 			clientSecret,
 			clientId,
+			metadata: {
+				mappings = {}
+			} = {},
 			properties: {
 				artist = PROPERTY_IF_CHANGED,
 				copyright = PROPERTY_OVERWRITE,
@@ -80,6 +86,15 @@ export function getConfigFromAppCfg(): GetConfigFromAppCfgReturnType {
 				remoteAddresses[ip] = true;
 			});
 			//log.info(`remoteAddresses:${toStr(remoteAddresses)}`);
+
+			Object.keys(mappings).forEach((key) => {
+				const value = mappings[key] as string;
+				if (stringIncludes(value, ',')) {
+					mappings[key] = value.split(',');
+				}
+			});
+			// log.debug('mappings:%s', toStr(mappings));
+
 			sitesConfigs[siteName] = {
 				archiveName,
 				url,
@@ -87,6 +102,16 @@ export function getConfigFromAppCfg(): GetConfigFromAppCfgReturnType {
 				clientSecret,
 				clientId,
 				imports: {},
+				metadata: {
+					mappings: {
+						5: 'displayName',
+						25: 'data.tags',
+						80: 'data.artist',
+						116: 'data.copyright',
+						120: 'x.media.imageInfo.description',
+						...mappings
+					},
+				},
 				properties: {
 					artist,
 					copyright,
