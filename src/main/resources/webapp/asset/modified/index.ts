@@ -35,7 +35,7 @@ import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid';
 import {
 	CHECK_REMOTE_ADDRESS,
 	DEBUG_INCOMING_REQUESTS
-} from '/constants';
+} from '../../../constants';
 
 
 const A_MINUTE_IN_MS = 60 * 1000;

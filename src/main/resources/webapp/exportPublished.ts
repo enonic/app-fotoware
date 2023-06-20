@@ -2,7 +2,7 @@ import type {Request} from '/lib/xp/Request';
 
 
 import {toStr} from '@enonic/js-utils';
-import {DEBUG_INCOMING_REQUESTS} from '/constants';
+import {DEBUG_INCOMING_REQUESTS} from '../constants';
 
 
 export const exportPublished = (request: Request) => {

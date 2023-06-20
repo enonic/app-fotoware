@@ -9,7 +9,7 @@ import type {
 import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import {request} from '/lib/http-client';
-import {DEBUG_REQUESTS} from '/constants';
+import {DEBUG_REQUESTS} from '../../../constants';
 /*import {
 	//base64Encode,
 	base64UrlDecode

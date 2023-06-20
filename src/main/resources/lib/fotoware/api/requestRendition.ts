@@ -13,7 +13,7 @@ import type {
 import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations
 import {request} from '/lib/http-client';
-import {DEBUG_REQUESTS} from '/constants';
+import {DEBUG_REQUESTS} from '../../../constants';
 
 
 export const requestRendition = ({
@@ -132,14 +132,16 @@ export const requestRendition = ({
 	if (accessToken) {
 		pollAndDownloadRenditionRequestParams.headers = { Authorization: `bearer ${accessToken}` };
 	}
-	//log.debug(`pollAndDownloadRenditionRequestParams:${toStr(pollAndDownloadRenditionRequestParams)}`);
+	DEBUG_REQUESTS && log.debug('pollAndDownloadRenditionRequestParams:%s', toStr(pollAndDownloadRenditionRequestParams));
 
 	let pollAndDownloadRenditionResponse: Response = {
 		status: 202
 	};
 	while (pollAndDownloadRenditionResponse.status === 202) {
 		pollAndDownloadRenditionResponse = request(pollAndDownloadRenditionRequestParams);
+		// DEBUG_REQUESTS && log.debug('pollAndDownloadRenditionResponse:%s', toStr(pollAndDownloadRenditionResponse));
 	}
+	DEBUG_REQUESTS && log.debug('pollAndDownloadRenditionResponse:%s', toStr(pollAndDownloadRenditionResponse));
 	if (pollAndDownloadRenditionResponse.status === 410) {
 		log.error(`Rendition no longer available renditionServiceResponse:${toStr(renditionServiceResponse)} pollAndDownloadRenditionResponse:${toStr(pollAndDownloadRenditionResponse)}`);
 		throw new Error(`Rendition no longer available renditionUrl:${renditionUrl}`);

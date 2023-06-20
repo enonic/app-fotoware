@@ -58,7 +58,7 @@ import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 import {
 	CHECK_REMOTE_ADDRESS,
 	DEBUG_INCOMING_REQUESTS
-} from '/constants';
+} from '../constants';
 
 
 export const assetDeleted = (request: Request) => {

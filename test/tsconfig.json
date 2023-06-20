@@ -1,14 +1,67 @@
 {
+	// "extends": "../tsconfig.json", // Doesn't seem to work
 	"compilerOptions": {
+		"allowJs": true,
 		"baseUrl": ".",
-		"noEmit": true,
+		"declaration": false,
+		"declarationMap": false,
+		"downlevelIteration": true,
+		"esModuleInterop": true,
+		"importHelpers": true,
+		"inlineSourceMap": false, // Doesn't seem to affect Uncoveraged Lines
+		"inlineSources": false, // Doesn't seem to affect Uncoveraged Lines
+		"listEmittedFiles": true,
+		"listFiles": false,
 		"module": "commonjs",
 		"moduleResolution": "node",
+		"noEmit": true,
+		"noEmitOnError": true,
+		"noErrorTruncation": true,
+		"noImplicitAny": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUncheckedIndexedAccess": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"paths": {
+			"/lib/xp/admin": ["../node_modules/@enonic-types/lib-admin"],
+			"/lib/xp/auth": ["../node_modules/@enonic-types/lib-auth"],
+			"/lib/xp/common": ["../node_modules/@enonic-types/lib-common"],
+			"/lib/xp/content": ["../node_modules/@enonic-types/lib-content"],
+			"/lib/xp/context": ["../node_modules/@enonic-types/lib-context"],
+			"/lib/xp/node": ["../node_modules/@enonic-types/lib-node"],
+			"/lib/xp/portal": ["../node_modules/@enonic-types/lib-portal"],
+			"/lib/xp/io": ["../node_modules/@enonic-types/lib-io"],
+			"/lib/xp/repo": ["../node_modules/@enonic-types/lib-repo"],
+			"/lib/xp/scheduler": ["../node_modules/@enonic-types/lib-scheduler"],
+			"/lib/xp/task": ["../node_modules/@enonic-types/lib-task"],
+
+			// "/constants": ["../src/main/resources/constants.ts"], // Doesn't work :(
+			"/types": ["../src/main/resources/lib/fotoware/index.d.ts"],
+			"/types/*": ["../src/main/resources/lib/fotoware/types/*"],
+			// "/lib/xp/*": ["../src/main/resources/lib/xp/*"],
 			// "/lib/*": ["../src/main/resources/lib/*"],
 			// "/webapp/*": ["../src/main/resources/webapp/*"],
 			"/*": ["../src/main/resources/*"],
 		},
-		"target": "ES5"
-	}
+		"removeComments": true, // Doesn't seem to affect Uncoveraged Lines
+		"resolveJsonModule": true,
+		"rootDir": "..",
+		"rootDirs": [
+			"../src/main/resources",
+			// "../node_modules"
+		],
+		"skipLibCheck": true,
+		"sourceMap": true, // Needed to get correct Uncovered Line numbers
+		"strict": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
+		"target": "ES5",
+		"types": [
+			"@enonic-types/global"
+		],
+		"verbatimModuleSyntax": false,
+	},
+	"include": [
+		"./**/*.ts"
+	]
 }

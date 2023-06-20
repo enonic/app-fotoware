@@ -21,7 +21,7 @@ import {paginate} from '/lib/fotoware/api/paginate';
 import {camelize} from '/lib/fotoware/xp/camelize';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
-import {DEBUG_REQUESTS} from '/constants';
+import {DEBUG_REQUESTS} from '../../../constants';
 
 
 export interface CollectionObj {
