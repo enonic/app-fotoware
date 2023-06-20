@@ -32,7 +32,10 @@ import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 import {getConfigFromAppCfg} from '/lib/fotoware/xp/getConfigFromAppCfg';
 import {buildLicensedTo} from '/lib/fotoware/xp/buildLicensedTo';
 import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid';
-import {DEBUG_INCOMING_REQUESTS} from '/constants';
+import {
+	CHECK_REMOTE_ADDRESS,
+	DEBUG_INCOMING_REQUESTS
+} from '/constants';
 
 
 const A_MINUTE_IN_MS = 60 * 1000;
@@ -143,7 +146,7 @@ export const assetModified = (request: Request) => {
 		remoteAddresses
 	} = siteConfig;
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
-	if (!arrayIncludes(Object.keys(remoteAddresses), remoteAddress)) {
+	if (CHECK_REMOTE_ADDRESS && !arrayIncludes(Object.keys(remoteAddresses), remoteAddress)) {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
 		return {status: 404};
 	}
