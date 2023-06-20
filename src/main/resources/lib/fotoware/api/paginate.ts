@@ -8,7 +8,7 @@ import type {
 import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request as send} from '/lib/http-client';
-import {DEBUG_REQUESTS} from '/constants';
+import {DEBUG_REQUESTS} from '../../../constants';
 
 
 export function paginate<

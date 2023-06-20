@@ -1,7 +1,7 @@
 module.exports = {
-	collectCoverageFrom: [
-		'src/main/resources/**/*.{ts,tsx}'
-	],
+	// collectCoverageFrom: [
+	// 	'src/main/resources/**/*.{ts,tsx}'
+	// ],
 	// In order for tests to work on all files, we have to use v8 coverage provider.
 	coverageProvider: 'v8', // Changes Uncovered Lines
 
@@ -23,24 +23,7 @@ module.exports = {
 		'^.+\\.(js|jsx|ts|tsx)$': [
 			'ts-jest',
 			{
-				tsconfig: { // actually compilerOptions
-					allowJs: true,
-					sourceMap: true, // Needed to get correct Uncovered Line numbers
-					// target: 'ES5', // Changes Uncovered Line numbers
-
-					// This "group" have the same Uncovered Line numbers:
-					// target: 'ES6', // Changes Uncovered Line numbers
-					// target: 'ES2016', // Changes Uncovered Line numbers
-					// target: 'ES2017', // Changes Uncovered Line numbers
-					// target: 'ES2018', // Changes Uncovered Line numbers
-					// target: 'ES2019', // Changes Uncovered Line numbers
-
-					// This "group" have the same Uncovered Line numbers:
-					// target: 'ES2020', // Changes Uncovered Line numbers
-					// target: 'ES2021', // Changes Uncovered Line numbers
-					// target: 'ES2022', // Changes Uncovered Line numbers
-					// target: 'ESNext', // Changes Uncovered Line numbers
-				}
+				tsconfig: 'test/tsconfig.json'
 			}
 		]
 	},

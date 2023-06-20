@@ -54,7 +54,7 @@ import {queryForFilename} from '/lib/fotoware/xp/queryForFilename';
 import {
 	CHECK_REMOTE_ADDRESS,
 	DEBUG_INCOMING_REQUESTS
-} from '/constants';
+} from '../constants';
 
 
 //const CRON_DELAY = 1000 * 60; // A minute in milliseconds
@@ -435,6 +435,7 @@ export const assetIngested = (request: Request) => {
 
 	return {
 		body: {},
-		contentType: 'application/json;charset=utf-8'
+		contentType: 'application/json;charset=utf-8',
+		status: 200
 	};
 };
