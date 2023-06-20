@@ -87,7 +87,7 @@ module.exports = {
 		'comma-dangle': ['error', {
 			arrays: 'ignore',
 			objects: 'ignore',
-			imports: 'never',
+			imports: 'ignore',
 			exports: 'never',
 			functions: 'ignore'
 		}],

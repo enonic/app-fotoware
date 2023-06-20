@@ -4,6 +4,7 @@ import type {
 	Asset,
 	Filename,
 	Hostname,
+	Mappings,
 	MediaContent,
 	Path,
 	Project,
@@ -34,6 +35,7 @@ interface ModifyInImportParams {
 	readonly fileNameNew: Filename
 	readonly fileNameOld: Filename
 	readonly hostname: Hostname
+	mappings: Mappings
 	readonly path: Path
 	readonly project: Project
 	readonly properties: SiteConfig['properties']
@@ -50,6 +52,7 @@ export function modifyInImport({
 	fileNameNew,
 	fileNameOld,
 	hostname,
+	mappings,
 	path,
 	project,
 	properties,
@@ -127,6 +130,7 @@ export function modifyInImport({
 				fileNameNew,
 				fileNameOld,
 				hostname,
+				mappings,
 				path,
 				project,
 				properties,

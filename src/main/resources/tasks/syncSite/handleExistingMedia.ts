@@ -3,6 +3,7 @@ import type {
 	Filename,
 	Hostname,
 	Journal,
+	Mappings,
 	MediaContent,
 	Metadata,
 	Project,
@@ -53,6 +54,7 @@ export function handleExistingMedia({
 	filename,
 	hostname,
 	journal,
+	mappings,
 	metadata,
 	project,
 	properties,
@@ -66,6 +68,7 @@ export function handleExistingMedia({
 	filename: Filename
 	hostname: Hostname
 	journal: Journal
+	mappings: Mappings
 	metadata: Metadata
 	project: Project
 	properties: SiteConfig['properties']
@@ -153,6 +156,7 @@ export function handleExistingMedia({
 	const maybeModifiedMediaContent = updateMetadataOnContent({
 		content: JSON.parse(JSON.stringify(exisitingMediaContent)), // deref so exisitingMediaContent can't be modified
 		md5sum: md5sumToStore,
+		mappings,
 		metadata,
 		modify: true,
 		properties
@@ -166,6 +170,7 @@ export function handleExistingMedia({
 		modifyMediaContent({
 			exisitingMediaContent,
 			key: exisitingMediaContent._path,
+			mappings,
 			md5sum: md5sumToStore,
 			metadata,
 			properties

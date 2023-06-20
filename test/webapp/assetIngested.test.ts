@@ -74,10 +74,10 @@ global.app.config = {
 // @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
 	// loglevel: 'debug'
-	loglevel: 'info'
+	// loglevel: 'info'
 	// loglevel: 'warn'
 	// loglevel: 'error'
-	// loglevel: 'silent'
+	loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -2779,7 +2779,11 @@ describe('webapp', () => {
 										'Author',
 										'Author2'
 									],
-									819: 'Consent status'
+									819: 'Consent status',
+									820: [
+										'Person1',
+										'Person2'
+									]
 								}
 							},
 							media: {

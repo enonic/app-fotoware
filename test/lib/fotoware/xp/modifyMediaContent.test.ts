@@ -7,6 +7,7 @@ import type {
 	XpXDataMedia
 } from '../../../../src/main/resources/index.d';
 import type {
+	Mappings,
 	MediaContent,
 	SiteConfigProperties
 } from '/lib/fotoware';
@@ -51,6 +52,17 @@ global.app.config = {
 global.log = Log.createLogger({
 	loglevel: 'silent'
 });
+
+const MAPPINGS: Mappings = {
+	5: 'displayName',
+	25: 'data.tags',
+	80: 'data.artist',
+	116: 'data.copyright',
+	120: [
+		'x.media.imageInfo.description',
+		'data.altText',
+	]
+};
 
 jest.mock('/lib/xp/common', () => ({
 	sanitize: jest.fn<typeof sanitize>((text) => text)
@@ -177,6 +189,7 @@ describe('lib', () => {
 					modifyMediaContent({
 						exisitingMediaContent: undefined, // is undefined when creating
 						key: createdMediaContent._id,
+						mappings: MAPPINGS,
 						md5sum: 'md5sumValue',
 						metadata: {
 							5: { value: '5 original value from FotoWare' },
@@ -193,6 +206,7 @@ describe('lib', () => {
 						...createdMediaContent,
 						data: {
 							...createdMediaContent['data'] as MediaContent['data'],
+							altText: '120 original value from FotoWare',
 							artist: '80 original value from FotoWare',
 							copyright: '116 original value from FotoWare',
 							fotoWare: {
@@ -231,6 +245,7 @@ describe('lib', () => {
 						modifyMediaContent({
 							exisitingMediaContent: undefined,
 							key: createdMediaContent._id,
+							mappings: MAPPINGS,
 							md5sum: 'md5sumValue',
 							metadata: {
 								5: { value: '5 original value from FotoWare' },
@@ -257,6 +272,7 @@ describe('lib', () => {
 						modifyMediaContent({
 							exisitingMediaContent: undefined,
 							key: createdMediaContent._id,
+							mappings: MAPPINGS,
 							md5sum: 'md5sumValue',
 							metadata: {
 								5: { value: '5 original value from FotoWare' },
@@ -293,6 +309,7 @@ describe('lib', () => {
 						modifyMediaContent({
 							exisitingMediaContent: undefined,
 							key: createdMediaContent2._id,
+							mappings: MAPPINGS,
 							md5sum: 'md5sumValue',
 							metadata: {
 								5: { value: '5 original value from FotoWare' },

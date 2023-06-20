@@ -3,6 +3,7 @@ import type { PageComponent } from '@enonic-types/core';
 
 
 export type MediaContent = Content<{
+	altText?: string
 	artist?: string|string[]
 	caption?: string
 	copyright?: string

@@ -3,6 +3,7 @@ import type {
 	Asset,
 	Filename,
 	Hostname,
+	Mappings,
 	MediaContent,
 	Path,
 	Project,
@@ -28,6 +29,7 @@ export function handleAsset({
 	fileNameNew,
 	fileNameOld,
 	hostname,
+	mappings,
 	path,
 	project,
 	properties,
@@ -40,6 +42,7 @@ export function handleAsset({
 	fileNameNew: Filename
 	fileNameOld: Filename
 	hostname: Hostname
+	mappings: Mappings
 	path: Path
 	project: Project
 	properties: SiteConfig['properties']
@@ -106,6 +109,7 @@ export function handleAsset({
 			downloadRenditionResponse,
 			fileNameNew,
 			fileNameOld,
+			mappings,
 			md5sumOfDownload,
 			metadata,
 			project,
@@ -116,6 +120,7 @@ export function handleAsset({
 	handleMissingMediaContent({
 		downloadRenditionResponse,
 		fileNameNew,
+		mappings,
 		metadata,
 		md5sumOfDownload,
 		path,
