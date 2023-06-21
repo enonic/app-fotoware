@@ -17,6 +17,7 @@ import {
 	PROPERTY_IF_CHANGED,
 	PROPERTY_OVERWRITE
 } from '/lib/fotoware/xp/constants';
+import { METADATA_MAPPINGS_DEFAULT } from '../../../constants';
 
 
 interface GetConfigFromAppCfgReturnType {
@@ -104,11 +105,7 @@ export function getConfigFromAppCfg(): GetConfigFromAppCfgReturnType {
 				imports: {},
 				metadata: {
 					mappings: {
-						5: 'displayName',
-						25: 'data.tags',
-						80: 'data.artist',
-						116: 'data.copyright',
-						120: 'x.media.imageInfo.description',
+						...METADATA_MAPPINGS_DEFAULT,
 						...mappings
 					},
 				},
