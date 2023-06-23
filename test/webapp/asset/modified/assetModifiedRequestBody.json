@@ -1,0 +1,624 @@
+{
+    "byline": "Add author; Another author",
+    "created": "2023-06-23T07:39:29.222Z",
+    "data": {
+        "asset": {
+            "ancestors": [
+                {
+                    "data": "/fotoweb/data/a/5000.gHR5hx9Iez2jjw0_Sk1mBHMh6A5wYn56UAbcTu5nsK4/",
+                    "href": "/fotoweb/archives/5000-All-files/",
+                    "name": "All files"
+                }
+            ],
+            "archiveHREF": "/fotoweb/archives/5000-All-files/",
+            "archiveId": 5000,
+            "attributes": {
+                "imageattributes": {
+                    "colorspace": "rgb",
+                    "flipmirror": 0,
+                    "pixelheight": 136,
+                    "pixelwidth": 370,
+                    "resolution": 300,
+                    "rotation": 0
+                }
+            },
+            "builtinFields": [
+                {
+                    "field": "title",
+                    "required": false,
+                    "value": ""
+                },
+                {
+                    "field": "description",
+                    "required": false,
+                    "value": ""
+                },
+                {
+                    "field": "tags",
+                    "required": false,
+                    "value": [
+                        "Taggy"
+                    ]
+                },
+                {
+                    "field": "status",
+                    "required": false,
+                    "value": ""
+                },
+                {
+                    "field": "rating",
+                    "required": false,
+                    "value": ""
+                },
+                {
+                    "field": "notes",
+                    "required": false,
+                    "value": ""
+                }
+            ],
+            "capabilities": {
+                "crop": true,
+                "print": true,
+                "printWithAnnotations": true
+            },
+            "created": "2022-11-18T09:20:11.617000Z",
+            "createdBy": "system",
+            "doctype": "image",
+            "downloadcount": 0,
+            "dropHREF": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info#u=15003&m=36-kdUxvzRW7ctaJIZulccrDDVbHMwq9JIyosLjLxuI",
+            "filename": "test_rename_36.jpeg",
+            "filesize": 14336,
+            "href": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info",
+            "linkstance": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info",
+            "metadata": {
+                "110": {
+                    "value": "Add credit"
+                },
+                "115": {
+                    "value": "Add source"
+                },
+                "116": {
+                    "value": "Add copyright"
+                },
+                "25": {
+                    "value": [
+                        "Taggy"
+                    ]
+                },
+                "80": {
+                    "value": [
+                        "Add author",
+                        "Another author"
+                    ]
+                }
+            },
+            "metadataeditcount": 0,
+            "metadataEditor": {
+                "href": "/fotoweb/editors/260ef215-1a1c-4218-b5fb-3837eeafa1a0",
+                "name": "Archive"
+            },
+            "modified": "2021-04-19T13:37:56Z",
+            "modifiedBy": "system",
+            "permissions": [
+                "View",
+                "Preview",
+                "Workflow",
+                "Download",
+                "EditText",
+                "CropRotate",
+                "Delete",
+                "Comping",
+                "TrdParty1",
+                "TrdParty2",
+                "TrdParty3",
+                "TrdParty4",
+                "Alert",
+                "CopyTo",
+                "MoveTo",
+                "CopyFrom",
+                "MoveFrom",
+                "Rename",
+                "OpenFile",
+                "EditFile",
+                "CropFile",
+                "UploadFile",
+                "FwdtPlace",
+                "Export",
+                "Comment",
+                "Annotate",
+                "MngVideo",
+                "EditSmartFolders",
+                "CropAndDownload"
+            ],
+            "physicalFileId": "61d2db5594fb7f7314d5abf3/Folder 19/Folder 19/test_rename_36.jpeg",
+            "pincount": 0,
+            "previewcount": 12,
+            "previews": [
+                {
+                    "height": 294,
+                    "href": "/fotoweb/cache/v2/3/H/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljQA0A.L9WlkN5UgV.jpg",
+                    "size": 800,
+                    "square": false,
+                    "width": 800
+                },
+                {
+                    "height": 441,
+                    "href": "/fotoweb/cache/v2/-/v/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljYBMA.FoOKLQC2No.jpg",
+                    "size": 1200,
+                    "square": false,
+                    "width": 1200
+                },
+                {
+                    "height": 588,
+                    "href": "/fotoweb/cache/v2/c/u/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljgBkA.rvWqzXCcZW.jpg",
+                    "size": 1600,
+                    "square": false,
+                    "width": 1600
+                },
+                {
+                    "height": 882,
+                    "href": "/fotoweb/cache/v2/9/a/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljwCUA.xHwdvfXSPf.jpg",
+                    "size": 2400,
+                    "square": false,
+                    "width": 2400
+                },
+                {
+                    "height": 74,
+                    "href": "/fotoweb/cache/v2/O/m/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljkAMA.hdaHXVh1Lx.jpg",
+                    "size": 200,
+                    "square": false,
+                    "width": 200
+                },
+                {
+                    "height": 110,
+                    "href": "/fotoweb/cache/v2/T/s/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljWAUA.rrZQtrHIF1.jpg",
+                    "size": 300,
+                    "square": false,
+                    "width": 300
+                },
+                {
+                    "height": 147,
+                    "href": "/fotoweb/cache/v2/U/c/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljIAcA.vX1uIBDu8x.jpg",
+                    "size": 400,
+                    "square": false,
+                    "width": 400
+                },
+                {
+                    "height": 221,
+                    "href": "/fotoweb/cache/v2/v/P/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljsAkA.UBcJm8H6pS.jpg",
+                    "size": 600,
+                    "square": false,
+                    "width": 600
+                },
+                {
+                    "height": 100,
+                    "href": "/fotoweb/cache/v2/C/B/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljyAQ.aJMQq6Uh5k.jpg",
+                    "size": 100,
+                    "square": true,
+                    "width": 100
+                },
+                {
+                    "height": 200,
+                    "href": "/fotoweb/cache/v2/Q/r/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljkAME.G6vWM2nFQR.jpg",
+                    "size": 200,
+                    "square": true,
+                    "width": 200
+                },
+                {
+                    "height": 200,
+                    "href": "/fotoweb/cache/v2/Q/r/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljkAME.G6vWM2nFQR.jpg",
+                    "size": 200,
+                    "square": true,
+                    "width": 200
+                },
+                {
+                    "height": 400,
+                    "href": "/fotoweb/cache/v2/Y/F/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljIAcE.d5uKL7fB0m.jpg",
+                    "size": 400,
+                    "square": true,
+                    "width": 400
+                }
+            ],
+            "previewToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Vub25pYy5mb3Rvd2FyZS5jbG91ZC9mb3Rvd2ViLyIsInN1YiI6IjE1MDAzIiwiZXhwIjoxNjg3NTA5NTY5LCJuYmYiOjE2ODc1MDU5NjksImlhdCI6MTY4NzUwNTk2OSwianRpIjoiU2VkakZBWThKYVhWL28wbTI2RHNxVjJWMWVLanZjRk5sWk9QMUlZNVlkRT0iLCJhc3MiOiJhcmNoaXZlcy81MDAwL0ZvbGRlciUyMDE5L0ZvbGRlciUyMDE5L3Rlc3RfcmVuYW1lXzM2LmpwZWciLCJyZXYiOiIiLCJhdWQiOiJwcmV2aWV3X3Rva2VuIiwic2NvcGUiOlsiYXJiaXRyYXJ5X3JlbmRpdGlvbnMiXX0.n_lkLMO_cH83r1RsZhGSbBivTkhnT1IEBzMm_Ylv2C4",
+            "props": {
+                "annotations": {
+                    "enabled": false
+                },
+                "comments": {
+                    "enabled": false
+                },
+                "owner": null,
+                "shares": {
+                    "enabled": false
+                },
+                "tags": []
+            },
+            "quickRenditions": [],
+            "renditions": [
+                {
+                    "default": true,
+                    "description": "Original File",
+                    "display_name": "Original File",
+                    "height": 136,
+                    "href": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info/__renditions/ORIGINAL",
+                    "original": true,
+                    "profile": "2af4914d-6c11-4b15-a7ee-a4260efc8309",
+                    "sizeFixed": false,
+                    "width": 370
+                },
+                {
+                    "default": false,
+                    "description": "ComLockRenditionDescription",
+                    "display_name": "ComLockRendition",
+                    "height": 0,
+                    "href": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info/__renditions/07c8334c-d869-4897-a53d-98c28e706d2f",
+                    "original": false,
+                    "profile": "07c8334c-d869-4897-a53d-98c28e706d2f",
+                    "sizeFixed": true,
+                    "width": 0
+                }
+            ],
+            "revisioncount": 0,
+            "thumbnailFields": {
+                "additionalFields": [
+                    {
+                        "value": [
+                            "Taggy"
+                        ],
+                        "views": [
+                            "desktop",
+                            "widgets",
+                            "web"
+                        ]
+                    },
+                    {
+                        "value": "",
+                        "views": [
+                            "desktop",
+                            "widgets",
+                            "web"
+                        ]
+                    }
+                ],
+                "firstLine": {
+                    "value": ""
+                },
+                "label": {
+                    "value": "test_rename_36.jpeg"
+                },
+                "secondLine": {
+                    "value": [
+                        "Add author",
+                        "Another author"
+                    ]
+                }
+            },
+            "uniqueid": "",
+            "workflowcount": 0
+        },
+        "assetBefore": {
+            "ancestors": [
+                {
+                    "data": "/fotoweb/data/a/5000.gHR5hx9Iez2jjw0_Sk1mBHMh6A5wYn56UAbcTu5nsK4/",
+                    "href": "/fotoweb/archives/5000-All-files/",
+                    "name": "All files"
+                }
+            ],
+            "archiveHREF": "/fotoweb/archives/5000-All-files/",
+            "archiveId": 5000,
+            "attributes": {
+                "imageattributes": {
+                    "colorspace": "rgb",
+                    "flipmirror": 0,
+                    "pixelheight": 136,
+                    "pixelwidth": 370,
+                    "resolution": 300,
+                    "rotation": 0
+                }
+            },
+            "builtinFields": [
+                {
+                    "field": "title",
+                    "required": false,
+                    "value": ""
+                },
+                {
+                    "field": "description",
+                    "required": false,
+                    "value": ""
+                },
+                {
+                    "field": "tags",
+                    "required": false,
+                    "value": []
+                },
+                {
+                    "field": "status",
+                    "required": false,
+                    "value": ""
+                },
+                {
+                    "field": "rating",
+                    "required": false,
+                    "value": ""
+                },
+                {
+                    "field": "notes",
+                    "required": false,
+                    "value": ""
+                }
+            ],
+            "capabilities": {
+                "crop": true,
+                "print": true,
+                "printWithAnnotations": true
+            },
+            "created": "2022-11-18T09:20:11.617000Z",
+            "createdBy": "system",
+            "doctype": "image",
+            "downloadcount": 0,
+            "dropHREF": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info#u=15003&m=36-kdUxvzRW7ctaJIZulccrDDVbHMwq9JIyosLjLxuI",
+            "filename": "test_rename_36.jpeg",
+            "filesize": 14336,
+            "href": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info",
+            "linkstance": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info",
+            "metadata": {
+                "110": {
+                    "value": "Add credit"
+                },
+                "115": {
+                    "value": "Add source"
+                },
+                "116": {
+                    "value": "Add copyright"
+                },
+                "80": {
+                    "value": [
+                        "Add author",
+                        "Another author"
+                    ]
+                }
+            },
+            "metadataeditcount": 0,
+            "metadataEditor": {
+                "href": "/fotoweb/editors/260ef215-1a1c-4218-b5fb-3837eeafa1a0",
+                "name": "Archive"
+            },
+            "modified": "2021-04-19T13:37:54Z",
+            "modifiedBy": "system",
+            "permissions": [
+                "View",
+                "Preview",
+                "Workflow",
+                "Download",
+                "EditText",
+                "CropRotate",
+                "Delete",
+                "Comping",
+                "TrdParty1",
+                "TrdParty2",
+                "TrdParty3",
+                "TrdParty4",
+                "Alert",
+                "CopyTo",
+                "MoveTo",
+                "CopyFrom",
+                "MoveFrom",
+                "Rename",
+                "OpenFile",
+                "EditFile",
+                "CropFile",
+                "UploadFile",
+                "FwdtPlace",
+                "Export",
+                "Comment",
+                "Annotate",
+                "MngVideo",
+                "EditSmartFolders",
+                "CropAndDownload"
+            ],
+            "physicalFileId": "61d2db5594fb7f7314d5abf3/Folder 19/Folder 19/test_rename_36.jpeg",
+            "pincount": 0,
+            "previewcount": 12,
+            "previews": [
+                {
+                    "height": 294,
+                    "href": "/fotoweb/cache/v2/4/l/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljQA0A.gs7rjZujdu.jpg",
+                    "size": 800,
+                    "square": false,
+                    "width": 800
+                },
+                {
+                    "height": 441,
+                    "href": "/fotoweb/cache/v2/I/v/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljYBMA.JU-oonIxFs.jpg",
+                    "size": 1200,
+                    "square": false,
+                    "width": 1200
+                },
+                {
+                    "height": 588,
+                    "href": "/fotoweb/cache/v2/g/4/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljgBkA.BmF6b5juUa.jpg",
+                    "size": 1600,
+                    "square": false,
+                    "width": 1600
+                },
+                {
+                    "height": 882,
+                    "href": "/fotoweb/cache/v2/Y/0/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljwCUA.fsmuHY8-hy.jpg",
+                    "size": 2400,
+                    "square": false,
+                    "width": 2400
+                },
+                {
+                    "height": 74,
+                    "href": "/fotoweb/cache/v2/0/9/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljkAMA.RsYbjm70lG.jpg",
+                    "size": 200,
+                    "square": false,
+                    "width": 200
+                },
+                {
+                    "height": 110,
+                    "href": "/fotoweb/cache/v2/L/B/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljWAUA.mb3jYHiReN.jpg",
+                    "size": 300,
+                    "square": false,
+                    "width": 300
+                },
+                {
+                    "height": 147,
+                    "href": "/fotoweb/cache/v2/C/d/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljIAcA.Cho-lfKrD8.jpg",
+                    "size": 400,
+                    "square": false,
+                    "width": 400
+                },
+                {
+                    "height": 221,
+                    "href": "/fotoweb/cache/v2/y/k/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljsAkA.ko8kPLJIbH.jpg",
+                    "size": 600,
+                    "square": false,
+                    "width": 600
+                },
+                {
+                    "height": 100,
+                    "href": "/fotoweb/cache/v2/q/E/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljyAQ.BvYqTE5so0.jpg",
+                    "size": 100,
+                    "square": true,
+                    "width": 100
+                },
+                {
+                    "height": 200,
+                    "href": "/fotoweb/cache/v2/v/A/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljkAME.2u0e45DA2-.jpg",
+                    "size": 200,
+                    "square": true,
+                    "width": 200
+                },
+                {
+                    "height": 200,
+                    "href": "/fotoweb/cache/v2/v/A/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljkAME.2u0e45DA2-.jpg",
+                    "size": 200,
+                    "square": true,
+                    "width": 200
+                },
+                {
+                    "height": 400,
+                    "href": "/fotoweb/cache/v2/A/L/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWVjcWljIAcE.IGbxWLuH-Z.jpg",
+                    "size": 400,
+                    "square": true,
+                    "width": 400
+                }
+            ],
+            "previewToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Vub25pYy5mb3Rvd2FyZS5jbG91ZC9mb3Rvd2ViLyIsInN1YiI6IjE1MDAzIiwiZXhwIjoxNjg3NTA5NTY5LCJuYmYiOjE2ODc1MDU5NjksImlhdCI6MTY4NzUwNTk2OSwianRpIjoidHJXUy9xaGYwc0pRU1ZucFdBUjZENWtGZ3llL1dHVGFjR1BwQ2xsd3BQcz0iLCJhc3MiOiJhcmNoaXZlcy81MDAwL0ZvbGRlciUyMDE5L0ZvbGRlciUyMDE5L3Rlc3RfcmVuYW1lXzM2LmpwZWciLCJyZXYiOiIiLCJhdWQiOiJwcmV2aWV3X3Rva2VuIiwic2NvcGUiOlsiYXJiaXRyYXJ5X3JlbmRpdGlvbnMiXX0.cha7XDoKAFj6hSCMVBflxepmV_YPnyHM9uxAgvkVpOA",
+            "props": {
+                "annotations": {
+                    "enabled": false
+                },
+                "comments": {
+                    "enabled": false
+                },
+                "owner": null,
+                "shares": {
+                    "enabled": false
+                },
+                "tags": []
+            },
+            "quickRenditions": [],
+            "renditions": [
+                {
+                    "default": true,
+                    "description": "Original File",
+                    "display_name": "Original File",
+                    "height": 136,
+                    "href": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info/__renditions/ORIGINAL",
+                    "original": true,
+                    "profile": "2af4914d-6c11-4b15-a7ee-a4260efc8309",
+                    "sizeFixed": false,
+                    "width": 370
+                },
+                {
+                    "default": false,
+                    "description": "ComLockRenditionDescription",
+                    "display_name": "ComLockRendition",
+                    "height": 0,
+                    "href": "/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info/__renditions/07c8334c-d869-4897-a53d-98c28e706d2f",
+                    "original": false,
+                    "profile": "07c8334c-d869-4897-a53d-98c28e706d2f",
+                    "sizeFixed": true,
+                    "width": 0
+                }
+            ],
+            "revisioncount": 0,
+            "thumbnailFields": {
+                "additionalFields": [
+                    {
+                        "value": [],
+                        "views": [
+                            "desktop",
+                            "widgets",
+                            "web"
+                        ]
+                    },
+                    {
+                        "value": "",
+                        "views": [
+                            "desktop",
+                            "widgets",
+                            "web"
+                        ]
+                    }
+                ],
+                "firstLine": {
+                    "value": ""
+                },
+                "label": {
+                    "value": "test_rename_36.jpeg"
+                },
+                "secondLine": {
+                    "value": [
+                        "Add author",
+                        "Another author"
+                    ]
+                }
+            },
+            "uniqueid": "",
+            "workflowcount": 0
+        },
+        "metadataDiff": {
+            "changedFields": [
+                {
+                    "diff": {
+                        "added": {
+                            "values": [
+                                {
+                                    "s": "Taggy"
+                                }
+                            ]
+                        },
+                        "new": {
+                            "values": [
+                                {
+                                    "s": "Taggy"
+                                }
+                            ]
+                        },
+                        "old": null
+                    },
+                    "field": {
+                        "id": 25,
+                        "label": "Keywords"
+                    }
+                }
+            ]
+        }
+    },
+    "description": "",
+    "file-size": "14336",
+    "href": "https://enonic.fotoware.cloud/fotoweb/archives/5000-All-files/Folder%2019/Folder%2019/test_rename_36.jpeg.info",
+    "id": "b63d2400-9a19-48ca-8c54-310a41fbb8bc",
+    "operation-name": "updateMetadata",
+    "pixel-height": "136",
+    "pixel-width": "370",
+    "preview-href": "https://enonic.fotoware.cloud/fotoweb/cache/v2/3/H/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljQA0A.L9WlkN5UgV.jpg",
+    "tags": "Taggy",
+    "thumbnail-href": "https://enonic.fotoware.cloud/fotoweb/cache/v2/O/m/Folder%2019/Folder%2019/test_rename_36.jpeg.iCexlqbVMWljcWljkAMA.hdaHXVh1Lx.jpg",
+    "title": "",
+    "type": "asset"
+}

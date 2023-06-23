@@ -29,6 +29,9 @@ export namespace HttpClient {
 		body: string|null // Body of the response as string. Null if the response content-type is not of type text.
 		bodyStream?: unknown
 		contentType: string
+		cookies?: AnyObject[]
+		headers?: Record<string,string>
+		message?: string
 		status: number
 	}
 } // namespace HttpClient
