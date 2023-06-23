@@ -3,7 +3,6 @@ import type {Request} from '/lib/xp/Request';
 import type {HandleAssetModifiedParams} from '/tasks/handleAssetModifiedHook/handleAssetModifiedHook';
 
 
-
 import {
 	arrayIncludes,
 	startsWith,
@@ -34,7 +33,8 @@ import {buildLicensedTo} from '/lib/fotoware/xp/buildLicensedTo';
 import {isLicenseValid} from '/lib/fotoware/xp/isLicenseValid';
 import {
 	CHECK_REMOTE_ADDRESS,
-	DEBUG_INCOMING_REQUESTS
+	DEBUG_INCOMING_REQUESTS,
+	HTTP_RESPONSE_STATUS_CODES
 } from '../../../constants';
 
 
@@ -49,7 +49,7 @@ export const assetModified = (request: Request) => {
 
 	if (!isLicenseValid(licenseDetails)) {
 		log.error(buildLicensedTo(licenseDetails));
-		return {status: 404};
+		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
 	}
 
 	const {
@@ -63,22 +63,22 @@ export const assetModified = (request: Request) => {
 
 	if (!request.body) {
 		log.error(`Request without body ${toStr(request)}`);
-		return {status: 404};
+		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
 	}
 
 	if (!remoteAddress) {
 		log.error(`Request without remoteAddress ${toStr(request)}`);
-		return {status: 404};
+		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
 	}
 
 	if (!userAgent) {
 		log.error(`Missing userAgent in request! ${toStr(request)}`);
-		return {status: 404};
+		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
 	}
 
 	if (!arrayIncludes(SUPPORTED_USERAGENTS, userAgent)) {
 		log.error(`Illegal userAgent in request! ${toStr(request)}`);
-		return {status: 404};
+		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
 	}
 
 	let body;
@@ -87,10 +87,10 @@ export const assetModified = (request: Request) => {
 		log.debug(`body:${toStr(body)}`);
 	} catch (e) {
 		log.error(`Something went wrong when trying to parse request body ${toStr(request)}`);
-		return {status: 404};
+		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
 	}
 
-	let fileNameNewVar :string, fileNameOldVar :string, hrefFromHookVar :string;
+	let fileNameNewVar: string, fileNameOldVar: string, hrefFromHookVar: string;
 	try {
 		fileNameNewVar = getIn(body, 'data.asset.filename');
 		fileNameOldVar = getIn(body, 'previous-name');
@@ -107,7 +107,7 @@ export const assetModified = (request: Request) => {
 		}
 	} catch (e) {
 		log.error(`Something is wrong with asset modified body:${toStr(body)}`, e);
-		return {status: 400};
+		return { status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST };
 	}
 	const fileNameNew = fileNameNewVar;
 	const fileNameOld = fileNameOldVar;
@@ -119,12 +119,12 @@ export const assetModified = (request: Request) => {
 	if (startsWith(fileNameOld, '.') || startsWith(fileNameNew, '.')) {
 		log.warning(`Skipping fileNameOld:${fileNameOld} fileNameNew:${fileNameNew} because it starts with a dot, so probabbly a hidden file.`);
 		return {
-			status: 200
+			status: HTTP_RESPONSE_STATUS_CODES.OK
 		};
 	}
 
 	const url = new URL(hrefFromHook);
-	const siteName :string = url.getHost().replace('.fotoware.cloud', '');
+	const siteName: string = url.getHost().replace('.fotoware.cloud', '');
 	//log.debug(`site:${toStr(site)}`);
 
 	const {
@@ -138,7 +138,7 @@ export const assetModified = (request: Request) => {
 		log.debug(`Object.keys(sitesConfigs):${toStr(Object.keys(sitesConfigs))}`);
 		log.error(`Can't find siteConfig for site:${siteName}!`);
 		return {
-			status: 500
+			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
 		};
 	}
 
@@ -148,7 +148,7 @@ export const assetModified = (request: Request) => {
 	//log.debug(`remoteAddresses:${toStr(remoteAddresses)}`);
 	if (CHECK_REMOTE_ADDRESS && !arrayIncludes(Object.keys(remoteAddresses), remoteAddress)) {
 		log.error(`Illegal remoteaddress in request! ${toStr(request)}`);
-		return {status: 404};
+		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
 	}
 	runInContext({
 		repository: 'system-scheduler',
@@ -181,6 +181,7 @@ export const assetModified = (request: Request) => {
 	}); // runInContext
 	return {
 		body: {},
-		contentType: 'application/json;charset=utf-8'
+		contentType: 'application/json;charset=utf-8',
+		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};
 }; // assetModified

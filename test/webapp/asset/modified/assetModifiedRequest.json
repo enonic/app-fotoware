@@ -1,0 +1,33 @@
+{
+    "body": null,
+    "branch": "draft",
+    "contentType": "application/json",
+    "contextPath": "/webapp/com.enonic.app.fotoware",
+    "cookies": {},
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate",
+        "Connection": "keep-alive",
+        "Content-Length": "12836",
+        "Content-Type": "application/json",
+        "Host": "enonic-fotowaretest.enonic.cloud",
+        "User-Agent": "FotoWeb/8.1",
+        "X-Forwarded-For": null,
+        "X-Forwarded-Host": "enonic-fotowaretest.enonic.cloud",
+        "X-Forwarded-Proto": "https",
+        "X-Forwarded-Server": "enonic-fotowaretest.enonic.cloud"
+    },
+    "host": "enonic-fotowaretest.enonic.cloud",
+    "method": "POST",
+    "mode": "live",
+    "params": {},
+    "path": "/hooks/asset/modified",
+    "pathParams": {},
+    "port": 443,
+    "rawPath": "/webapp/com.enonic.app.fotoware/asset/modified",
+    "remoteAddress": null,
+    "repositoryId": "com.enonic.cms.default",
+    "scheme": "https",
+    "url": "https://enonic-fotowaretest.enonic.cloud/hooks/asset/modified",
+    "webSocket": false
+}

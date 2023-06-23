@@ -11,7 +11,10 @@ module.exports = {
 		},
 	},
 	moduleNameMapper: {
-		'/lib/fotoware/(.*)': '<rootDir>/src/main/resources/lib/fotoware/$1'
+		'/lib/fotoware/(.*)': '<rootDir>/src/main/resources/lib/fotoware/$1',
+		// '/lib/xp/(.*)': '<rootDir>/src/main/resources/lib/xp/$1', // Could not locate module /lib/xp/common mapped as
+		'/lib/xp/ContentAlreadyExistsException': '<rootDir>/src/main/resources/lib/xp/ContentAlreadyExistsException',
+		'/tasks/(.*)': '<rootDir>/src/main/resources/tasks/$1'
 	},
 	preset: 'ts-jest/presets/js-with-babel-legacy',
 	// preset: 'ts-jest/presets/js-with-babel',

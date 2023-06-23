@@ -56,6 +56,8 @@ export const modifyMediaContent = ({
 			requireValid: false // May contain extra undefined x-data
 		}); // modifyContent
 	} catch (e: unknown) {
+		log.debug('modifyContent catch');
+		log.debug(e);
 		// if (e instanceof Error) {
 		if (is.error(e)) {
 			if (e.class.name === 'com.enonic.xp.data.ValueTypeException') {
