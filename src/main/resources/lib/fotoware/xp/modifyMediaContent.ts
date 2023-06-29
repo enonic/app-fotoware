@@ -41,9 +41,10 @@ export const modifyMediaContent = ({
 	metadata: Metadata
 	properties: SiteConfigProperties
 }) => {
-	//log.debug(`modifyMediaContent properties:${toStr(properties)}`);
+	// log.debug(`modifyMediaContent properties:${toStr(properties)}`);
+	let modifiedContent: MediaContent;
 	try {
-		modifyContent<MediaContent['data'], 'media:image'>({
+		modifiedContent = modifyContent<MediaContent['data'], 'media:image'>({
 			key,
 			editor: (content) => updateMetadataOnContent({
 				content,
@@ -54,7 +55,7 @@ export const modifyMediaContent = ({
 				properties
 			}) as Content<MediaContent['data'], 'media:image'>,
 			requireValid: false // May contain extra undefined x-data
-		}); // modifyContent
+		}) as MediaContent; // modifyContent
 	} catch (e: unknown) {
 		log.debug('modifyContent catch');
 		log.debug(e);
@@ -88,4 +89,6 @@ export const modifyMediaContent = ({
 		}
 		throw(e); // This will never happen :)
 	} // catch
+	// log.debug('modifyMediaContent modifiedContent:%s', modifiedContent); // wihtout toStr for jest tests
+	return modifiedContent;
 }

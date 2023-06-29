@@ -75,7 +75,7 @@
     "@enonic-types/lib-repo": "^7.13.0-B1",
     "@enonic-types/lib-scheduler": "^7.13.0-B1",
     "@enonic-types/lib-task": "^7.13.0-B1",
-    "@enonic/mock-xp": "^0.4.0",
+    "@enonic/mock-xp": "^0.6.1",
     "@jest/globals": "^29",
     "@swc/core": "^1",
     "@types/get-value": "^3",

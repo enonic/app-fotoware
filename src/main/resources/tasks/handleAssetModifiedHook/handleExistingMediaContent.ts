@@ -37,7 +37,10 @@ import {
 // import {getTags} from '/lib/fotoware/asset/metadata/getTags';
 import {updateMedia} from '/lib/fotoware/content';
 import {ContentAlreadyExistsException} from '/lib/xp/ContentAlreadyExistsException';
-import {getMimeType, readText} from '/lib/xp/io';
+import {
+	getMimeType,
+	readText
+} from '/lib/xp/io';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 // import {shouldUpdateArtist} from '/lib/fotoware/xp/shouldUpdateArtist';
@@ -59,18 +62,31 @@ interface HandleExistingMediaContent {
 }
 
 
-export function handleExistingMediaContent({
-	exisitingMediaContent,
-	downloadRenditionResponse,
-	fileNameNew,
-	fileNameOld,
-	mappings,
-	md5sumOfDownload,
-	metadata,
-	project,
-	properties
-} :HandleExistingMediaContent) {
-	log.debug(`exisitingMediaContent:${toStr(exisitingMediaContent)}`);
+export function handleExistingMediaContent(params: HandleExistingMediaContent) {
+	// log.debug('handleExistingMediaContent(%s)', toStr(params));
+
+	const {
+		exisitingMediaContent,
+		downloadRenditionResponse,
+		fileNameNew,
+		fileNameOld,
+		mappings,
+		md5sumOfDownload,
+		metadata,
+		project,
+		properties
+	} = params;
+	// log.debug('handleExistingMediaContent(%s)', {
+	// 	exisitingMediaContent,
+	// 	// downloadRenditionResponse, bodyStream is huge
+	// 	fileNameNew,
+	// 	fileNameOld,
+	// 	mappings,
+	// 	md5sumOfDownload,
+	// 	metadata,
+	// 	project,
+	// 	properties
+	// });
 
 	const {
 		_id: exisitingMediaContentId,
@@ -84,6 +100,12 @@ export function handleExistingMediaContent({
 			} = {}
 		} = {}
 	} = exisitingMediaContent;
+	// log.debug('handleExistingMediaContent %s', {
+	// 	exisitingMediaContentId,
+	// 	existingDisplayName,
+	// 	md5sumFromContent,
+	// 	existingAttachmentName
+	// });
 
 	if (!isString(existingAttachmentName)) {
 		log.error('exisitingMediaContent.data.media.attachment is not a string! exisitingMediaContentId:%s', exisitingMediaContentId);
@@ -96,6 +118,7 @@ export function handleExistingMediaContent({
 			key: exisitingMediaContentId,
 			name: fileNameOld
 		});
+		// log.debug('handleExistingMediaContent exisitingMediaContentAttachmentStream:%s', exisitingMediaContentAttachmentStream); // huge!
 
 		if (exisitingMediaContentAttachmentStream == null) {
 			log.error('Unable to getAttachmentStream({key:%s, name:%s})!', exisitingMediaContentId, fileNameOld);
@@ -159,8 +182,9 @@ export function handleExistingMediaContent({
 				? potentialNewTags
 				: exisitingMediaContent.data.tags*/
 		});
-		const contentAfterUpdateMedia = getContentByKey({key: exisitingMediaContentId});
-		log.debug(`contentAfterUpdateMedia:${toStr(contentAfterUpdateMedia)}`);
+		// const contentAfterUpdateMedia =
+		getContentByKey({key: exisitingMediaContentId});
+		// log.debug('contentAfterUpdateMedia:%s', toStr(contentAfterUpdateMedia));
 	}
 
 	if (
@@ -189,12 +213,17 @@ export function handleExistingMediaContent({
 		modify: true,
 		properties
 	});
-	//log.info(`maybeModifiedMediaContent:${toStr(maybeModifiedMediaContent)}`);
+	// log.debug('maybeModifiedMediaContent:%s', toStr(maybeModifiedMediaContent));
 
+	let exisitingOrModifiedMediaContent: MediaContent;
 	if (!deepEqual(exisitingMediaContent, maybeModifiedMediaContent)) {
 		const differences = detailedDiff(exisitingMediaContent, maybeModifiedMediaContent);
-		log.debug(`_path:${exisitingMediaContent._path} differences:${toStr(differences)}`);
-		modifyMediaContent({
+		// Debug without toStr to get more readable output when running tests
+		// log.error('handleExistingMediaContent _path:%s exisitingMediaContent:%s maybeModifiedMediaContent:%s differences:%s', exisitingMediaContent._path, exisitingMediaContent, maybeModifiedMediaContent, differences);
+		log.debug('handleExistingMediaContent _path:%s differences:%s', exisitingMediaContent._path, toStr(differences));
+		// log.error('handleExistingMediaContent _path:%s differences:%s', exisitingMediaContent._path, differences); // Without toStr to get more readable output when running tests
+
+		exisitingOrModifiedMediaContent = modifyMediaContent({
 			exisitingMediaContent,
 			key: exisitingMediaContent._path,
 			mappings,
@@ -202,9 +231,10 @@ export function handleExistingMediaContent({
 			metadata,
 			properties
 		});
-	} /*else {
-		log.debug(`_path:${exisitingMediaContent._path} no differences :)`);
-	}*/
+	} else {
+		// log.error('_path:%s no differences :)', exisitingMediaContent._path);
+		exisitingOrModifiedMediaContent = exisitingMediaContent;
+	}
 
 	if (
 		fileNameNew !== fileNameOld // Renamed in FotoWare
@@ -245,7 +275,9 @@ export function handleExistingMediaContent({
 			targetBranch: 'master'
 		};
 		//log.debug(`_path:${exisitingMediaContent._path} publishParams:${toStr(publishParams)}`);
-		const publishRes = publish(publishParams);
-		log.debug(`_path:${exisitingMediaContent._path} publishRes:${toStr(publishRes)}`);
+		// const publishRes =
+		publish(publishParams);
+		// log.debug('_path:%s publishRes:%s', exisitingMediaContent._path, toStr(publishRes));
 	}
+	return exisitingOrModifiedMediaContent;
 }

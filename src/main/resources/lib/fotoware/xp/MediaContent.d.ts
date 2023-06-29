@@ -20,13 +20,13 @@ export type MediaContent = Content<{
 	}
 	media: {
 		attachment: string
-		focalPoint: {
+		focalPoint?: {
 			x: number
 			y: number
 		}
 	}
 	tags?: string|string[]
 },
-	'media:image',
+	'media:image'|'media:unknown',
 	PageComponent
 >

@@ -109,11 +109,17 @@ module.exports = {
 		'no-tabs': ['off'],
 		'no-underscore-dangle': ['error', {
 			allow: [
+				'_childOrder', // node property
 				'_id', // node property
+				'_indexConfig', // node property
+				'_inheritsPermissions', // node property
 				'_name', // node property
+				'_nodeType', // node property
 				'_path', // content-type property
 				'_selected', // option-set property
-				'_ts' // node property
+				'_state', // node property
+				'_ts', // node property
+				'_versionKey', // node property
 			],
 			allowAfterThis: false,
 			allowAfterSuper: false,
