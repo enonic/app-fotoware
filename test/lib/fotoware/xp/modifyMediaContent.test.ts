@@ -111,7 +111,7 @@ const NODE_CREATE_PARAMS = {
 		size: 8,
 		sha512: 'sha512'
 	},
-	creator: 'user:system:cwe',
+	creator: 'user:system:su',
 	createdTime: '2023-05-26T12:40:03.693253Z',
 	data: {
 		artist: '',
@@ -127,9 +127,9 @@ const NODE_CREATE_PARAMS = {
 		tags: ''
 	},
 	displayName: FILESTEM,
-	modifier: 'user:system:cwe',
+	modifier: 'user:system:su',
 	modifiedTime: '2023-05-26T12:40:03.693253Z',
-	owner: 'user:system:cwe',
+	owner: 'user:system:su',
 	type: 'media:image',
 	valid: true,
 	x: {

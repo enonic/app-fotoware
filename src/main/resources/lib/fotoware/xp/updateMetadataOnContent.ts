@@ -122,8 +122,20 @@ export const updateMetadataOnContent = ({
 			} else {
 				// The new value is empty
 				if (policy !== PROPERTY_ON_CREATE) {
-					log.info('Deleting %s was:%s', xpPath, getIn(dereffedContent, xpPath));
-					deleteIn(dereffedContent, xpPath);
+					const prevValue = getIn(dereffedContent, xpPath);
+					if ([
+						'data.artist',
+						'data.copyright',
+						'data.tags'
+					].includes(xpPath)) {
+						log.info("Setting %s to '' was:%s", xpPath, prevValue);
+						setIn(dereffedContent, xpPath, '');
+					} else if (xpPath === 'displayName') {
+						log.warning('displayName is not allowed to be empty! untouched:%s', prevValue);
+					} else {
+						log.info('Deleting %s was:%s', xpPath, prevValue);
+						deleteIn(dereffedContent, xpPath);
+					}
 				}
 			}
 		} // for xpPaths
@@ -170,10 +182,12 @@ export const updateMetadataOnContent = ({
 	if (getIn(dereffedContent, ['x', 'media']) && Object.keys(getIn(dereffedContent, ['x', 'media'])).length === 0) {
 		deleteIn(dereffedContent, 'x', 'media');
 	}
-	if (Object.keys(getIn(dereffedContent, 'x')).length === 0) {
-		delete dereffedContent.x;
-	}
 
-	log.debug('modified content:%s', toStr(dereffedContent));
+	// Existing content typically has an empty x-object, so let's keep it so diff is empty
+	// if (Object.keys(getIn(dereffedContent, 'x')).length === 0) {
+	// 	delete dereffedContent.x;
+	// }
+
+	log.debug('updateMetadataOnContent content:%s', toStr(dereffedContent));
 	return dereffedContent;
 }

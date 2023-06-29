@@ -105,7 +105,7 @@ const PROPERTY_POLICY: SiteConfigProperties = {
 const METADATA_VALUE_5_ORIG_FROM_FW = '5 (title displayname) original value from FotoWare';
 const METADATA_VALUE_25_ORIG_FROM_FW = '25 (tags) original value from FotoWare';
 const METADATA_VALUE_80_ORIG_FROM_FW = '80 (author artist) original value from FotoWare';
-const METADATA_VALUE_116_ORIG_FROM_FW = '116 (copyright) original value from FotoWare';
+const METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW = '116 (copyright) original value from FotoWare';
 const METADATA_VALUE_120_ORIG_FROM_FW = '120 (description) original value from FotoWare';
 
 const METADATA_VALUE_5_CHANGED_FROM_FW = '5 (title displayname) changed value from FotoWare';
@@ -138,7 +138,7 @@ const MEDIA_CONTENT_WITHOUT_METADATA: MediaContent = {
 		}
 	},
 	childOrder: 'modifiedtime DESC',
-	creator: 'user:system:cwe',
+	creator: 'user:system:su',
 	createdTime: '2023-05-26T12:40:03.693253Z',
 	data: {
 		artist: '',
@@ -156,10 +156,10 @@ const MEDIA_CONTENT_WITHOUT_METADATA: MediaContent = {
 	displayName: 'image',
 	hasChildren: false,
 	language: 'en_US',
-	modifier: 'user:system:cwe',
+	modifier: 'user:system:su',
 	modifiedTime: '2023-05-26T13:00:00.123456Z',
 	originProject: 'originProject',
-	owner: 'user:system:cwe',
+	owner: 'user:system:su',
 	page: {} as PageComponent,
 	type: 'media:image',
 	valid: true,
@@ -185,11 +185,11 @@ const NEW_MEDIA_CONTENT: MediaContent = {
 		...deref(MEDIA_CONTENT_WITHOUT_METADATA.data),
 		altText: METADATA_VALUE_120_ORIG_FROM_FW,
 		artist: METADATA_VALUE_80_ORIG_FROM_FW,
-		copyright: METADATA_VALUE_116_ORIG_FROM_FW,
+		copyright: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW,
 		fotoWare: {
 			md5sum: '1',
 			metadata: {
-				'116': METADATA_VALUE_116_ORIG_FROM_FW,
+				'116': METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW,
 				'120': METADATA_VALUE_120_ORIG_FROM_FW,
 				'25': METADATA_VALUE_25_ORIG_FROM_FW,
 				'5': METADATA_VALUE_5_ORIG_FROM_FW,
@@ -248,7 +248,7 @@ describe('lib', () => {
 							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
 							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
-							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
@@ -258,13 +258,14 @@ describe('lib', () => {
 
 				// test('it does nothing, when nothing is changed', () => {
 				// 	expect(updateMetadataOnContent({
-				// 		content: MEDIA_CONTENT_CHANGED_IN_XP,
+				// 		content: deref(MEDIA_CONTENT_CHANGED_IN_XP),
+				// 		mappings: MAPPINGS,
 				// 		md5sum: '1',
 				// 		metadata: {
 				// 			5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
 				// 			25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 				// 			80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
-				// 			116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+				// 			116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 				// 			120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 				// 		},
 				// 		// modify: true,
@@ -320,12 +321,12 @@ describe('lib', () => {
 					})).toStrictEqual(content_with_changes);
 				});
 
-				test('it deletes deleted fields', () => {
+				test('it deletes or empties deleted fields, except displayName', () => {
 					const data = deref(MEDIA_CONTENT_CHANGED_IN_XP.data)
 					delete data.altText;
-					delete data.artist;
-					delete data.copyright;
-					delete data.tags;
+					setIn(data, 'artist', '');
+					setIn(data, 'copyright', '');
+					setIn(data, 'tags', '');
 
 					const fw = data.fotoWare;
 					if (fw && hasOwnProperty(fw, 'metadata')) {
@@ -349,7 +350,10 @@ describe('lib', () => {
 						md5sum: '1',
 						metadata: {},
 						modify: true,
-						properties: PROPERTY_POLICY
+						properties: {
+							...PROPERTY_POLICY,
+							displayName: PROPERTY_IF_CHANGED
+						}
 					})).toStrictEqual(contentWithDeletedFields);
 				});
 
@@ -369,7 +373,7 @@ describe('lib', () => {
 						// 	fotoWare: {
 						// 		md5sum: '1',
 						// 		metadata: {
-						// 			'116': METADATA_VALUE_116_ORIG_FROM_FW,
+						// 			'116': METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW,
 						// 			'120': METADATA_VALUE_120_ORIG_FROM_FW,
 						// 			'25': METADATA_VALUE_25_ORIG_FROM_FW,
 						// 			'5': METADATA_VALUE_5_ORIG_FROM_FW,
@@ -394,7 +398,7 @@ describe('lib', () => {
 							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
 							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
-							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
@@ -411,7 +415,7 @@ describe('lib', () => {
 							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
 							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
-							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						modify: true,
@@ -420,7 +424,7 @@ describe('lib', () => {
 						...deref(MEDIA_CONTENT_CHANGED_IN_XP),
 						data: {
 							...deref(MEDIA_CONTENT_CHANGED_IN_XP.data),
-							copyright: METADATA_VALUE_116_ORIG_FROM_FW,
+							copyright: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW,
 							fotoWare: {
 								...deref(MEDIA_CONTENT_CHANGED_IN_XP.data.fotoWare),
 								md5sum: '2',
@@ -439,7 +443,7 @@ describe('lib', () => {
 							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
 							115: { value: '115 original value from FotoWare' },
-							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW },
 						},
 						// modify: true,
@@ -500,46 +504,12 @@ describe('lib', () => {
 							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
 							// No 115 anymore :)
-							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW },
 						},
 						modify: true,
 						properties: PROPERTY_POLICY
 					})).toStrictEqual(contentWithExtraMetadataDeleted);
-				});
-
-				// This probably doesn't happen in real life, but it's a good test
-				test('it deletes empty x-data', () => {
-					const mediaContentWithoutImageInfo: MediaContent = {
-						...deref(MEDIA_CONTENT_WITHOUT_METADATA),
-						data: {
-							...deref(MEDIA_CONTENT_WITHOUT_METADATA.data),
-							fotoWare: {
-								md5sum: '1',
-							}
-						},
-						x: {
-							media: {
-								imageInfo: {}
-							}
-						}
-					};
-					deleteIn(mediaContentWithoutImageInfo as unknown as NestedRecord, 'data', 'artist');
-					deleteIn(mediaContentWithoutImageInfo as unknown as NestedRecord, 'data', 'copyright');
-					deleteIn(mediaContentWithoutImageInfo as unknown as NestedRecord, 'data', 'tags');
-					const mediaContentWithoutXData: MediaContent = {
-						...deref(mediaContentWithoutImageInfo),
-					}
-					// @ts-ignore
-					delete mediaContentWithoutXData.x;
-					expect(updateMetadataOnContent({
-						content: mediaContentWithoutImageInfo,
-						mappings: MAPPINGS,
-						md5sum: '1',
-						metadata: {},
-						modify: true,
-						properties: PROPERTY_POLICY
-					})).toStrictEqual(mediaContentWithoutXData);
 				});
 
 				test('it deletes old x-data', () => {
@@ -562,14 +532,14 @@ describe('lib', () => {
 							}
 						}
 					};
-					deleteIn(mediaContentWithOldXData as unknown as NestedRecord, 'data', 'artist');
-					deleteIn(mediaContentWithOldXData as unknown as NestedRecord, 'data', 'copyright');
-					deleteIn(mediaContentWithOldXData as unknown as NestedRecord, 'data', 'tags');
+					setIn(mediaContentWithOldXData, ['data', 'artist'], '');
+					setIn(mediaContentWithOldXData, ['data', 'copyright'], '');
+					setIn(mediaContentWithOldXData, ['data', 'tags'], '');
 					const mediaContentWithoutOldXData: MediaContent = {
 						...deref(mediaContentWithOldXData),
 					}
 					// @ts-ignore
-					delete mediaContentWithoutOldXData.x;
+					deleteIn(mediaContentWithoutOldXData.x, X_APP_NAME);
 					expect(updateMetadataOnContent({
 						content: mediaContentWithOldXData,
 						mappings: MAPPINGS,
@@ -588,14 +558,17 @@ describe('lib', () => {
 					const mediaContentWithoutData: MediaContent = deref(MEDIA_CONTENT_WITHOUT_METADATA);
 					// @ts-ignore
 					delete mediaContentWithoutData.data;
-					// print({mediaContentWithoutData}, { maxItems: Infinity });
+					// log.debug('mediaContentWithoutData:%s', mediaContentWithoutData);
 
 					const mediaContentWithData: MediaContent = {
 						...deref(mediaContentWithoutData),
 						data: {
+							artist: '',
+							copyright: '',
 							fotoWare: {
 								md5sum: '1',
 							},
+							tags: '',
 						} as MediaContent['data']
 					};
 					// print({mediaContentWithData}, { maxItems: Infinity });
@@ -617,7 +590,7 @@ describe('lib', () => {
 					// print({MEDIA_CONTENT_CHANGED_IN_XP}, { maxItems: Infinity });
 
 					const mediaContentWithChangedDisplayName: MediaContent = deref(MEDIA_CONTENT_CHANGED_IN_XP);
-					setIn(mediaContentWithChangedDisplayName, ['data', 'copyright'], METADATA_VALUE_116_ORIG_FROM_FW);
+					setIn(mediaContentWithChangedDisplayName, ['data', 'copyright'], METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW);
 					setIn(mediaContentWithChangedDisplayName, ['data', 'fotoWare', 'metadata', 5], METADATA_VALUE_5_CHANGED_FROM_FW);
 					setIn(mediaContentWithChangedDisplayName, 'displayName', METADATA_VALUE_5_CHANGED_FROM_FW);
 					// print({mediaContentWithChangedDisplayName}, { maxItems: Infinity });
@@ -630,7 +603,7 @@ describe('lib', () => {
 							5: { value: METADATA_VALUE_5_CHANGED_FROM_FW },
 							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
-							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						modify: true,
@@ -662,7 +635,7 @@ describe('lib', () => {
 								'80 original Artist1 from FotoWare',
 								'80 original Artist2 from FotoWare'
 							] },
-							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
@@ -672,7 +645,7 @@ describe('lib', () => {
 
 				test('it handles copyright PROPERTY_IF_CHANGED', () => {
 					const contentWithChangedCopyright = deref(NEW_MEDIA_CONTENT) as unknown as NestedRecord;
-					deleteIn(contentWithChangedCopyright, 'data', 'copyright');
+					setIn(contentWithChangedCopyright, ['data', 'copyright'], '');
 					deleteIn(contentWithChangedCopyright, 'data', 'fotoWare', 'metadata', 116);
 
 					expect(updateMetadataOnContent({
@@ -683,7 +656,7 @@ describe('lib', () => {
 							5: { value: METADATA_VALUE_5_ORIG_FROM_FW },
 							25: { value: METADATA_VALUE_25_ORIG_FROM_FW },
 							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
-							// 116: { value: METADATA_VALUE_116_ORIG_FROM_FW }
+							// 116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW }
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
@@ -715,7 +688,7 @@ describe('lib', () => {
 								'25 original Tag2 from FotoWare'
 							]},
 							80: { value: METADATA_VALUE_80_ORIG_FROM_FW },
-							116: { value: METADATA_VALUE_116_ORIG_FROM_FW },
+							116: { value: METADATA_VALUE_116_COPYRIGHT_ORIG_FROM_FW },
 							120: { value: METADATA_VALUE_120_ORIG_FROM_FW }
 						},
 						// modify: true,
@@ -725,9 +698,6 @@ describe('lib', () => {
 
 				test('it handles falsy metadata', () => {
 					const contentWithNoMetadata = deref(MEDIA_CONTENT_WITHOUT_METADATA) as unknown as NestedRecord;
-					deleteIn(contentWithNoMetadata, 'data', 'artist');
-					deleteIn(contentWithNoMetadata, 'data', 'copyright');
-					deleteIn(contentWithNoMetadata, 'data', 'tags');
 					setIn(contentWithNoMetadata, 'data.fotoWare.md5sum', '1');
 
 					expect(updateMetadataOnContent({

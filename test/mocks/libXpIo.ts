@@ -1,5 +1,7 @@
-import type { readText } from '@enonic-types/lib-io';
-import type { ReadStream } from 'fs';
+import type {
+	getMimeType as importedGetMimeType,
+	readText
+} from '@enonic-types/lib-io';
 
 
 import { jest } from '@jest/globals';
@@ -7,15 +9,18 @@ import { jest } from '@jest/globals';
 
 export default function mockLibXpIo() {
 	jest.mock('/lib/xp/io', () => ({
+		getMimeType: jest.fn<typeof importedGetMimeType>((path) => {
+			// log.debug('getMimeType path:%s', path);
+			if (path === 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp') {
+				return 'image/webp';
+			}
+			if (path === 'fileNameNew.webp') {
+				return 'image/webp';
+			}
+			throw new Error('getMimeType mock not implemented for path: ' + path);
+		}),
 		readText: jest.fn<typeof readText>((stream) => {
-			const readerStream = stream as unknown as ReadStream;
-			readerStream.setEncoding('utf8');
-			let data = '';
-			readerStream.on('data', function(chunk){
-				data += chunk;
-				// console.log('data event: ' + data);
-			});
-			return data;
+			return stream.toString();
 		})
 	}), { virtual: true });
 }

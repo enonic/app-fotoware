@@ -1,4 +1,4 @@
-import type { NestedRecord } from '@enonic-types/core'
+import type { NestedRecord } from '@enonic-types/core';
 
 //import {toStr} from '@enonic/js-utils';
 

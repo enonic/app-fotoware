@@ -1,14 +1,14 @@
 import type { HttpClient } from '/lib/fotoware';
 
 
-import { createReadStream } from 'fs';
+import { readFileSync } from 'fs';
 import {join} from 'path';
 
 
 export default function mockOctetStreamResponse(): HttpClient.Response {
 	return {
 		body: null,
-		bodyStream: createReadStream(join(__dirname, 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp')),
+		bodyStream: readFileSync(join(__dirname, 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp')),
 		contentType: "application/octet-stream",
 		cookies: [],
 		headers: {

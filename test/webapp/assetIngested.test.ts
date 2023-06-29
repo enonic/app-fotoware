@@ -57,8 +57,7 @@ mockLibTextEncoding({
 	md5sum: MD5SUM
 });
 const {
-	connection,
-	xpPathToId
+	contentConnection
 } = mockLibXpContent();
 mockLibXpContext();
 mockLibXpIo();
@@ -107,14 +106,6 @@ const mockRequest: Request = {
 // Tests
 //──────────────────────────────────────────────────────────────────────────────
 afterEach(() => {
-	// log.info('afterEach1 xpPathToId:%s', xpPathToId);
-	Object.values(xpPathToId).forEach((id) => {
-		connection.delete(id);
-	});
-	Object.keys(xpPathToId).forEach((path) => {
-		delete xpPathToId[path];
-	});
-	// log.info('afterEach2 xpPathToId:%s', xpPathToId);
 	jest.resetModules();
 	mockLibLicense();
 });
@@ -126,36 +117,17 @@ test('creates mediacontent from assetIngested request', () => {
 			contentType: 'application/json;charset=utf-8',
 			status: 200
 		});
-		const id = xpPathToId['/content/EnonicWare/Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp'];
-		expect(id).toBeDefined();
-		if (id) {
-			const node = connection.get(id);
-			expect(node).toStrictEqual({
-				_id: id,
-				// @ts-ignore
-				_indexConfig: node['_indexConfig'],
-				_childOrder: 'modifiedtime DESC',
-				//_indexConfig // Not important for this test
-				_inheritsPermissions: true,
+		const content = contentConnection.get({ key: '/EnonicWare/Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp' });
+		expect(content).toBeDefined();
+		if (content) {
+			expect(content).toStrictEqual({
+				_id: content._id,
 				_name: 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
-				_path: '/content/EnonicWare/Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
-				// _permissions // Not important for this test
-				_nodeType: 'content',
-				_state: 'DEFAULT',
-				// @ts-ignore
-				_ts: node['_ts'],
-				// @ts-ignore
-				_versionKey: node['_versionKey'],
-				attachment: {
-					binary: 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
-					label: 'source',
-					mimeType: 'image/webp',
-					name: 'Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
-					size: 103506,
-					sha512: 'sha512'
-				},
-				creator: 'user:system:cwe',
-				createdTime: '2023-05-26T12:40:03.693253Z',
+				_path: '/EnonicWare/Thuringia_Schmalkalden_asv2020-07_img18_Schloss_Wilhelmsburg.jpg.webp',
+				attachments: {},
+				childOrder: 'displayname ASC', // hardcoded in mock-xp
+				creator: 'user:system:su',
+				createdTime: content.createdTime,
 				data: {
 					artist: [
 						'Author',
@@ -201,16 +173,18 @@ test('creates mediacontent from assetIngested request', () => {
 					]
 				},
 				displayName: 'Title',
-				modifier: 'user:system:cwe',
-				modifiedTime: '2023-05-26T12:40:03.693253Z',
-				owner: 'user:system:cwe',
+				hasChildren: true,
+				modifier: 'user:system:su',
+				modifiedTime: content.modifiedTime,
+				owner: 'user:system:su',
+				publish: {},
 				type: 'media:image',
 				valid: true,
 				x: {
 					media: {
 						imageInfo: {
-							byteSize: 103506,
-							contentType: 'image/webp',
+							byteSize: 187348,
+							// contentType: 'image/webp',
 							description: 'Description',
 							imageHeight: 600,
 							imageWidth: 480,
