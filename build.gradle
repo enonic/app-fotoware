@@ -29,8 +29,8 @@ app {
 
 
 dependencies {
-	implementation "com.enonic.xp:core-api:${xpVersion}"
-	implementation "com.enonic.xp:portal-api:${xpVersion}"
+	compile "com.enonic.xp:core-api:${xpVersion}"
+	compile "com.enonic.xp:portal-api:${xpVersion}"
 
 	include "com.enonic.xp:lib-admin:${xpVersion}"
 	include "com.enonic.xp:lib-auth:${xpVersion}"
