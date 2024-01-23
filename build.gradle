@@ -182,6 +182,7 @@ processResources {
 	exclude '**/*.ts'
 }
 
+javadoc.dependsOn npmBuild
 
 /*publishing {
 	publications {
