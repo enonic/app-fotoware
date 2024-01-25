@@ -122,17 +122,6 @@ jar.dependsOn npmBuild
 //──────────────────────────────────────────────────────────────────────────────
 // Webpack
 //──────────────────────────────────────────────────────────────────────────────
-sourceSets {
-	main {
-		java {
-			srcDir 'src/main/java'
-		}
-		resources { // Paths relative to src/main/resources
-			//exclude 'assets/**/*.svg'
-		}
-	}
-}
-
 
 // task webpack(type:NodeTask) {
 // 	dependsOn yarn_install
