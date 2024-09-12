@@ -94,10 +94,10 @@ export function query(params: {
 	//log.debug(`collectionList:${toStr(collectionList)}`);
 
 	const {paging} = collectionList;
-	if (paging) {
+	if (paging && paging.next) {
+		log.info('collectionList:%s',toStr(collectionList));
 		const errMsg = `Unhandeled paging:${toStr(paging)}`
 		log.error(errMsg);
-		throw new Error(errMsg);
 	}
 
 	let assetCountTotal = 0;
