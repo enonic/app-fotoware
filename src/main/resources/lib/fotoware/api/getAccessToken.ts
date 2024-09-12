@@ -7,7 +7,7 @@ import type {
 
 
 import {toStr} from '@enonic/js-utils';
-//@ts-ignore
+//@ts-expect-error
 import {request} from '/lib/http-client';
 import {DEBUG_REQUESTS} from '../../../constants';
 /*import {

@@ -13,9 +13,9 @@ import {
 import getIn from 'get-value';
 
 // Enonic modules
-// @ts-ignore
+// @ts-expect-error
 import {URL} from '/lib/galimatias';
-// @ts-ignore
+// @ts-expect-error
 import {validateLicense} from '/lib/license';
 import {generatePassword} from '/lib/xp/auth';
 import {run as runInContext} from '/lib/xp/context';

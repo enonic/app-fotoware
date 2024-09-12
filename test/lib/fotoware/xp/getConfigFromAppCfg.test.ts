@@ -11,7 +11,7 @@ import {
 import { getConfigFromAppCfg } from '/lib/fotoware/xp/getConfigFromAppCfg';
 
 
-// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
 	// loglevel: 'debug'
 	loglevel: 'silent'
@@ -28,7 +28,7 @@ describe('lib', () => {
 			describe('getConfigFromAppCfg', () => {
 
 				test('handles an empty app.config', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {};
 					expect(getConfigFromAppCfg()).toStrictEqual({
 						sitesConfigs:{}
@@ -36,7 +36,7 @@ describe('lib', () => {
 				});
 
 				test('handles a full app.config', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'config.filename': 'com.enonic.app.fotoware.cfg',
 						'imports.MyImportName.path': 'EnonicWare',
@@ -98,7 +98,7 @@ describe('lib', () => {
 				}); // test handles a full app.config
 
 				test('throws on a corrupt app.config', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic' : ''
 					};
@@ -106,13 +106,13 @@ describe('lib', () => {
 				});
 
 				test('logs an error on missing clientId', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic.clientSecret': 'clientSecret',
 						'sites.enonic.allowWebhookFromIp': '13.95.161.205,127.0.0.1',
 						'sites.enonic.url': 'https://enonic.fotoware.cloud'
 					};
-					// @ts-ignore 2552 Cannot find name 'log'.
+					// @ts-expect-error 2552 Cannot find name 'log'.
 					const spy = jest.spyOn(log, 'error');
 					getConfigFromAppCfg();
 					expect(spy).toHaveBeenCalledWith('Site enonic is missing clientId!');
@@ -120,13 +120,13 @@ describe('lib', () => {
 				});
 
 				test('logs an error on missing clientSecret', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic.clientId': 'clientId',
 						'sites.enonic.allowWebhookFromIp': '13.95.161.205,127.0.0.1',
 						'sites.enonic.url': 'https://enonic.fotoware.cloud'
 					};
-					// @ts-ignore 2552 Cannot find name 'log'.
+					// @ts-expect-error 2552 Cannot find name 'log'.
 					const spy = jest.spyOn(log, 'error');
 					getConfigFromAppCfg();
 					expect(spy).toHaveBeenCalledWith('Site enonic is missing clientSecret!');
@@ -134,13 +134,13 @@ describe('lib', () => {
 				});
 
 				test('logs an error on missing url', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic.clientId': 'clientId',
 						'sites.enonic.clientSecret': 'clientSecret',
 						'sites.enonic.allowWebhookFromIp': '13.95.161.205,127.0.0.1',
 					};
-					// @ts-ignore 2552 Cannot find name 'log'.
+					// @ts-expect-error 2552 Cannot find name 'log'.
 					const spy = jest.spyOn(log, 'error');
 					getConfigFromAppCfg();
 					expect(spy).toHaveBeenCalledWith('Site enonic is missing url!');
@@ -148,7 +148,7 @@ describe('lib', () => {
 				});
 
 				test('throws on when imports is corrupt', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic.clientId': 'clientId',
 						'sites.enonic.clientSecret': 'clientSecret',
@@ -160,7 +160,7 @@ describe('lib', () => {
 				});
 
 				test('logs an error when import is missing site', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic.clientId': 'clientId',
 						'sites.enonic.clientSecret': 'clientSecret',
@@ -170,7 +170,7 @@ describe('lib', () => {
 						'imports.MyImportName.project': 'fotoware',
 						'imports.MyImportName.query': '(fn:.gif|fn:.jpg|fn:.jpeg|fn:.png|fn:*.svg)AND NOT(25:notforweb)',
 					};
-					// @ts-ignore 2552 Cannot find name 'log'.
+					// @ts-expect-error 2552 Cannot find name 'log'.
 					const spy = jest.spyOn(log, 'error');
 					getConfigFromAppCfg();
 					expect(spy).toHaveBeenCalledWith('Import MyImportName is missing site!');
@@ -178,7 +178,7 @@ describe('lib', () => {
 				});
 
 				test('logs an error when import is missing project', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic.clientId': 'clientId',
 						'sites.enonic.clientSecret': 'clientSecret',
@@ -188,7 +188,7 @@ describe('lib', () => {
 						'imports.MyImportName.query': '(fn:.gif|fn:.jpg|fn:.jpeg|fn:.png|fn:*.svg)AND NOT(25:notforweb)',
 						'imports.MyImportName.site': 'enonic',
 					};
-					// @ts-ignore 2552 Cannot find name 'log'.
+					// @ts-expect-error 2552 Cannot find name 'log'.
 					const spy = jest.spyOn(log, 'error');
 					getConfigFromAppCfg();
 					expect(spy).toHaveBeenCalledWith('Import MyImportName is missing project!');
@@ -196,7 +196,7 @@ describe('lib', () => {
 				});
 
 				test('logs an error when import is referenceing a site that is not configured', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic.clientId': 'clientId',
 						'sites.enonic.clientSecret': 'clientSecret',
@@ -207,7 +207,7 @@ describe('lib', () => {
 						'imports.MyImportName.query': '(fn:.gif|fn:.jpg|fn:.jpeg|fn:.png|fn:*.svg)AND NOT(25:notforweb)',
 						'imports.MyImportName.site': 'wrongSite',
 					};
-					// @ts-ignore 2552 Cannot find name 'log'.
+					// @ts-expect-error 2552 Cannot find name 'log'.
 					const spy = jest.spyOn(log, 'error');
 					getConfigFromAppCfg();
 					expect(spy).toHaveBeenCalledWith('Unconfigured site wrongSite!');
@@ -215,7 +215,7 @@ describe('lib', () => {
 				});
 
 				test('logs an error when two imports try to write to the same location', () => {
-					// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+					// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 					global.app.config = {
 						'sites.enonic.clientId': 'clientId',
 						'sites.enonic.clientSecret': 'clientSecret',
@@ -230,7 +230,7 @@ describe('lib', () => {
 						'imports.MyImportName2.query': '(fn:.gif|fn:.jpg|fn:.jpeg|fn:.png|fn:*.svg)AND NOT(25:notforweb)',
 						'imports.MyImportName2.site': 'enonic',
 					};
-					// @ts-ignore 2552 Cannot find name 'log'.
+					// @ts-expect-error 2552 Cannot find name 'log'.
 					const spy = jest.spyOn(log, 'error');
 					getConfigFromAppCfg();
 					expect(spy).toHaveBeenCalledWith('Two imports cannot have the same project:fotoware and path:EnonicWare!');

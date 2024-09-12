@@ -40,7 +40,7 @@ export default defineConfig((options: Options) => {
 			bundle: true, // Needed to bundle @enonic/js-utils
 			dts: false, // d.ts files are use useless at runtime
 			entry: FILES_SERVER,
-			esbuildOptions(options, context) {
+			esbuildOptions(options/*, context*/) {
 				// options.alias = {
 				// 	'alias': './src/main/resources/lib/filename.js'
 				// };

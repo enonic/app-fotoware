@@ -7,7 +7,7 @@ export function mockAppConfig({
 	allowWebhookFromIp?: string
 } = {}) {
 
-	// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+	// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 	global.app.config = {
 		'config.filename': 'com.enonic.app.fotoware.cfg',
 		'imports.MyImportName.path': 'EnonicWare',

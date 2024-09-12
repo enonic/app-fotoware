@@ -7,7 +7,7 @@ export default function mockLibGalimatias({
 	host?: string
 } = {}) {
 	jest.mock('/lib/galimatias', () => ({
-		// @ts-ignore
+		// @ts-expect-error typeerror
 		URL: jest.fn().mockImplementation((_url: string) => ({
 			getHost: jest.fn().mockReturnValue(host)
 		}))

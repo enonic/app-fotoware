@@ -39,7 +39,7 @@ const MD5SUM = 'md5sum';
 mockAppConfig();
 
 
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'

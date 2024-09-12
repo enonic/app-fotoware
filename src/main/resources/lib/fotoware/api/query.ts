@@ -5,7 +5,7 @@ import type {
 	CollectionList,
 	FieldDescriptionField,
 	MetadataItemWithValue
-} from '/lib/fotoware';
+} from '..';
 
 
 import {toStr} from '@enonic/js-utils';
@@ -16,9 +16,9 @@ import uri from 'encodeuricomponent-tag';
 
 //import * as deepEqual from 'fast-deep-equal';
 //import deepEqual from 'fast-deep-equal';
-import {getMetadataView} from '/lib/fotoware/api/metadata/get';
-import {paginate} from '/lib/fotoware/api/paginate';
-import {camelize} from '/lib/fotoware/xp/camelize';
+import {getMetadataView} from './metadata/get';
+import {paginate} from './paginate';
+import {camelize} from '../xp/camelize';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
 import {DEBUG_REQUESTS} from '../../../constants';
@@ -91,10 +91,11 @@ export function query(params: {
 	//log.debug(`body:${toStr(queryRequestResponse.body)}`);
 
 	const collectionList = JSON.parse(queryRequestResponse.body) as CollectionList;
-	//log.debug(`collectionList:${toStr(collectionList)}`);
+	// log.debug('collectionList:%s', toStr(collectionList));
 
 	const {paging} = collectionList;
-	if (paging) {
+	if (paging && paging.next) {
+		// log.debug('collectionList:%s', toStr(collectionList)); // DEBUGGING
 		const errMsg = `Unhandeled paging:${toStr(paging)}`
 		log.error(errMsg);
 		throw new Error(errMsg);

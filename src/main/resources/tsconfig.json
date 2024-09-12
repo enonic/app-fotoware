@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"skipLibCheck": true,
+		"types": [
+			"@enonic-types/global",
+		]
+	},
+	"include": [
+		"./**/*.ts"
+	]
+}

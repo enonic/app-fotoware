@@ -14,7 +14,7 @@ import type {
 
 
 import {toStr} from '@enonic/js-utils';
-// @ts-ignore
+// @ts-expect-error
 import {md5} from '/lib/text-encoding';
 import {readText} from '/lib/xp/io';
 import {requestRendition} from '/lib/fotoware/api/requestRendition';

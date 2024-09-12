@@ -34,7 +34,7 @@ import RuntimeException from '../../../RuntimeException';
 import ValueTypeException from '../../../ValueTypeException';
 
 
-// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 global.app.config = {
 	'config.filename': 'com.enonic.app.fotoware.cfg',
 	'imports.MyImportName.path': 'EnonicWare',
@@ -48,7 +48,7 @@ global.app.config = {
 	'sites.enonic.url': 'https://enonic.fotoware.cloud'
 };
 
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
 	loglevel: 'silent'
 });
@@ -156,7 +156,6 @@ jest.mock('/lib/xp/content', () => ({
 		connection.delete(key);
 		return true; // TODO Hardcode (I'm using Node layer to simulate Content Layer)
 	}),
-	// @ts-ignore
 	modify: jest.fn<typeof modify>(({
 		key,
 		editor,
@@ -165,7 +164,6 @@ jest.mock('/lib/xp/content', () => ({
 		// TODO: I'm using Node layer to simulate Content Layer. I should use mock-xp to simulate Content Layer.
 		return connection.modify({
 			key,
-			// @ts-ignore
 			editor,
 			// requireValid
 		}) //as unknown as Content;

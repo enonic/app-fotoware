@@ -1,68 +1,68 @@
 {
 	"compilerOptions": {
-		"allowJs": false,
-		"baseUrl": ".",
-		"declaration": false,
-		"declarationMap": false,
-		"downlevelIteration": true,
-		"esModuleInterop": true,
-		"importHelpers": true,
-		"inlineSourceMap": false, // Doesn't seem to affect Uncoveraged Lines
-		"inlineSources": false, // Doesn't seem to affect Uncoveraged Lines
-		"listEmittedFiles": true,
-		"listFiles": false,
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"noEmitOnError": true,
-		"noErrorTruncation": true,
-		"noImplicitAny": true,
-		"noPropertyAccessFromIndexSignature": true,
-		"noUncheckedIndexedAccess": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"outDir": "build/tsc",
-		"paths": {
-			"/lib/fotoware/xp/capitalize": ["src/main/resources/lib/fotoware/xp/capitalize.ts"],
-			// Production (should be commented in on commit)
-			"/lib/fotoware": ["src/main/resources/lib/fotoware"],
-			"/lib/fotoware/xp/*": ["src/main/resources/lib/fotoware/xp/*"],
-			"/lib/fotoware/*": ["src/main/resources/lib/fotoware/*"],
-			"/tasks/*": ["src/main/resources/tasks/*"],
-			"/types": ["src/main/resources/lib/fotoware/index.d.ts"],
-			"/types/*": ["src/main/resources/lib/fotoware/types/*"],
+		// "allowJs": false,
+		// "baseUrl": ".",
+		// "declaration": false,
+		// "declarationMap": false,
+		// "downlevelIteration": true,
+		// "esModuleInterop": true,
+		// "importHelpers": true,
+		// "inlineSourceMap": false, // Doesn't seem to affect Uncoveraged Lines
+		// "inlineSources": false, // Doesn't seem to affect Uncoveraged Lines
+		// "listEmittedFiles": true,
+		// "listFiles": false,
+		// "module": "commonjs",
+		// "moduleResolution": "node",
+		// "noEmitOnError": true,
+		// "noErrorTruncation": true,
+		// "noImplicitAny": true,
+		// "noPropertyAccessFromIndexSignature": true,
+		// "noUncheckedIndexedAccess": true,
+		// "noUnusedLocals": true,
+		// "noUnusedParameters": true,
+		// "outDir": "build/tsc",
+		// "paths": {
+		// 	"/lib/fotoware/xp/capitalize": ["src/main/resources/lib/fotoware/xp/capitalize.ts"],
+		// 	// Production (should be commented in on commit)
+		// 	"/lib/fotoware": ["src/main/resources/lib/fotoware"],
+		// 	"/lib/fotoware/xp/*": ["src/main/resources/lib/fotoware/xp/*"],
+		// 	"/lib/fotoware/*": ["src/main/resources/lib/fotoware/*"],
+		// 	"/tasks/*": ["src/main/resources/tasks/*"],
+		// 	"/types": ["src/main/resources/lib/fotoware/index.d.ts"],
+		// 	"/types/*": ["src/main/resources/lib/fotoware/types/*"],
 
-			"/lib/xp/admin": ["node_modules/@enonic-types/lib-admin"],
-			"/lib/xp/auth": ["node_modules/@enonic-types/lib-auth"],
-			"/lib/xp/common": ["node_modules/@enonic-types/lib-common"],
-			"/lib/xp/content": ["node_modules/@enonic-types/lib-content"],
-			"/lib/xp/context": ["node_modules/@enonic-types/lib-context"],
-			"/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
-			"/lib/xp/portal": ["node_modules/@enonic-types/lib-portal"],
-			"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
-			"/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
-			"/lib/xp/scheduler": ["node_modules/@enonic-types/lib-scheduler"],
-			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"],
-			// "/lib/xp/*": ["src/main/resources/lib/xp/*"],
-			// "/webapp/*": ["src/main/resources/webapp/*"],
-			"/*": ["src/main/resources/*"],
+		// 	"/lib/xp/admin": ["node_modules/@enonic-types/lib-admin"],
+		// 	"/lib/xp/auth": ["node_modules/@enonic-types/lib-auth"],
+		// 	"/lib/xp/common": ["node_modules/@enonic-types/lib-common"],
+		// 	"/lib/xp/content": ["node_modules/@enonic-types/lib-content"],
+		// 	"/lib/xp/context": ["node_modules/@enonic-types/lib-context"],
+		// 	"/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
+		// 	"/lib/xp/portal": ["node_modules/@enonic-types/lib-portal"],
+		// 	"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
+		// 	"/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
+		// 	"/lib/xp/scheduler": ["node_modules/@enonic-types/lib-scheduler"],
+		// 	"/lib/xp/task": ["node_modules/@enonic-types/lib-task"],
+		// 	// "/lib/xp/*": ["src/main/resources/lib/xp/*"],
+		// 	// "/webapp/*": ["src/main/resources/webapp/*"],
+		// 	"/*": ["src/main/resources/*"],
 
-			// "/*": ["src/main/resources/lib/*"],
+		// 	// "/*": ["src/main/resources/lib/*"],
 
-			// Development (should be commented out on commit)
-			//"/lib/xp/content": ["../xp/modules/lib/lib-content/src/main/resources/lib/xp/content.ts"],
-		},
-		"removeComments": true, // Doesn't seem to affect Uncoveraged Lines
-		"resolveJsonModule": true,
-		"rootDir": ".",
-		"rootDirs": [
-			"src/main/resources",
-			// "node_modules"
-		],
+		// 	// Development (should be commented out on commit)
+		// 	//"/lib/xp/content": ["../xp/modules/lib/lib-content/src/main/resources/lib/xp/content.ts"],
+		// },
+		// "removeComments": true, // Doesn't seem to affect Uncoveraged Lines
+		// "resolveJsonModule": true,
+		// "rootDir": ".",
+		// "rootDirs": [
+		// 	"src/main/resources",
+		// 	// "node_modules"
+		// ],
 		"skipLibCheck": true,
-		"sourceMap": false, // Affect Uncoveraged Lines, but overridden for tests in jest.config.js
-		"strict": true,
-		"strictFunctionTypes": true,
-		"strictNullChecks": true,
+		// "sourceMap": false, // Affect Uncoveraged Lines, but overridden for tests in jest.config.js
+		// "strict": true,
+		// "strictFunctionTypes": true,
+		// "strictNullChecks": true,
 
 		// We set target in tsup.config.ts instead
 		// "target": "ES5", // Affects Uncovered Lines, but seems ok as along as sourceMap: true in jest.config.js
@@ -71,20 +71,23 @@
 		// 	"node_modules/@types",
 		// 	"node_modules/@enonic-types"
 		// ],
-		"types": [
-			"@enonic-types/global"
-		],
-		"verbatimModuleSyntax": false,
+		// "types": [
+		// 	// "@enonic-types/global",
+		// 	"bun"
+		// ],
+		// "verbatimModuleSyntax": false,
 	},
 	"exclude": [
 		"node_modules",
 		// "**/*.d.ts",
-		"./src/main/resources/**/*.d.ts" // Nope this destroys the globalThis.app
+		// "./src/main/resources/**/*.d.ts", // Nope this destroys the globalThis.app
+		"./src/main/resources/**/*.ts"
 	],
 	// "files": [
 	// 	"./src/main/resources/services/sitesConfigs/sitesConfigs.ts"
 	// ],
 	"include": [
-		"src/main/resources/**/*.ts"
+		"src/**/*.ts",
+		// "src/main/resources/**/*.ts",
 	]
 }

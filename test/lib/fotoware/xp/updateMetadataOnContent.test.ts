@@ -22,7 +22,6 @@ import {
 	jest,
 	test
 } from '@jest/globals';
-// @ts-ignore
 // import {print} from 'q-i';
 import {
 	PROPERTY_ON_CREATE,
@@ -54,7 +53,7 @@ function deref<T>(obj: T): T {
 }
 
 
-// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 global.app.config = {
 	'config.filename': 'com.enonic.app.fotoware.cfg',
 	'imports.MyImportName.path': 'EnonicWare',
@@ -69,7 +68,7 @@ global.app.config = {
 };
 
 
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
@@ -538,7 +537,7 @@ describe('lib', () => {
 					const mediaContentWithoutOldXData: MediaContent = {
 						...deref(mediaContentWithOldXData),
 					}
-					// @ts-ignore
+					// @ts-expect-error typeerror
 					deleteIn(mediaContentWithoutOldXData.x, X_APP_NAME);
 					expect(updateMetadataOnContent({
 						content: mediaContentWithOldXData,
@@ -555,12 +554,11 @@ describe('lib', () => {
 				//──────────────────────────────────────────────────────────────
 
 				test('it handles content without data', () => {
-					const mediaContentWithoutData: MediaContent = deref(MEDIA_CONTENT_WITHOUT_METADATA);
-					// @ts-ignore
+					const mediaContentWithoutData: Partial<MediaContent> = deref(MEDIA_CONTENT_WITHOUT_METADATA);
 					delete mediaContentWithoutData.data;
 					// log.debug('mediaContentWithoutData:%s', mediaContentWithoutData);
 
-					const mediaContentWithData: MediaContent = {
+					const mediaContentWithData = {
 						...deref(mediaContentWithoutData),
 						data: {
 							artist: '',
@@ -569,8 +567,8 @@ describe('lib', () => {
 								md5sum: '1',
 							},
 							tags: '',
-						} as MediaContent['data']
-					};
+						}
+					} as MediaContent;
 					// print({mediaContentWithData}, { maxItems: Infinity });
 					expect(updateMetadataOnContent({
 						content: mediaContentWithoutData,
@@ -705,7 +703,7 @@ describe('lib', () => {
 						mappings: MAPPINGS,
 						md5sum: '1',
 						metadata: {
-							// @ts-ignore
+							// @ts-expect-error typeerror
 							5: undefined,
 						},
 						// modify: true,

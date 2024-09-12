@@ -1,11 +1,8 @@
 plugins {
 	id 'java' // Needed for assemble and build
-	//id 'maven' // When is this needed?
 	id 'maven-publish' // Provides publishing and publishToMavenLocal
 	id 'com.enonic.defaults' version '2.1.5' // Publishing
 	id 'com.enonic.xp.app' version '3.5.0'
-
-	//id 'com.moowork.node' version '1.3.1'
 	id 'com.github.node-gradle.node' version '7.0.2'
 }
 
@@ -83,15 +80,28 @@ tasks.withType(Copy) {
 //──────────────────────────────────────────────────────────────────────────────
 node {
 	download = true
-	version = "${nodeVersion}"
+	version = "20.16.0"
 }
 
-task npmTest(type: NpmTask) {
+tasks.register('npmCheck', NpmTask) {
+	dependsOn npmInstall
+	args = [
+		'run',
+		'check'
+	]
+	environment = [
+		'FORCE_COLOR': 'true',
+	]
+}
+
+check.dependsOn npmCheck
+
+tasks.register('npmTest', NpmTask) {
 	args = [
 		'run',
 		'test'
 	]
-	dependsOn yarn_install
+	dependsOn npmInstall
 	environment = [
 		'FORCE_COLOR': 'true',
 	]
@@ -99,13 +109,13 @@ task npmTest(type: NpmTask) {
 
 test.dependsOn npmTest
 
-task npmBuild(type: NpmTask) {
+tasks.register('npmBuild', NpmTask) {
 	args = [
 		'run',
 		'--silent',
 		'build'
 	]
-	dependsOn yarn_install
+	dependsOn npmInstall
 	environment = [
 		'FORCE_COLOR': 'true',
 		'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
@@ -119,29 +129,6 @@ task npmBuild(type: NpmTask) {
 
 jar.dependsOn npmBuild
 
-//──────────────────────────────────────────────────────────────────────────────
-// Webpack
-//──────────────────────────────────────────────────────────────────────────────
-
-// task webpack(type:NodeTask) {
-// 	dependsOn yarn_install
-// 	mustRunAfter yarn_install
-// 	script = file('node_modules/webpack-cli/bin/cli.js')
-// 	args = [
-// 		'--color'
-// 	]
-// 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
-// }
-
-// jar.dependsOn webpack
-
-// task watch(type:NodeTask) {
-// 	script = file('node_modules/webpack-cli/bin/cli.js')
-// 	args = [
-// 		'--color',
-// 		'--watch'
-// 	]
-// }
 
 /*task asciidoc(type: NodeTask) {
   dependsOn yarn_install

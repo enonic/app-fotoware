@@ -27,7 +27,7 @@ import {updateMedia} from '/lib/fotoware/content';
 import {updateMetadataOnContent} from '/lib/fotoware/xp/updateMetadataOnContent';
 import {modifyMediaContent} from '/lib/fotoware/xp/modifyMediaContent';
 import {isPublished} from '/lib/fotoware/xp/isPublished';
-//@ts-ignore
+//@ts-expect-error
 import {md5} from '/lib/text-encoding';
 //import {sanitize} from '/lib/xp/common';
 import {

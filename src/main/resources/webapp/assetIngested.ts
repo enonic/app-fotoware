@@ -19,11 +19,11 @@ import deepEqual from 'fast-deep-equal';
 //import {schedule, unschedule} from '/lib/cron';
 import {SUPPORTED_USERAGENTS} from '/lib/fotoware/constants';
 import {updateMedia} from '/lib/fotoware/content';
-//@ts-ignore
+//@ts-expect-error
 import {URL} from '/lib/galimatias';
-//@ts-ignore
+//@ts-expect-error
 import {validateLicense} from '/lib/license';
-//@ts-ignore
+//@ts-expect-error
 import {md5} from '/lib/text-encoding';
 import {
 	createMedia,

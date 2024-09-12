@@ -61,7 +61,7 @@ export default function mockLibXpContent() {
 		modify: mockModify,
 		move: jest.fn<typeof importedMove>((...params) => contentConnection.move(...params)),
 		publish: jest.fn<typeof importedPublish>((...params) => contentConnection.publish(...params)),
-		// @ts-ignore
+		// @ts-expect-error typeerror
 		query: jest.fn<typeof query<Content>>((params) => {
 			log.warning('query');
 			log.debug('/lib/xp/content query(%s)', toStr(params));
@@ -76,7 +76,7 @@ export default function mockLibXpContent() {
 			} = params;
 			if (query === "_path LIKE '/content/EnonicWare/*'") {
 				const {
-					// @ts-ignore
+					// @ts-expect-error typeerror
 					boolean: {
 						must
 					}

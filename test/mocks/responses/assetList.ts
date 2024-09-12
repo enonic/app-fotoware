@@ -1,4 +1,4 @@
-import type { HttpClient } from '/lib/fotoware';
+import type { HttpClient } from '../../../src/main/resources/lib/fotoware';
 
 
 export default function mockAssetListResponse(): HttpClient.Response {

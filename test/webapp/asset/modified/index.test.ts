@@ -40,7 +40,7 @@ const USER_AGENT_ILLEGAL = 'illegal user agent';
 //──────────────────────────────────────────────────────────────────────────────
 // Globals
 //──────────────────────────────────────────────────────────────────────────────
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
@@ -126,7 +126,7 @@ test('returns 404 when remoteaddress is missing', () => {
 	import('../../../../src/main/resources/webapp/asset/modified/index').then((moduleName) => {
 		const requestWithoutRemoteAddress = deref(mockedAssetModifiedRequest);
 		delete requestWithoutRemoteAddress.remoteAddress;
-		// @ts-ignore
+		// @ts-expect-error typerror
 		deleteIn(requestWithoutRemoteAddress, 'headers', 'X-Forwarded-For');
 		expect(moduleName.assetModified(requestWithoutRemoteAddress)).toStrictEqual({
 			status: 404
@@ -137,7 +137,7 @@ test('returns 404 when remoteaddress is missing', () => {
 test('returns 404 when useragent is missing', () => {
 	import('../../../../src/main/resources/webapp/asset/modified/index').then((moduleName) => {
 		const requestWithoutUserAgent = deref(mockedAssetModifiedRequest);
-		// @ts-ignore
+		// @ts-expect-error typerror
 		deleteIn(requestWithoutUserAgent, 'headers', 'User-Agent');
 		expect(moduleName.assetModified(requestWithoutUserAgent)).toStrictEqual({
 			status: 404

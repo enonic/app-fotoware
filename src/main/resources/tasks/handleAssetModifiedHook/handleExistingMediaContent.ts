@@ -20,7 +20,7 @@ import {detailedDiff} from 'deep-object-diff';
 //import * as deepEqual from 'fast-deep-equal';
 import deepEqual from 'fast-deep-equal';
 
-// @ts-ignore
+// @ts-expect-error
 import {md5} from '/lib/text-encoding';
 
 

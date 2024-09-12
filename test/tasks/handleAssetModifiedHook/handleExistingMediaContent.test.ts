@@ -25,7 +25,7 @@ import deref from '../../deref';
 //──────────────────────────────────────────────────────────────────────────────
 // Globals
 //──────────────────────────────────────────────────────────────────────────────
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
@@ -115,7 +115,6 @@ describe('handleExistingMediaContent', () => {
 	test("modifies content when there are changes", () => {
 		import('../../../src/main/resources/tasks/handleAssetModifiedHook/handleExistingMediaContent').then((moduleName) => {
 			const res = moduleName.handleExistingMediaContent({
-				// @ts-ignore
 				exisitingMediaContent: contentConnection.get({ key: createdMediaContent._id }),
 				downloadRenditionResponse: DOWNLOAD_RENDITION_RESPONSE,
 				fileNameNew: FILENAME,
@@ -178,7 +177,6 @@ describe('handleExistingMediaContent', () => {
 				},
 				attachments: {},
 			});
-			// @ts-ignore
 			expect(mockModify).toHaveBeenCalledTimes(1);
 			mockModify.mockClear();
 		});
@@ -188,7 +186,6 @@ describe('handleExistingMediaContent', () => {
 		// log.debug('createdMediaContent: %s', createdMediaContent);
 		import('../../../src/main/resources/tasks/handleAssetModifiedHook/handleExistingMediaContent').then((moduleName) => {
 			const res = moduleName.handleExistingMediaContent({
-				// @ts-ignore
 				exisitingMediaContent: contentConnection.get({ key: createdMediaContent._id }),
 				downloadRenditionResponse: DOWNLOAD_RENDITION_RESPONSE,
 				fileNameNew: FILENAME,
@@ -261,7 +258,6 @@ describe('handleExistingMediaContent', () => {
 	test("updates media on new md5sum", () => {
 		import('../../../src/main/resources/tasks/handleAssetModifiedHook/handleExistingMediaContent').then((moduleName) => {
 			const modifiedMediaContent = moduleName.handleExistingMediaContent({
-				// @ts-ignore
 				exisitingMediaContent: contentConnection.get({ key: createdMediaContent._id }),
 				downloadRenditionResponse: DOWNLOAD_RENDITION_RESPONSE,
 				fileNameNew: FILENAME,
@@ -331,7 +327,6 @@ describe('handleExistingMediaContent', () => {
 	test("updates displayName on rename in fotoware", () => {
 		import('../../../src/main/resources/tasks/handleAssetModifiedHook/handleExistingMediaContent').then((moduleName) => {
 			const modifiedMediaContent = moduleName.handleExistingMediaContent({
-				// @ts-ignore
 				exisitingMediaContent: contentConnection.get({ key: createdMediaContent._id }),
 				downloadRenditionResponse: DOWNLOAD_RENDITION_RESPONSE,
 				fileNameNew: 'fileNameNew.webp',
@@ -407,7 +402,6 @@ describe('handleExistingMediaContent', () => {
 			const exisitingMediaContentWithoutData = contentConnection.get({ key: createdMediaContent._id });
 			deleteIn(exisitingMediaContentWithoutData as unknown as NestedRecord, 'data');
 			const fn = () => moduleName.handleExistingMediaContent({
-				// @ts-ignore
 				exisitingMediaContent: exisitingMediaContentWithoutData,
 				downloadRenditionResponse: DOWNLOAD_RENDITION_RESPONSE,
 				fileNameNew: FILENAME,
@@ -433,7 +427,6 @@ describe('handleExistingMediaContent', () => {
 			const exisitingMediaContentWithoutDataFotoWare = contentConnection.get({ key: createdMediaContent._id });
 			deleteIn(exisitingMediaContentWithoutDataFotoWare as unknown as NestedRecord, 'data', 'fotoWare');
 			const modifiedMediaContent = moduleName.handleExistingMediaContent({
-				// @ts-ignore
 				exisitingMediaContent: exisitingMediaContentWithoutDataFotoWare,
 				downloadRenditionResponse: DOWNLOAD_RENDITION_RESPONSE,
 				fileNameNew: FILENAME,
@@ -508,7 +501,6 @@ describe('handleExistingMediaContent', () => {
 
 		import('../../../src/main/resources/tasks/handleAssetModifiedHook/handleExistingMediaContent').then((moduleName) => {
 			const fn = () => moduleName.handleExistingMediaContent({
-				// @ts-ignore
 				exisitingMediaContent: exisitingMediaContentWithoutAttachmentAndMd5sum,
 				downloadRenditionResponse: DOWNLOAD_RENDITION_RESPONSE,
 				fileNameNew: 'fileNameNew.webp',
@@ -534,7 +526,6 @@ describe('handleExistingMediaContent', () => {
 			const downloadRenditionResponseWithoutBodyStream = deref(DOWNLOAD_RENDITION_RESPONSE);
 			deleteIn(downloadRenditionResponseWithoutBodyStream, 'bodyStream');
 			const fn = () => moduleName.handleExistingMediaContent({
-				// @ts-ignore
 				exisitingMediaContent: contentConnection.get({ key: createdMediaContent._id }),
 				downloadRenditionResponse: downloadRenditionResponseWithoutBodyStream,
 				fileNameNew: 'filenameWithoutAttachment',

@@ -25,7 +25,7 @@ import mockLibTextEncoding from '../../mocks/libTextEncoding';
 //──────────────────────────────────────────────────────────────────────────────
 // Globals
 //──────────────────────────────────────────────────────────────────────────────
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
+// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
@@ -82,7 +82,7 @@ test('logs an error when site is unconfigured', () => {
 });
 
 test('throws an error when site is configured, but imports are invalid', () => {
-	// @ts-ignore TS2339: Property 'app' does not exist on type 'typeof globalThis'.
+	// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
 	global.app.config = {
 		'config.filename': 'com.enonic.app.fotoware.cfg',
 		'imports.MyImportName': '',
