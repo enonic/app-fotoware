@@ -12,7 +12,7 @@ import {
 	forceArray,
 	toStr
 } from '@enonic/js-utils';
-//import * as deepEqual from 'fast-deep-equal';
+// import * as deepEqual from 'fast-deep-equal';
 import deepEqual from 'fast-deep-equal';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
@@ -33,20 +33,30 @@ export const getMetadataView = ({
 	const metadataViewRequestParams: HttpClient.Request = {
 		contentType: 'application/json',
 		followRedirects: true, // Documentation is on unclear on the default https://developer.enonic.com/docs/http-client-library/master#requestoptions
-		/*headers: {
-			'Accept-Language': 'nb, no, en-US, en pt-BR' // Localization
-		},*/
+		// headers: {
+		// 	'Accept-Language': 'nb, no, en-US, en pt-BR' // Localization
+		// },
 		method: 'GET',
 		url: `${hostname}${shortAbsolutePath}`
 	};
 	if (accessToken) {
 		metadataViewRequestParams.params = {
-			access_token: accessToken
+			// access_token: accessToken // 2024-09-16 Used to work
+			Authorization: `Bearer ${accessToken}` // 2024-09-16 Recommended by FotoWare support
 		};
 	}
 	DEBUG_REQUESTS && log.debug('metadataViewRequestParams:%s', toStr(metadataViewRequestParams));
 	const metadataViewResponse = request(metadataViewRequestParams);
 	DEBUG_REQUESTS && log.debug('metadataViewResponse:%s', toStr(metadataViewResponse));
+
+	// if (metadataViewResponse.status === 401) {
+	// 	log.error('metadataViewResponse:%s', toStr(metadataViewResponse));
+	// 	return;
+	// }
+	if (metadataViewResponse.status !== 200) {
+		log.error('metadataViewResponse:%s', toStr(metadataViewResponse));
+		return;
+	}
 
 	let metadataViewResponseBodyObj: MetadataView;
 	try {
@@ -54,26 +64,26 @@ export const getMetadataView = ({
 	} catch (e) {
 		throw new Error(`Something went wrong when trying to JSON parse the response body! metadataViewListResponse:${toStr(metadataViewResponse)}`);
 	}
-	//log.debug(`metadataViewResponseBodyObj:${toStr(metadataViewResponseBodyObj)}`);
+	log.debug('metadataViewResponseBodyObj:%s', toStr(metadataViewResponseBodyObj));
 
 	const {
-		id,
-		//href,
-		name,
+		// id,
+		// href,
+		// name,
 		builtinFields,
 		detailRegions, // Contains descriptions of all metadata fields (WARNING NO this turns out not to be true)
-		thumbnailFields//,
-		//preserveModificationTime,
-		//...rest
+		thumbnailFields // ,
+		// preserveModificationTime,
+		// ...rest
 	} = metadataViewResponseBodyObj;
-	//log.debug(`rest:${toStr(rest)}`);
+	// log.debug(`rest:${toStr(rest)}`);
 
-	//const fields = {};
+	// const fields = {};
 
-	//log.debug(`builtinFields:${toStr(builtinFields)}`);
+	// log.debug(`builtinFields:${toStr(builtinFields)}`);
 	Object.keys(builtinFields).forEach((k) => {
-		//log.debug(`k:${toStr(k)}`);
-		//log.debug(`builtinFields[${k}]:${toStr(builtinFields[k])}`);
+		// log.debug(`k:${toStr(k)}`);
+		// log.debug(`builtinFields[${k}]:${toStr(builtinFields[k])}`);
 		const {
 			id: fieldId,
 			...fieldRest
@@ -99,18 +109,18 @@ export const getMetadataView = ({
 	}) => {
 		detailRegionsObj[detailRegionName] = {};
 		detailRegionFields.forEach(({
-			//'taxonomy-only',
-			//isWritable,
-			//required,
+			// 'taxonomy-only',
+			// isWritable,
+			// required,
 			field: {
-				//label,
-				//'multi-instance',
-				//'max-size',
-				//multiline,
-				//'data-type',
-				//validation,
+				// label,
+				// 'multi-instance',
+				// 'max-size',
+				// multiline,
+				// 'data-type',
+				// validation,
 				id: fieldId,
-				//taxonomyHref,
+				// taxonomyHref,
 				...fieldRest
 			},
 			...fieldOuterRest
@@ -131,13 +141,13 @@ export const getMetadataView = ({
 		});
 	});
 
-	//log.debug(`thumbnailFields:${toStr(thumbnailFields)}`);
-	/*[
-		'secondLine', // single
-		'additionalFields', // array
-		'firstLine', // single
-		'label' // no field
-	]*/
+	// log.debug(`thumbnailFields:${toStr(thumbnailFields)}`);
+	// [
+	// 	'secondLine', // single
+	// 	'additionalFields', // array
+	// 	'firstLine', // single
+	// 	'label' // no field
+	// ]
 	Object.keys(thumbnailFields).forEach((k) => {
 		const aThumbnailFieldsArray = forceArray(thumbnailFields[k as ThumbnailFieldsKeys]);
 		aThumbnailFieldsArray.forEach(({field}) => {
@@ -156,17 +166,20 @@ export const getMetadataView = ({
 			}
 		}); // aThumbnailFieldsArray.forEach
 	});
-	//log.debug(`fields:${toStr(fields)}`);
+	// log.debug(`fields:${toStr(fields)}`);
 
-	const getMetadataViewReturnValue = {
-		id,
-		name,
-		fields,
-		builtinFields,
-		detailRegions: detailRegionsObj,
-		thumbnailFields
-	};
-	//log.debug(`getMetadataViewReturnValue:${toStr(getMetadataViewReturnValue)}`);
+	// NOTE: This module is only imported by /lib/fotoware/api/query.
+	// The return value is not used there.
+	//
+	// const getMetadataViewReturnValue = {
+	// 	id,
+	// 	name,
+	// 	fields,
+	// 	builtinFields,
+	// 	detailRegions: detailRegionsObj,
+	// 	thumbnailFields
+	// };
+	// // log.debug(`getMetadataViewReturnValue:${toStr(getMetadataViewReturnValue)}`);
 
-	return getMetadataViewReturnValue;
+	// return getMetadataViewReturnValue;
 }; // getMetadataView
