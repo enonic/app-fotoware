@@ -3,8 +3,8 @@ import type {
 	Asset,
 	AssetList,
 	CollectionList,
-	FieldDescriptionField,
-	MetadataItemWithValue
+	// FieldDescriptionField,
+	// MetadataItemWithValue
 } from '/lib/fotoware';
 
 
@@ -14,11 +14,11 @@ import {toStr} from '@enonic/js-utils';
 // @ts-expect-error TS7016: Could not find a declaration file for module 'encodeuricomponent-tag'
 import uri from 'encodeuricomponent-tag';
 
-//import * as deepEqual from 'fast-deep-equal';
-//import deepEqual from 'fast-deep-equal';
-import {getMetadataView} from '/lib/fotoware/api/metadata/get';
+// import * as deepEqual from 'fast-deep-equal';
+// import deepEqual from 'fast-deep-equal';
+// import {getMetadataView} from '/lib/fotoware/api/metadata/get';
 import {paginate} from '/lib/fotoware/api/paginate';
-import {camelize} from '/lib/fotoware/xp/camelize';
+// import {camelize} from '/lib/fotoware/xp/camelize';
 // @ts-expect-error TS2307: Cannot find module '/lib/http-client' or its corresponding type declarations.
 import {request} from '/lib/http-client';
 import {DEBUG_REQUESTS} from '../../../constants';
@@ -72,10 +72,10 @@ export function query(params: {
 			Accept: 'application/vnd.fotoware.collectionlist+json', // 200 OK
 			Authorization: `bearer ${accessToken}`
 		},
-		/*params: {
-			access_token: accessToken//,
-			//q
-		},*/
+		// params: {
+		// 	access_token: accessToken // ,
+		// 	// q
+		// },
 		url
 	}
 	DEBUG_REQUESTS && log.debug('queryRequest:%s', toStr(queryRequest));
@@ -88,10 +88,10 @@ export function query(params: {
 		throw new Error(`Something went wrong when querying:${q} HTTP Status:${queryRequestResponse.status}!`);
 	}
 
-	//log.debug(`body:${toStr(queryRequestResponse.body)}`);
+	// log.debug(`body:${toStr(queryRequestResponse.body)}`);
 
 	const collectionList = JSON.parse(queryRequestResponse.body) as CollectionList;
-	//log.debug(`collectionList:${toStr(collectionList)}`);
+	// log.debug(`collectionList:${toStr(collectionList)}`);
 
 	const {paging} = collectionList;
 	if (paging && paging.next) {
@@ -101,33 +101,33 @@ export function query(params: {
 	}
 
 	let assetCountTotal = 0;
-	const fields: Record<string, Omit<FieldDescriptionField, 'id'>> = {};
-	const unknownFields: Record<string, boolean> = {};
-	const metadataHrefs: Record<string, boolean> = {};
+	// const fields: Record<string, Omit<FieldDescriptionField, 'id'>> = {};
+	// const unknownFields: Record<string, boolean> = {}; // 2024-09-16 Not used
+	// const metadataHrefs: Record<string, boolean> = {};
 
 	const collections = collectionList.data.map(({
 		assetCount,
 		href,
-		metadataEditor: {
-			href: collectionMetadataHref
-		},
-		originalURL//,
-		//...rest
+		// metadataEditor: {
+		// 	href: collectionMetadataHref
+		// },
+		originalURL //,
+		// ...rest
 	}) => ({
 		assetCount,
 		collectionId: originalURL.replace(/\/$/, '').replace(/^.*\//, ''),
-		collectionMetadataHref,
-		href//,
-		//rest
+		// collectionMetadataHref,
+		href // ,
+		// rest
 	})).filter(({
 		assetCount,
-		collectionId//,
-		//rest
+		collectionId // ,
+		// rest
 	}) => { // False gets removed
-		//log.debug(`rest:${toStr(rest)}`);
+		// log.debug(`rest:${toStr(rest)}`);
 		// log.debug('assetCount:%s', toStr(assetCount));
 		if (!assetCount) {
-			//log.debug(`No hits collectionId:${toStr(collectionId)}`);
+			// log.debug(`No hits collectionId:${toStr(collectionId)}`);
 			return false;
 		}
 		// log.debug('whitelistedCollections:%s', toStr(whitelistedCollections));
@@ -138,43 +138,46 @@ export function query(params: {
 		}
 		// log.debug('blacklistedCollections:%s', toStr(blacklistedCollections));
 		if (Object.keys(blacklistedCollections).length && blacklistedCollections[collectionId]) {
-			//log.debug(`Blacklisted collectionId:${toStr(collectionId)}`);
+			// log.debug(`Blacklisted collectionId:${toStr(collectionId)}`);
 			return false;
 		}
 		return true;
 	}).map(({
 		assetCount,
 		collectionId,
-		collectionMetadataHref,
+		// collectionMetadataHref,
 		href
 	}) => {
-		//log.debug(`href:${toStr(href)}`); // /fotoweb/archives/5000-Archive/?q=
+		// log.debug(`href:${toStr(href)}`); // /fotoweb/archives/5000-Archive/?q=
 		assetCountTotal += assetCount;
 		// log.debug('metadataHrefs:%s', toStr(metadataHrefs));
-		if (!metadataHrefs[collectionMetadataHref]) {
-			//log.debug(`New metadataEditor in collection ${collectionId} href:${collectionMetadataHref}`);
-			metadataHrefs[collectionMetadataHref] = true;
-			getMetadataView({
-				accessToken,
-				fields,
-				hostname,
-				shortAbsolutePath: collectionMetadataHref
-			});
-		}
+
+		// 2024-09-16 The fields object isn't used for anything, so why even query for metadata???
+		// if (!metadataHrefs[collectionMetadataHref]) {
+		// 	//log.debug(`New metadataEditor in collection ${collectionId} href:${collectionMetadataHref}`);
+		// 	metadataHrefs[collectionMetadataHref] = true;
+		// 	getMetadataView({
+		// 		accessToken,
+		// 		fields, // object, gets modified inside the function
+		// 		hostname,
+		// 		shortAbsolutePath: collectionMetadataHref
+		// 	});
+		// }
+
 		// NOTE 17.7 seconds when processing metadata, 1.6 seconds when not
 		// Skipping the deepEqual wasn't good enough, still 17.6 seconds
 		// Skipping filter 17.3
 		// Skipping previous metadataHrefs 2.74 // I'm happy with this result
-		//const metaDataViews = {};
+		// const metaDataViews = {};
 		const collectionObj: CollectionObj = {
 			collectionId,
 			assetCount,
 			assets: []
 		};
 		paginate<AssetList>({
-			//doPaginate: false, // DEBUG
+			// doPaginate: false, // DEBUG
 			fnHandlePage: (page) => {
-				//log.debug(`page:${toStr(page)}`);
+				// log.debug(`page:${toStr(page)}`);
 				const {
 					data
 				} = page;
@@ -185,48 +188,53 @@ export function query(params: {
 					filesize,
 					href,
 					metadata,
-					metadataEditor: {
-						href: assetMetadataHref
-					},
-					renditions//,
-					//...pageRest
+					// metadataEditor: {
+					// 	href: assetMetadataHref
+					// },
+					renditions // ,
+					// ...pageRest
 				}) => {
-					//log.debug(`pageRest:${toStr(pageRest)}`);
-					if (!metadataHrefs[assetMetadataHref]) {
-						log.debug(`New metadataEditor in asset ${href} href:${assetMetadataHref}`); // Haven's seen this happen yet.
-						metadataHrefs[assetMetadataHref] = true;
-						getMetadataView({
-							accessToken,
-							fields,
-							hostname,
-							shortAbsolutePath: assetMetadataHref
-						});
-					}
-					const metadataObj: Record<string, MetadataItemWithValue['value']> = {};
-					Object.keys(metadata).forEach((k) => {
-						if(!metadata[k]) {
-							throw new Error(`Malformed metadata key:${k} metadata:${toStr(metadata)}`);
-						}
-						if (fields[k]) {
-							metadataObj[camelize((fields[k] as Omit<FieldDescriptionField, 'id'>).label.toLowerCase())] = (metadata[k] as MetadataItemWithValue).value;
-						} else {
-							if (!unknownFields[k]) {
-								unknownFields[k] = true;
-								log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])} assetHref:${href} editorHref:${assetMetadataHref}`);
-							}
-						}
-					});
-					//log.debug(`metadataArray:${toStr(metadataArray)}`);
+					// log.debug(`pageRest:${toStr(pageRest)}`);
+
+					// 2024-09-16 The fields object isn't used for anything, so why even query for metadata???
+					// if (!metadataHrefs[assetMetadataHref]) {
+					// 	log.debug(`New metadataEditor in asset ${href} href:${assetMetadataHref}`); // Haven's seen this happen yet.
+					// 	metadataHrefs[assetMetadataHref] = true;
+					// 	getMetadataView({
+					// 		accessToken,
+					// 		fields, // object, gets modified inside the function
+					// 		hostname,
+					// 		shortAbsolutePath: assetMetadataHref
+					// 	});
+					// }
+
+					// 2024-09-16 The metadataObj isn't used for anything, this code might have been important, can't remember why it was here:
+					// const metadataObj: Record<string, MetadataItemWithValue['value']> = {};
+					// Object.keys(metadata).forEach((k) => {
+					// 	if(!metadata[k]) {
+					// 		throw new Error(`Malformed metadata key:${k} metadata:${toStr(metadata)}`);
+					// 	}
+					// 	if (fields[k]) {
+					// 		metadataObj[camelize((fields[k] as Omit<FieldDescriptionField, 'id'>).label.toLowerCase())] = (metadata[k] as MetadataItemWithValue).value;
+					// 	} else {
+					// 		if (!unknownFields[k]) {
+					// 			unknownFields[k] = true;
+					// 			log.error(`Unable to find field:${k} metadata[${k}]:${toStr(metadata[k])} assetHref:${href} editorHref:${assetMetadataHref}`);
+					// 		}
+					// 	}
+					// });
+					// log.debug(`metadataArray:${toStr(metadataArray)}`);
+
 					collectionObj.assets.push({
 						doctype,
 						filename,
 						filesize,
 						href,
 						metadata,
-						//metadataObj,
+						// metadataObj, // 2024-09-16 This was already commented out, so it seems we're not even using it.
 						renditions
-						/*renditionHref: renditions
-							.filter(({original}) => original === true)[0].href*/
+						// renditionHref: renditions
+						// 	.filter(({original}) => original === true)[0].href
 					});
 				}); // assets forEach
 			}, // fnHandlePage
@@ -245,11 +253,11 @@ export function query(params: {
 		return collectionObj;
 	}); // collectionList.data.map
 
-	/*if (Object.keys(unknownFields).length) {
-		log.warning(`unknownFields:${toStr(Object.keys(unknownFields))}`);
-	}
+	// if (Object.keys(unknownFields).length) {
+	// 	log.warning(`unknownFields:${toStr(Object.keys(unknownFields))}`);
+	// }
 
-	log.debug(`fields:${toStr(fields)}`);*/
+	// log.debug(`fields:${toStr(fields)}`);
 
 	return {
 		assetCountTotal,
