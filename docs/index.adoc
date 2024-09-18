@@ -57,6 +57,27 @@ imports.myimport.project = myproject // <8>
 <10> Optionally specify query to use when finding what to import. Defaults to `fn:*.gif|fn:*.jpg|fn:*.jpeg|fn:*.png|fn:*.svg`.
 <11> Optionally specify a rendition in FotoWare. If the rendition is not supported by an asset type `Original File` is used. Default is `Original File`. Read more about renditions below.
 
+=== Metadata mappings
+
+NOTE: This feature is available from version 2.0.2
+
+The integration allows you to map metadata from FotoWare to Enonic. This is done by specifying the metadata field in FotoWare and the corresponding field in Enonic.
+
+Here is an example using the default configuration:
+
+.com.enonic.app.fotoware.cfg
+[source,cfg]
+----
+sites.mysite.metadata.mappings.5 = 'displayName'
+sites.mysite.metadata.mappings.25 = 'data.tags'
+sites.mysite.metadata.mappings.80 = 'data.artist'
+sites.mysite.metadata.mappings.116 = 'data.copyright'
+sites.mysite.metadata.mappings.120 = 'x.media.imageInfo.description' // <1>
+
+#sites.mysite.metadata.mappings.120 = 'x.media.imageInfo.description,data.altText' // <2>
+----
+<1> The metadata field named `120` in FotoWare is mapped to a field named `x.media.imageInfo.description` in Enonic.
+<2> In this outcommented example, the metadata field named `120` in FotoWare is mapped to multiple fields in Enonic. The first field is `x.media.imageInfo.description` and the second field is `data.altText`.
 
 == Auth
 To enable communication between Enonic and FotoWare, simply add an application in Fotoware from `Settings / Integrations / Applications`.
