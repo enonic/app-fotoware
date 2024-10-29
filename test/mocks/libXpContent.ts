@@ -45,8 +45,8 @@ export default function mockLibXpContent() {
 	});
 	contentConnection.publish({
 		keys: [createdFolder._id],
-		sourceBranch: 'draft', // ignored
-		targetBranch: 'master', // ignored
+		// sourceBranch: 'draft', // ignored
+		// targetBranch: 'master', // ignored
 	});
 
 	const mockModify = jest.fn<typeof importedModify>((...params) => contentConnection.modify(...params));

@@ -74,6 +74,7 @@
     "@enonic-types/lib-portal": "^7.13.0-B1",
     "@enonic-types/lib-repo": "^7.13.0-B1",
     "@enonic-types/lib-scheduler": "^7.13.0-B1",
+    "@enonic-types/lib-static": "^2.0.0",
     "@enonic-types/lib-task": "^7.13.0-B1",
     "@enonic/mock-xp": "^0.6.1",
     "@jest/globals": "^29",
@@ -112,7 +113,6 @@
     "webpack": "^5",
     "webpack-cli": "^4"
   },
-  "name": "TODO",
   "private": true,
   "scripts": {
     "build": "npx tsup -d build/resources/main",
