@@ -1,8 +1,10 @@
 {
 	// "extends": "../tsconfig.json", // Doesn't seem to work
+	"include": [
+		"./**/*.ts"
+	],
 	"compilerOptions": {
 		"allowJs": true,
-		"baseUrl": ".",
 		"declaration": false,
 		"declarationMap": false,
 		"downlevelIteration": true,
@@ -23,6 +25,7 @@
 		"noUnusedLocals": false, // Annoying while writing tests
 		"noUnusedParameters": true,
 		"paths": {
+			"/lib/enonic/static": ["../node_modules/@enonic-types/lib-static"],
 			"/lib/xp/admin": ["../node_modules/@enonic-types/lib-admin"],
 			"/lib/xp/auth": ["../node_modules/@enonic-types/lib-auth"],
 			"/lib/xp/common": ["../node_modules/@enonic-types/lib-common"],
@@ -61,7 +64,4 @@
 		],
 		"verbatimModuleSyntax": false,
 	},
-	"include": [
-		"./**/*.ts"
-	]
 }
