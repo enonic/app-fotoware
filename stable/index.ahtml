@@ -762,10 +762,7 @@ sites.mysite.metadata.mappings.120 = 'x.media.imageInfo.description' <i class="c
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API" class="bare">https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API</a></p>
-</li>
-<li>
-<p><a href="https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview" class="bare">https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview</a></p>
+<p><a href="https://learn.fotoware.com/en_US/integrations-and-apis" class="bare">https://learn.fotoware.com/en_US/integrations-and-apis</a></p>
 </li>
 <li>
 <p><a href="https://api.fotoware.com/" class="bare">https://api.fotoware.com/</a></p>
@@ -783,7 +780,7 @@ sites.mysite.metadata.mappings.120 = 'x.media.imageInfo.description' <i class="c
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://learn.fotoware.com/On-Premises/FotoWeb/Navigating_and_searching_to_find_your_assets/Searching_in_FotoWeb/001_Searching_for_assets/FotoWare_Search_Expressions_Reference" class="bare">https://learn.fotoware.com/On-Premises/FotoWeb/Navigating_and_searching_to_find_your_assets/Searching_in_FotoWeb/001_Searching_for_assets/FotoWare_Search_Expressions_Reference</a></p>
+<p><a href="https://learn.fotoware.com/metadata-in-the-fotoware-system/fotoweb-reference-of-search-expressions-used-to-create-queries-in-fotoweb?from_search=188109329&amp;swifty_search_highlight=query" class="bare">https://learn.fotoware.com/metadata-in-the-fotoware-system/fotoweb-reference-of-search-expressions-used-to-create-queries-in-fotoweb?from_search=188109329&amp;swifty_search_highlight=query</a></p>
 </li>
 </ul>
 </div>
@@ -837,7 +834,7 @@ sites.mysite.metadata.mappings.120 = 'x.media.imageInfo.description' <i class="c
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-20 09:00:39 UTC
+Last updated 2025-05-20 13:37:20 UTC
 </div>
 </div>
 </body>
