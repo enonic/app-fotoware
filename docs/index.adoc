@@ -133,8 +133,7 @@ To enable this, you need to perform the following steps in your FotoWare instanc
 
 The integration uses FotoWare's standard API. For more information about the API, vitsit their documentation:
 
-- https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API
-- https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview
+- https://learn.fotoware.com/en_US/integrations-and-apis
 - https://api.fotoware.com/
 
 
@@ -142,7 +141,7 @@ The integration uses FotoWare's standard API. For more information about the API
 
 For more details on how to create queries, visit the FotoWare documentation:
 
-- https://learn.fotoware.com/On-Premises/FotoWeb/Navigating_and_searching_to_find_your_assets/Searching_in_FotoWeb/001_Searching_for_assets/FotoWare_Search_Expressions_Reference
+- https://learn.fotoware.com/metadata-in-the-fotoware-system/fotoweb-reference-of-search-expressions-used-to-create-queries-in-fotoweb?from_search=188109329&swifty_search_highlight=query
 
 [WARNING]
 ====
