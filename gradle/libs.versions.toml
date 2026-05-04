@@ -1,0 +1,17 @@
+[versions]
+lib-admin-ui = "4.3.4"
+lib-galimatias = "1.0.0"
+lib-http-client = "3.2.2"
+lib-license = "3.1.0"
+lib-router = "3.2.0"
+lib-static = "2.1.1"
+lib-text-encoding = "2.1.1"
+
+[libraries]
+lib-admin-ui = { module = "com.enonic.lib:lib-admin-ui", version.ref = "lib-admin-ui" }
+lib-galimatias = { module = "com.enonic.lib:lib-galimatias", version.ref = "lib-galimatias" }
+lib-http-client = { module = "com.enonic.lib:lib-http-client", version.ref = "lib-http-client" }
+lib-license = { module = "com.enonic.lib:lib-license", version.ref = "lib-license" }
+lib-router = { module = "com.enonic.lib:lib-router", version.ref = "lib-router" }
+lib-static = { module = "com.enonic.lib:lib-static", version.ref = "lib-static" }
+lib-text-encoding = { module = "com.enonic.lib:lib-text-encoding", version.ref = "lib-text-encoding" }

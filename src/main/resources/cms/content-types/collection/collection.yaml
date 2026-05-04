@@ -1,0 +1,12 @@
+kind: "ContentType"
+title: "Collection"
+superType: "base:structured"
+final: true
+allowChildContent: true
+form:
+  - type: "TextLine"
+    name: "href"
+    label: "href"
+    occurrences:
+      min: 0
+      max: 1

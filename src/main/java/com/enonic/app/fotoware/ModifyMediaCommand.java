@@ -1,5 +1,9 @@
 package com.enonic.app.fotoware;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.common.io.ByteSource;
 
 import com.enonic.xp.content.Content;
@@ -53,12 +57,24 @@ public class ModifyMediaCommand
 		params.focalX( focalX );
 		params.focalY( focalY );
 		params.caption( caption );
-		params.artist( artist );
+		params.artist( splitCsv( artist ) );
 		params.copyright( copyright );
-		params.tags( tags );
+		params.tags( splitCsv( tags ) );
 
 		final Content result = this.contentService.update( params );
 		return new ContentMapper( result );
+	}
+
+	private static List<String> splitCsv( final String value )
+	{
+		if ( value == null || value.isBlank() )
+		{
+			return List.of();
+		}
+		return Arrays.stream( value.split( "," ) )
+			.map( String::trim )
+			.filter( s -> !s.isEmpty() )
+			.collect( Collectors.toList() );
 	}
 
 	private Content getExistingContent( final String key )
