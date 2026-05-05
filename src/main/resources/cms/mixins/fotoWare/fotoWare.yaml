@@ -1,0 +1,124 @@
+kind: "Mixin"
+title: "FotoWare"
+form:
+  - type: "ItemSet"
+    name: "metadata"
+    label: "Metadata"
+    occurrences:
+      min: 0
+      max: 1
+    items:
+      - type: "TextLine"
+        name: "10"
+        label: "10"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "101"
+        label: "101"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "105"
+        label: "105"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "230"
+        label: "230"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "320"
+        label: "320"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "801"
+        label: "801"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "802"
+        label: "802"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "803"
+        label: "803"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "804"
+        label: "804"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "806"
+        label: "806"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "807"
+        label: "807"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "808"
+        label: "808"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "809"
+        label: "809"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "810"
+        label: "810"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "811"
+        label: "811"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "812"
+        label: "812"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "813"
+        label: "813"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "820"
+        label: "820"
+        occurrences:
+          min: 0
+          max: 0
+      - type: "TextLine"
+        name: "821"
+        label: "821"
+        occurrences:
+          min: 0
+          max: 0

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-	<!--x-data name="fotoWare" allowContentTypes="^media:(archive|code|document|image|unknown|vector|video)$" optional="true"/-->
-	<x-data name="fotoWare" allowContentTypes="^media:.*$" optional="true"/>
-</site>

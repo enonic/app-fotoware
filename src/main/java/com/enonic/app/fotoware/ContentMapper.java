@@ -1,19 +1,11 @@
 package com.enonic.app.fotoware;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-
-import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.attachment.Attachments;
 import com.enonic.xp.content.Content;
 import com.enonic.xp.content.ContentInheritType;
 import com.enonic.xp.content.ContentPublishInfo;
-import com.enonic.xp.content.ExtraData;
-import com.enonic.xp.content.WorkflowCheckState;
 import com.enonic.xp.content.WorkflowInfo;
 import com.enonic.xp.data.PropertyTree;
 import com.enonic.xp.page.Page;
@@ -55,7 +47,6 @@ class ContentMapper
 		gen.value( "owner", value.getOwner() );
 		gen.value( "type", value.getType() );
 		gen.value( "displayName", value.getDisplayName() );
-		gen.value( "hasChildren", value.hasChildren() );
 		gen.value( "language", value.getLanguage() );
 		gen.value( "valid", value.isValid() );
 		gen.value( "originProject", value.getOriginProject() );
@@ -74,7 +65,6 @@ class ContentMapper
 		}
 
 		serializeData( gen, value.getData() );
-		serializeExtraData( gen, value.getAllExtraData() );
 		serializePage( gen, value.getPage() );
 		serializeAttachments( gen, value.getAttachments() );
 		serializePublishInfo( gen, value.getPublishInfo() );
@@ -94,9 +84,9 @@ class ContentMapper
 		gen.map( "publish" );
 		if ( info != null )
 		{
-			gen.value( "from", info.getFrom() );
-			gen.value( "to", info.getTo() );
-			gen.value( "first", info.getFirst() );
+			gen.value( "from", info.from() );
+			gen.value( "to", info.to() );
+			gen.value( "first", info.first() );
 		}
 		gen.end();
 	}
@@ -107,41 +97,6 @@ class ContentMapper
 		if ( info != null )
 		{
 			gen.value( "state", info.getState().toString() );
-			gen.map( "checks" );
-			for ( Map.Entry<String, WorkflowCheckState> e : info.getChecks().entrySet() )
-			{
-				gen.value( e.getKey(), e.getValue().toString() );
-			}
-			gen.end();
-		}
-		gen.end();
-	}
-
-	private void serializeExtraData( final MapGenerator gen, final Iterable<ExtraData> values )
-	{
-		gen.map( "x" );
-
-		final ListMultimap<ApplicationKey, ExtraData> extradatasByModule = ArrayListMultimap.create();
-		for ( ExtraData extraData : values )
-		{
-			extradatasByModule.put( extraData.getName().getApplicationKey(), extraData );
-		}
-
-		for ( final ApplicationKey applicationKey : extradatasByModule.keys() )
-		{
-			final List<ExtraData> extraDatas = extradatasByModule.get( applicationKey );
-			if ( extraDatas.isEmpty() )
-			{
-				continue;
-			}
-			gen.map( extraDatas.get( 0 ).getApplicationPrefix() );
-			for ( final ExtraData extraData : extraDatas )
-			{
-				gen.map( extraData.getName().getLocalName() );
-				new PropertyTreeMapper( extraData.getData() ).serialize( gen );
-				gen.end();
-			}
-			gen.end();
 		}
 		gen.end();
 	}

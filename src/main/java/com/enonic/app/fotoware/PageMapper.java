@@ -1,13 +1,10 @@
 package com.enonic.app.fotoware;
 
-import com.enonic.xp.lib.common.PropertyTreeMapper;
-import com.enonic.xp.lib.content.mapper.ComponentMapper;
-import com.enonic.xp.lib.content.mapper.RegionMapper;
 import com.enonic.xp.page.Page;
-import com.enonic.xp.page.PageRegions;
 import com.enonic.xp.region.Component;
 import com.enonic.xp.region.ComponentPath;
 import com.enonic.xp.region.Region;
+import com.enonic.xp.region.Regions;
 import com.enonic.xp.script.serializer.MapGenerator;
 import com.enonic.xp.script.serializer.MapSerializable;
 
@@ -46,9 +43,8 @@ public final class PageMapper
 	private void serializeFragment( final MapGenerator gen, final Component value )
 	{
 		gen.map( "fragment" );
-
-		new ComponentMapper( value ).serialize( gen );
-
+		gen.value( "type", value.getType().toString() );
+		gen.value( "path", value.getPath() != null ? value.getPath().toString() : null );
 		gen.end();
 	}
 
@@ -75,7 +71,7 @@ public final class PageMapper
 		gen.end();
 	}
 
-	private void serializeRegions( final MapGenerator gen, final PageRegions values )
+	private void serializeRegions( final MapGenerator gen, final Regions values )
 	{
 		gen.map( "regions" );
 
@@ -83,7 +79,15 @@ public final class PageMapper
 		{
 			for ( final Region region : values )
 			{
-				new RegionMapper( region ).serialize( gen );
+				gen.map( region.getName() );
+				gen.value( "name", region.getName() );
+				gen.array( "components" );
+				for ( final Component component : region.getComponents() )
+				{
+					gen.value( component.getType().toString() );
+				}
+				gen.end();
+				gen.end();
 			}
 		}
 

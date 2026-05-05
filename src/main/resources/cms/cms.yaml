@@ -1,0 +1,5 @@
+kind: "CMS"
+mixins:
+  - name: "com.enonic.app.fotoware:fotoWare"
+    allowContentTypes: "^media:.*$"
+    optional: true

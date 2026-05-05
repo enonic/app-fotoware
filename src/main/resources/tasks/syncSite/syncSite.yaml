@@ -1,0 +1,112 @@
+kind: "Task"
+description: "Sync a FotoWare site"
+form:
+  - type: "TextLine"
+    name: "archiveName"
+    label: "archiveName"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "taskNodeId"
+    label: "taskNodeId"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "CheckBox"
+    name: "boolResume"
+    label: "Resume?"
+    default: "checked"
+    occurrences:
+      min: 0
+      max: 1
+  - type: "TextLine"
+    name: "clientId"
+    label: "clientId"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "clientSecret"
+    label: "clientSecret"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "importName"
+    label: "Import name"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "json"
+    label: "JSON"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "path"
+    label: "path"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "project"
+    label: "project"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "propertyArtist"
+    label: "propertyArtist"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "propertyCopyright"
+    label: "propertyCopyright"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "propertyDescription"
+    label: "propertyDescription"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "propertyDisplayName"
+    label: "propertyDisplayName"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "propertyTags"
+    label: "propertyTags"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "query"
+    label: "query"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "rendition"
+    label: "rendition"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "site"
+    label: "site"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "url"
+    label: "url"
+    occurrences:
+      min: 1
+      max: 1

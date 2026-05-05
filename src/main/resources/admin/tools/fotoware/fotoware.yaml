@@ -1,0 +1,9 @@
+kind: "AdminTool"
+title: "FotoWare"
+description: "Integration"
+allow:
+  - "role:system.admin"
+apis:
+  - "admin:extension"
+  - "admin:event"
+  - "admin:status"
