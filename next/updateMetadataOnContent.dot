@@ -1,0 +1,51 @@
+digraph {
+	webapp -> assetIngested
+
+	modifyMediaContent -> updateMetadataOnContent
+	handleExistingMediaContent -> updateMetadataOnContent
+	assetIngested -> updateMetadataOnContent
+
+	handleExistingMediaContent -> modifyMediaContent
+	handleMissingMediaContent -> modifyMediaContent
+	assetIngested -> modifyMediaContent
+
+	handleAssetTask -> handleExistingMediaContent
+
+
+	handleAssetTask -> handleMissingMediaContent
+
+
+	modifyInImport -> handleAssetTask
+
+	handleAssetModifiedHookTask -> modifyInImport
+
+	assetModified -> handleAssetModifiedHookTask
+
+	webapp -> assetModified
+
+	webapp -> assetDeleted
+	webapp -> exportPublished
+	webapp -> exportRevoked
+
+	Admin -> syncSiteTask
+	syncSiteTask -> handleNewMedia
+	syncSiteTask -> handleExistingMedia
+	handleExistingMedia -> updateMetadataOnContent
+	handleExistingMedia -> modifyMediaContent
+	handleNewMedia -> modifyMediaContent
+
+
+	// http-requests
+	Admin [color = red]
+	assetDeleted [color = red]
+	assetIngested [color = red]
+	assetModified  [color = red]
+	exportPublished [color = red]
+	exportRevoked [color = red]
+	webapp [color = red]
+
+	// Tasks:
+	handleAssetModifiedHookTask [color = blue]
+	handleAssetTask [color = blue]
+	syncSiteTask [color = blue]
+}
