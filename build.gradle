@@ -32,9 +32,7 @@ dependencies {
 	include xplibs.task
 
 	include libs.lib.admin.ui
-	include(libs.lib.galimatias) {
-		exclude group: 'com.enonic.xp'
-	}
+	include libs.lib.galimatias
 	include libs.lib.http.client
 	include libs.lib.license
 	include libs.lib.router
