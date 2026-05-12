@@ -107,6 +107,7 @@ describe('handleExistingMediaContent', () => {
 		data: readFileSync(join(__dirname, '../../mocks/responses', FILENAME)) as unknown as ByteSource,
 		name: FILENAME,
 		parentPath: '/EnonicWare',
+		// @ts-expect-error mimeType is consumed by @enonic/mock-xp but not part of XP 8 CreateMediaParams (auto-detected at runtime)
 		mimeType: 'image/webp',
 		focalX: 0.5,
 		focalY: 0.5,

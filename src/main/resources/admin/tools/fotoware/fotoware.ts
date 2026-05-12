@@ -9,11 +9,6 @@ import {validateLicense} from '/lib/license';
 // @ts-expect-error TS2307: Cannot find module '/lib/router' or its corresponding type declarations.
 import Router from '/lib/router';
 import {
-	getBaseUri,
-	getLauncherPath,
-	getLauncherUrl
-} from '/lib/xp/admin';
-import {
 	getResource,
 	readText
 } from '/lib/xp/io';
@@ -155,14 +150,11 @@ function get(/*request*/) {
 
 		<script type="text/javascript">
 			var CONFIG = {
-				//adminUrl: '${getBaseUri()}',
 				//appId: '${app.name}',
-				launcherUrl: '${getLauncherUrl()}',
 				services: {}, // Workaround for i18nUrl BUG
 				xpVersion: '7.1.3'
 			};
 		</script>
-		<script defer type="text/javascript" src="${getLauncherPath()}"></script>
 	</body>
 </html>`,
 		contentType: 'text/html; charset=utf-8'
