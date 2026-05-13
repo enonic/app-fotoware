@@ -468,7 +468,7 @@ export function run(params: {
 					branch: REPO_BRANCH
 				});
 				//const modifyTaskNodeRes =
-				suConnection.modify<TaskNodeData>({
+				suConnection.update<TaskNodeData>({
 					key: taskNodeId,
 					editor: (node) => {
 						//log.debug(`journal:${toStr(journal)}`);

@@ -109,7 +109,7 @@ export function post(request: Request<{
 		});
 		if(boolStop) {
 			if (taskNodeId) {
-				suConnection.modify<TaskNodeData>({
+				suConnection.update<TaskNodeData>({
 					key: taskNodeId,
 					editor: (node) => {
 						node.data.shouldStop = true;
