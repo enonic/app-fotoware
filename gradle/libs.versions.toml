@@ -3,9 +3,9 @@ lib-admin-ui = "4.3.4"
 lib-galimatias = "2.0.0-SNAPSHOT"
 lib-http-client = "4.0.0-SNAPSHOT"
 lib-license = "4.0.0-SNAPSHOT"
-lib-router = "3.2.0"
-lib-static = "2.1.1"
-lib-text-encoding = "2.1.1"
+lib-router = "4.0.0-SNAPSHOT"
+lib-static = "3.0.0-SNAPSHOT"
+lib-text-encoding = "3.0.0-SNAPSHOT"
 
 [libraries]
 lib-admin-ui = { module = "com.enonic.lib:lib-admin-ui", version.ref = "lib-admin-ui" }
