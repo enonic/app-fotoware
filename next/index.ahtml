@@ -762,7 +762,10 @@ sites.mysite.metadata.mappings.120 = 'x.media.imageInfo.description' <i class="c
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://learn.fotoware.com/en_US/integrations-and-apis" class="bare">https://learn.fotoware.com/en_US/integrations-and-apis</a></p>
+<p><a href="https://fotoware.helpjuice.com/en_US/integrations-and-apis" class="bare">https://fotoware.helpjuice.com/en_US/integrations-and-apis</a></p>
+</li>
+<li>
+<p><a href="https://fotoware.helpjuice.com/en_US/fotoware-api-overview" class="bare">https://fotoware.helpjuice.com/en_US/fotoware-api-overview</a></p>
 </li>
 <li>
 <p><a href="https://api.fotoware.com/" class="bare">https://api.fotoware.com/</a></p>
@@ -834,7 +837,7 @@ sites.mysite.metadata.mappings.120 = 'x.media.imageInfo.description' <i class="c
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-05-06 12:29:08 UTC
+Last updated 2026-06-10 11:48:08 UTC
 </div>
 </div>
 </body>
