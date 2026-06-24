@@ -112,10 +112,9 @@ To enable this, you need to perform the following steps in your FotoWare instanc
 
 The integration uses FotoWare's standard API. For more information about the API, vitsit their documentation:
 
-- https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API
-- https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview
+- https://fotoware.helpjuice.com/en_US/integrations-and-apis
+- https://fotoware.helpjuice.com/en_US/fotoware-api-overview
 - https://api.fotoware.com/
-
 
 == Query
 
