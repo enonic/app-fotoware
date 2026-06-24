@@ -713,10 +713,10 @@ imports.myimport.project = myproject <i class="conum" data-value="8"></i><b>(8)<
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API" class="bare">https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API</a></p>
+<p><a href="https://fotoware.helpjuice.com/en_US/integrations-and-apis" class="bare">https://fotoware.helpjuice.com/en_US/integrations-and-apis</a></p>
 </li>
 <li>
-<p><a href="https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview" class="bare">https://learn.fotoware.com/Integrations_and_APIs/001_The_FotoWare_API/FotoWare_API_Overview</a></p>
+<p><a href="https://fotoware.helpjuice.com/en_US/fotoware-api-overview" class="bare">https://fotoware.helpjuice.com/en_US/fotoware-api-overview</a></p>
 </li>
 <li>
 <p><a href="https://api.fotoware.com/" class="bare">https://api.fotoware.com/</a></p>
@@ -788,7 +788,7 @@ imports.myimport.project = myproject <i class="conum" data-value="8"></i><b>(8)<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-06-10 11:47:42 UTC
+Last updated 2026-06-24 14:40:30 UTC
 </div>
 </div>
 </body>
