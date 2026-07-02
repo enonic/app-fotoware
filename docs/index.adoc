@@ -2,6 +2,8 @@
 :toc: right
 :imagesdir: media
 
+NOTE: Versions 2.x target XP 7+.
+
 Configure Enonic to import your media from Fotoware seamlessly in the background
 
 == Introduction
