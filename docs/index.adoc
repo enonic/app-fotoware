@@ -59,8 +59,6 @@ imports.myimport.project = myproject // <8>
 
 === Metadata mappings
 
-NOTE: This feature is available from version 2.0.2
-
 The integration allows you to map metadata from FotoWare to Enonic. This is done by specifying the metadata field in FotoWare and the corresponding field in Enonic.
 
 Here is an example using the default configuration:
