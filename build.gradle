@@ -38,6 +38,10 @@ dependencies {
 	include libs.lib.router
 	include libs.lib.static
 	include libs.lib.text.encoding
+
+	testImplementation "com.enonic.xp:testing:${xpVersion}"
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:6.1.1'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.1'
 }
 
 
@@ -84,6 +88,19 @@ task npmBuild(type: NpmTask) {
 }
 
 jar.dependsOn npmBuild
+
+tasks.named('compileTestJava') {
+	dependsOn npmBuild
+}
+
+test {
+	dependsOn npmBuild
+	useJUnitPlatform()
+}
+
+xp {
+	scriptEngines = ['Nashorn', 'GraalJS']
+}
 
 processResources {
 	exclude '**/.gitkeep'
