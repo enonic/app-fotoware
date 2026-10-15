@@ -1,7 +1,7 @@
 [versions]
 lib-admin-ui = "4.3.4"
 lib-galimatias = "2.0.0-SNAPSHOT"
-lib-http-client = "4.0.0"
+lib-http-client = "4.0.1"
 lib-license = "4.0.0"
 lib-router = "4.0.0"
 lib-static = "3.0.0"
