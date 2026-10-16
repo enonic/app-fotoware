@@ -6,4 +6,3 @@ allow:
 apis:
   - "admin:extension"
   - "admin:event"
-  - "admin:status"
